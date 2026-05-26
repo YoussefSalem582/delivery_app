@@ -56,6 +56,8 @@
   "no_notifications": "لا توجد إشعارات بعد",
   "mark_read": "تحديد كمقروء",
   "error_required": "مطلوب",
+  "error_email_invalid": "أدخل بريداً إلكترونياً صالحاً",
+  "error_password_short": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
   "offline_banner": "أنت غير متصل",
   "offline_trips_banner": "أنت غير متصل حالياً. يتم عرض الرحلات المحفوظة.",
   "today": "اليوم",
@@ -82,5 +84,6 @@
   "home_tab": "الرئيسية",
   "trips_tab": "الرحلات",
   "notifications_tab": "التنبيهات",
-  "profile_tab": "الملف"
+  "profile_tab": "الملف",
+  "open_in_maps": "فتح في الخرائط"
 }

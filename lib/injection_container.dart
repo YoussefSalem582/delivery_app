@@ -22,6 +22,8 @@ import 'package:delivery_app/core/architecture/repositories/trip_repository.dart
 import 'package:delivery_app/core/architecture/repositories/trip_repository_impl.dart';
 import 'package:delivery_app/core/network/dio_client.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/core/network/route_service.dart';
+import 'package:delivery_app/core/utils/map_tile_cache.dart';
 import 'package:delivery_app/core/sync/sync_service.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
 import 'package:delivery_app/core/utils/talker_setup.dart';
@@ -61,6 +63,8 @@ Future<void> initDependencies() async {
 
   sl.registerLazySingleton(() => Connectivity());
   sl.registerLazySingleton<Dio>(() => createDioClient(sl<Talker>()));
+  sl.registerLazySingleton(() => RouteService(sl(), sl()));
+  await MapTileCache.init();
 
   sl.registerLazySingleton(() => TripLocalDataSource(sl()));
   sl.registerLazySingleton(() => TripRemoteDataSource(sl()));
@@ -120,7 +124,7 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory(() => RequestRideBloc(repository: sl(), fcmService: sl()));
   sl.registerFactory(() => MapBloc());
-  sl.registerFactory(() => TrackingBloc());
+  sl.registerFactory(() => TrackingBloc(sl()));
   sl.registerFactory(() => OrderBloc(sl()));
   sl.registerLazySingleton(() => NotificationBloc(sl()));
 

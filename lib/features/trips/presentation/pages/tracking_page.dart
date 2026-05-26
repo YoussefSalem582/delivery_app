@@ -3,14 +3,18 @@ import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
-import 'package:delivery_app/core/utils/ui_helpers.dart';
+import 'package:delivery_app/core/utils/map_launcher.dart';
+import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
+import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 @RoutePage()
 class TrackingPage extends StatefulWidget {
@@ -25,6 +29,7 @@ class TrackingPage extends StatefulWidget {
 class _TrackingPageState extends State<TrackingPage> {
   TripEntity? _trip;
   late final TrackingBloc _trackingBloc;
+  final _mapKey = GlobalKey<DeliveryMapState>();
 
   @override
   void initState() {
@@ -54,7 +59,13 @@ class _TrackingPageState extends State<TrackingPage> {
     if (_trip == null) {
       return Scaffold(
         appBar: AppBar(title: Text('tracking_title'.tr())),
-        body: LoadingView(message: 'loading'),
+        body: Skeletonizer(
+          enabled: true,
+          child: ListView(
+            padding: const EdgeInsets.all(NoktaSpacing.md),
+            children: const [SkeletonTripCard(), SkeletonTripCard()],
+          ),
+        ),
       );
     }
 
@@ -97,19 +108,38 @@ class _TrackingPageState extends State<TrackingPage> {
         ),
         body: BlocBuilder<TrackingBloc, TrackingState>(
           builder: (context, state) {
+            if (state is TrackingLoading) {
+              return Skeletonizer(
+                enabled: true,
+                child: ListView(
+                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  children: const [SkeletonTripCard()],
+                ),
+              );
+            }
+
             if (state is! TrackingActive) {
-              return LoadingView(message: 'loading');
+              return Skeletonizer(
+                enabled: true,
+                child: ListView(
+                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  children: const [SkeletonTripCard()],
+                ),
+              );
             }
 
             final active = state;
             final scheme = Theme.of(context).colorScheme;
+            final driverName = active.trip.driverName ?? 'driver'.tr();
 
             return Stack(
               children: [
                 DeliveryMap(
+                  key: _mapKey,
                   center: active.driverPosition,
                   zoom: MapConfig.defaultZoom,
                   followCenter: true,
+                  fitRouteBounds: true,
                   polylines: active.route,
                   markers: [
                     MapMarkerData(
@@ -133,9 +163,10 @@ class _TrackingPageState extends State<TrackingPage> {
                 ),
                 Positioned(
                   right: NoktaSpacing.md,
-                  bottom: 200,
+                  bottom: 260,
                   child: FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: () =>
+                        _mapKey.currentState?.recenter(active.driverPosition),
                     child: const Icon(Icons.my_location),
                   ),
                 ),
@@ -179,7 +210,10 @@ class _TrackingPageState extends State<TrackingPage> {
                                   ),
                                   Text(
                                     '${active.etaMinutes} ${'minutes'.tr()}',
-                                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .displayLarge
+                                        ?.copyWith(
                                           color: scheme.primary,
                                           fontSize: 40,
                                           height: 1,
@@ -188,7 +222,10 @@ class _TrackingPageState extends State<TrackingPage> {
                                 ],
                               ),
                             ),
-                            NoktaStatusChip(status: active.trip.status, compact: true),
+                            NoktaStatusChip(
+                              status: active.trip.status,
+                              compact: true,
+                            ),
                           ],
                         ),
                         Divider(
@@ -197,10 +234,10 @@ class _TrackingPageState extends State<TrackingPage> {
                         ),
                         Row(
                           children: [
-                            CircleAvatar(
+                            AvatarImage(
+                              imageUrl: active.trip.driverAvatarUrl,
+                              fallback: driverName,
                               radius: 24,
-                              backgroundColor: scheme.surfaceContainerHigh,
-                              child: Icon(Icons.person, color: scheme.outline),
                             ),
                             const SizedBox(width: NoktaSpacing.md),
                             Expanded(
@@ -208,8 +245,11 @@ class _TrackingPageState extends State<TrackingPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${'driver'.tr()}: ${active.trip.driverName ?? 'driver'.tr()}',
-                                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    '${'driver'.tr()}: $driverName',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(
                                           color: scheme.onSurface,
                                         ),
                                   ),
@@ -221,7 +261,12 @@ class _TrackingPageState extends State<TrackingPage> {
                                         color: NoktaColors.tertiaryFixedDim,
                                       ),
                                       const SizedBox(width: 4),
-                                      Text('4.9', style: Theme.of(context).textTheme.bodyMedium),
+                                      Text(
+                                        '4.9',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -239,10 +284,23 @@ class _TrackingPageState extends State<TrackingPage> {
                             color: scheme.primary,
                           ),
                         ),
+                        const SizedBox(height: NoktaSpacing.md),
+                        OutlinedButton.icon(
+                          onPressed: () => openExternalMaps(
+                            lat: active.trip.dropoffLat,
+                            lng: active.trip.dropoffLng,
+                            label: active.trip.dropoffAddress,
+                          ),
+                          icon: const Icon(Icons.map_outlined),
+                          label: Text('open_in_maps'.tr()),
+                        ),
                       ],
                     ),
                   ),
-                ),
+                )
+                    .animate()
+                    .fadeIn(duration: 400.ms)
+                    .slideY(begin: 0.15, end: 0, curve: Curves.easeOutCubic),
               ],
             );
           },

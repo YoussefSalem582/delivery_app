@@ -10,6 +10,7 @@
     "status": "completed",
     "driverName": "Ahmed Hassan",
     "driverPhone": "+201234567890",
+    "driverAvatarUrl": "https://i.pravatar.cc/150?img=12",
     "fare": 125.50,
     "createdAt": "2026-05-20T10:30:00.000Z",
     "updatedAt": "2026-05-20T11:15:00.000Z"
@@ -25,6 +26,7 @@
     "status": "inProgress",
     "driverName": "Sara Mohamed",
     "driverPhone": "+201987654321",
+    "driverAvatarUrl": "https://i.pravatar.cc/150?img=47",
     "fare": 85.00,
     "createdAt": "2026-05-25T14:00:00.000Z",
     "updatedAt": "2026-05-25T14:20:00.000Z"

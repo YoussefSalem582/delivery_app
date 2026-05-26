@@ -3,12 +3,15 @@ import 'package:delivery_app/core/sync/sync_service.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_card.dart';
+import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_list_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 @RoutePage()
 class TripListPage extends StatelessWidget {
@@ -50,7 +53,19 @@ class TripListPage extends StatelessWidget {
         body: BlocBuilder<TripListBloc, TripListState>(
           builder: (context, state) {
             if (state is TripListLoading) {
-              return LoadingView(message: 'loading');
+              return Skeletonizer(
+                enabled: true,
+                child: ListView(
+                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  children: List.generate(
+                    4,
+                    (_) => const Padding(
+                      padding: EdgeInsets.only(bottom: NoktaSpacing.md),
+                      child: SkeletonTripCard(),
+                    ),
+                  ),
+                ),
+              );
             }
             if (state is TripListError) {
               return ErrorView(
@@ -87,14 +102,25 @@ class TripListPage extends StatelessWidget {
                   padding: const EdgeInsets.all(NoktaSpacing.md),
                   children: [
                     if (state.isOffline) const NoktaOfflineTripsBanner(),
-                    ...state.trips.map(
-                      (trip) => Padding(
+                    ...state.trips.asMap().entries.map(
+                      (entry) => Padding(
                         padding: const EdgeInsets.only(bottom: NoktaSpacing.md),
                         child: NoktaTripCard(
-                          trip: trip,
-                          onTap: () =>
-                              context.router.push(TripDetailRoute(tripId: trip.id)),
-                        ),
+                          trip: entry.value,
+                          onTap: () => context.router.push(
+                            TripDetailRoute(tripId: entry.value.id),
+                          ),
+                        )
+                            .animate()
+                            .fadeIn(
+                              delay: (entry.key * 80).ms,
+                              duration: 350.ms,
+                            )
+                            .slideX(
+                              begin: 0.05,
+                              end: 0,
+                              curve: Curves.easeOutCubic,
+                            ),
                       ),
                     ),
                   ],

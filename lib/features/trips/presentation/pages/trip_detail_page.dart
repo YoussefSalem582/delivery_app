@@ -1,16 +1,20 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
+import 'package:delivery_app/core/utils/map_launcher.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
+import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_card.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
+import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_detail_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 @RoutePage()
 class TripDetailPage extends StatelessWidget {
@@ -35,7 +39,13 @@ class TripDetailPage extends StatelessWidget {
         body: BlocBuilder<TripDetailBloc, TripDetailState>(
           builder: (context, state) {
             if (state is TripDetailLoading) {
-              return LoadingView(message: 'loading');
+              return Skeletonizer(
+                enabled: true,
+                child: ListView(
+                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  children: const [SkeletonTripCard(), SkeletonTripCard()],
+                ),
+              );
             }
             if (state is TripDetailError) {
               return ErrorView(message: state.message);
@@ -76,6 +86,7 @@ class _TripDetailBody extends StatelessWidget {
           _DriverCard(
             name: trip.driverName ?? 'driver'.tr(),
             phone: trip.driverPhone,
+            avatarUrl: trip.driverAvatarUrl,
           ),
           const SizedBox(height: NoktaSpacing.md),
           _StatusTimeline(status: trip.status),
@@ -84,6 +95,22 @@ class _TripDetailBody extends StatelessWidget {
             label: 'track_trip'.tr(),
             icon: Icons.navigation,
             onPressed: () => context.router.push(TrackingRoute(tripId: trip.id)),
+          ),
+          const SizedBox(height: NoktaSpacing.sm),
+          OutlinedButton.icon(
+            onPressed: () => openExternalMaps(
+              lat: trip.dropoffLat,
+              lng: trip.dropoffLng,
+              label: trip.dropoffAddress,
+            ),
+            icon: const Icon(Icons.map_outlined),
+            label: Text('open_in_maps'.tr()),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(NoktaSpacing.buttonHeight),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+              ),
+            ),
           ),
           if (trip.status != TripStatus.completed &&
               trip.status != TripStatus.cancelled) ...[
@@ -123,10 +150,15 @@ class _TripDetailBody extends StatelessWidget {
 }
 
 class _DriverCard extends StatelessWidget {
-  const _DriverCard({required this.name, this.phone});
+  const _DriverCard({
+    required this.name,
+    this.phone,
+    this.avatarUrl,
+  });
 
   final String name;
   final String? phone;
+  final String? avatarUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -141,10 +173,10 @@ class _DriverCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
+          AvatarImage(
+            imageUrl: avatarUrl,
+            fallback: name,
             radius: 24,
-            backgroundColor: scheme.surfaceContainer,
-            child: Icon(Icons.person, color: scheme.outline),
           ),
           const SizedBox(width: NoktaSpacing.md),
           Expanded(

@@ -11,7 +11,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:talker_flutter/talker_flutter.dart';
+import 'package:toastification/toastification.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +30,11 @@ Future<void> main() async {
 
   await initDependencies();
 
+  final savedLocale = sl<LocaleCubit>().state;
+  if (savedLocale == 'ar') {
+    await GoogleFonts.pendingFonts([GoogleFonts.cairo()]);
+  }
+
   final talker = sl<Talker>();
   Bloc.observer = createTalkerBlocObserver(talker);
 
@@ -39,7 +46,9 @@ Future<void> main() async {
       supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: const DeliveryApp(),
+      child: ToastificationWrapper(
+        child: const DeliveryApp(),
+      ),
     ),
   );
 }
@@ -62,6 +71,7 @@ class DeliveryApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
+          final localeCode = context.locale.languageCode;
           return MaterialApp.router(
             // OS task switcher title — avoid .tr() here; delegates may not be loaded yet.
             title: 'Nokta',
@@ -69,8 +79,8 @@ class DeliveryApp extends StatelessWidget {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            theme: AppTheme.light(),
-            darkTheme: AppTheme.dark(),
+            theme: AppTheme.light(locale: localeCode),
+            darkTheme: AppTheme.dark(locale: localeCode),
             themeMode: themeMode,
             routerConfig: sl<AppRouter>().config(),
           );

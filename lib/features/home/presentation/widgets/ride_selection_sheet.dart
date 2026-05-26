@@ -1,10 +1,12 @@
 import 'package:delivery_app/core/theme/nokta_colors.dart';
+import 'package:delivery_app/core/utils/app_toast.dart';
 import 'package:delivery_app/core/widgets/nokta_bottom_nav_bar.dart';
 import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
 import 'package:delivery_app/core/widgets/nokta_ride_option.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RideSelectionSheet extends StatefulWidget {
@@ -52,9 +54,7 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
             if (state is RequestRideSuccess) {
               Navigator.of(context).pop(state.trip);
             } else if (state is RequestRideError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              AppToast.error(context, state.message);
             }
           },
           builder: (context, state) {
@@ -118,7 +118,10 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                               ),
                             );
                       },
-                    ),
+                    )
+                        .animate()
+                        .fadeIn(duration: 300.ms)
+                        .slideY(begin: 0.1, end: 0),
                   ],
                 ),
               ),
@@ -144,36 +147,51 @@ class _PaymentChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: compact ? scheme.primary : scheme.onSurface,
+        );
+
+    if (compact) {
+      return Container(
+        height: NoktaSpacing.buttonHeight,
+        padding: const EdgeInsets.symmetric(horizontal: NoktaSpacing.md),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: textStyle,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      );
+    }
 
     return Container(
       height: NoktaSpacing.buttonHeight,
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? NoktaSpacing.md : NoktaSpacing.md,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: NoktaSpacing.md),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Row(
-        mainAxisAlignment:
-            compact ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
         children: [
           if (icon != null) ...[
             Icon(icon, size: 20, color: scheme.primary),
             const SizedBox(width: NoktaSpacing.sm),
           ],
-          Flexible(
+          Expanded(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: compact ? scheme.primary : scheme.onSurface,
-                  ),
+              style: textStyle,
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (!compact)
-            Icon(Icons.expand_more, color: scheme.onSurfaceVariant),
+          Icon(Icons.expand_more, color: scheme.onSurfaceVariant),
         ],
       ),
     );

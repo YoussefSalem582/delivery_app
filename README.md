@@ -7,9 +7,10 @@
 - **Clean Architecture** — `data` / `domain` (entities + repos) / `presentation` (BLoC + UI)
 - **Offline-first** — Hive cache for trips, orders, user, notifications; pending sync queue
 - **Dual sync** — `connectivity_plus` reconnect sync + `workmanager` periodic background task
-- **Maps & tracking** — flutter_map (OpenStreetMap tiles), geolocator live position, simulated driver polyline animation
+- **Maps & tracking** — flutter_map (OpenStreetMap tiles), OSRM road-following routes, tile disk cache, animated camera, live location marker, geolocator, driver polyline animation
 - **Push notifications** — Firebase Cloud Messaging + simulated fallback for demo without Firebase
-- **Themes & i18n** — Dark/light mode, English/Arabic with RTL via `easy_localization`
+- **Themes & i18n** — Dark/light mode, Inter + Cairo typography (locale-aware), English/Arabic with RTL via `easy_localization`
+- **UI polish** — Skeleton loaders, toast notifications, form validation (Formz), staggered animations, cached avatars
 - **Observability** — Talker logs for Dio, BLoC, and in-app debug console (long-press profile avatar)
 - **Navigation** — AutoRoute with tab shell + deep links to trip detail/tracking
 
@@ -46,7 +47,11 @@ dart run build_runner build --delete-conflicting-outputs
 
 Maps use **OpenStreetMap** tiles via `flutter_map` — no API key required for the demo.
 
-Tile URL is configured in `lib/core/utils/map_config.dart`. For production, consider a tile provider with usage terms that fit your app (Mapbox, Stadia, self-hosted tiles, etc.).
+Tile URL is configured in `lib/core/utils/map_config.dart`. Tiles are cached on disk via `flutter_map_cache` + `http_cache_file_store` (see `lib/core/utils/map_tile_cache.dart`).
+
+**Routing** uses the free [OSRM demo server](https://router.project-osrm.org/) through `RouteService`. Routes are memory-cached and fall back to a straight line when offline. Attribution: © [OSRM contributors](https://project-osrm.org/).
+
+For production, consider a tile provider with usage terms that fit your app (Mapbox, Stadia, self-hosted tiles, etc.) and a dedicated routing backend with rate limits.
 
 ### 3. Firebase (optional)
 
@@ -88,13 +93,22 @@ lib/
 └── main.dart
 ```
 
+## Package highlights
+
+| Area | Packages |
+|------|----------|
+| Maps | `flutter_map`, `flutter_map_animations`, `flutter_map_location_marker`, `flutter_map_cache`, `http_cache_file_store` |
+| Routing | OSRM via `dio` (`RouteService`) |
+| UI/UX | `skeletonizer`, `flutter_animate`, `toastification`, `formz`, `google_fonts`, `cached_network_image` |
+| External nav | `url_launcher` — Open in Google/Apple Maps |
+
 ## Testing
 
 ```bash
 flutter test
 ```
 
-Includes `bloc_test` coverage for `TripListBloc`, `RequestRideBloc`, and tracking route interpolation.
+Includes `bloc_test` coverage for `TripListBloc` and unit tests for `RouteService` (OSRM parsing + offline fallback).
 
 ## Freelance pitch
 

@@ -1,14 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/architecture/entities/notification_entity.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
-import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
+import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 @RoutePage()
 class NotificationsPage extends StatelessWidget {
@@ -63,7 +64,16 @@ class NotificationsPage extends StatelessWidget {
         body: BlocBuilder<NotificationBloc, NotificationState>(
           builder: (context, state) {
             if (state is NotificationLoading) {
-              return LoadingView(message: 'loading');
+              return Skeletonizer(
+                enabled: true,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  itemCount: 5,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: NoktaSpacing.sm),
+                  itemBuilder: (_, __) => const SkeletonListTile(),
+                ),
+              );
             }
             if (state is NotificationLoaded) {
               if (state.notifications.isEmpty) {

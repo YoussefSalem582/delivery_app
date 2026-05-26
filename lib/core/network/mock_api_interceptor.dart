@@ -16,6 +16,12 @@ class MockApiInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    if (options.extra['skipMockInterceptor'] == true ||
+        options.uri.isAbsolute && !options.uri.host.contains('localhost')) {
+      handler.next(options);
+      return;
+    }
+
     await Future<void>.delayed(
       Duration(milliseconds: 300 + _random.nextInt(500)),
     );
@@ -99,6 +105,7 @@ class MockApiInterceptor extends Interceptor {
         'status': 'accepted',
         'driverName': 'Demo Driver',
         'driverPhone': '+201555555555',
+        'driverAvatarUrl': 'https://i.pravatar.cc/150?img=33',
         'fare': 75.0,
         'createdAt': now,
         'updatedAt': now,

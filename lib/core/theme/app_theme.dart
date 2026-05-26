@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static ThemeData light() => _build(Brightness.light);
+  static ThemeData light({String locale = 'en'}) =>
+      _build(Brightness.light, locale);
 
-  static ThemeData dark() => _build(Brightness.dark);
+  static ThemeData dark({String locale = 'en'}) =>
+      _build(Brightness.dark, locale);
 
-  static ThemeData _build(Brightness brightness) {
+  static ThemeData _build(Brightness brightness, String locale) {
     final isDark = brightness == Brightness.dark;
     final colorScheme = isDark ? _darkScheme : _lightScheme;
-    final textTheme = _textTheme(colorScheme);
+    final textTheme = _textTheme(colorScheme, locale);
 
     return ThemeData(
       useMaterial3: true,
@@ -182,8 +184,10 @@ class AppTheme {
     surfaceContainerLowest: Color(0xFF0F172A),
   );
 
-  static TextTheme _textTheme(ColorScheme colorScheme) {
-    final base = GoogleFonts.interTextTheme();
+  static TextTheme _textTheme(ColorScheme colorScheme, String locale) {
+    final base = locale == 'ar'
+        ? GoogleFonts.cairoTextTheme()
+        : GoogleFonts.interTextTheme();
     return base.copyWith(
       displayLarge: base.displayLarge?.copyWith(
         fontSize: 48,

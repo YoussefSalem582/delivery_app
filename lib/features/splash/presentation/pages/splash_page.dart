@@ -7,6 +7,7 @@ import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
@@ -70,7 +71,15 @@ class _SplashPageState extends State<SplashPage>
                     Hero(
                       tag: 'app_logo',
                       child: NoktaBrandIcon(size: 64, filled: false),
-                    ),
+                    )
+                        .animate()
+                        .scale(
+                          begin: const Offset(0.85, 0.85),
+                          end: const Offset(1, 1),
+                          duration: 600.ms,
+                          curve: Curves.easeOutBack,
+                        )
+                        .fadeIn(duration: 400.ms),
                     const SizedBox(height: NoktaSpacing.md),
                     Text(
                       'app_name'.tr(),

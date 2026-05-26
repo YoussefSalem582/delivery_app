@@ -3,7 +3,8 @@ import 'package:delivery_app/core/architecture/entities/order_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/auth_repository.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
-import 'package:delivery_app/core/utils/ui_helpers.dart';
+import 'package:delivery_app/core/widgets/avatar_image.dart';
+import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
@@ -11,6 +12,7 @@ import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
 @RoutePage()
@@ -34,6 +36,25 @@ class _ProfilePageState extends State<ProfilePage> {
       child: FutureBuilder(
         future: sl<AuthRepository>().getProfile(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              appBar: AppBar(title: Text('profile_title'.tr())),
+              body: Skeletonizer(
+                enabled: true,
+                child: ListView(
+                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  children: const [
+                    SkeletonListTile(),
+                    SizedBox(height: NoktaSpacing.lg),
+                    SkeletonTripCard(),
+                    SkeletonTripCard(),
+                  ],
+                ),
+              ),
+            );
+          }
+
           final user = snapshot.data;
           final scheme = Theme.of(context).colorScheme;
           final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -121,15 +142,10 @@ class _ProfileHeader extends StatelessWidget {
                         ),
                       ],
               ),
-              child: CircleAvatar(
-                radius: 45,
-                backgroundColor: scheme.surfaceContainerHigh,
-                child: Text(
-                  (user?.name ?? 'D')[0].toUpperCase(),
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: scheme.onSurface,
-                      ),
-                ),
+              child: AvatarImage(
+                imageUrl: user?.avatarUrl,
+                fallback: user?.name ?? 'D',
+                radius: 42,
               ),
             ),
             Positioned(
@@ -325,9 +341,17 @@ class _OrdersTab extends StatelessWidget {
     return BlocBuilder<OrderBloc, OrderState>(
       builder: (context, state) {
         if (state is OrderLoading) {
-          return const SizedBox(
+          return SizedBox(
             height: 200,
-            child: LoadingView(message: 'loading'),
+            child: Skeletonizer(
+              enabled: true,
+              child: ListView(
+                children: const [
+                  SkeletonListTile(),
+                  SkeletonListTile(),
+                ],
+              ),
+            ),
           );
         }
         if (state is OrderLoaded) {
