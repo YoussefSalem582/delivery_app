@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:delivery_app/core/architecture/entities/cache_metadata_entity.dart';
+import 'package:delivery_app/core/cache/entities/cache_metadata_entity.dart';
 import 'package:delivery_app/core/utils/constants.dart';
 
 class CacheKeys {

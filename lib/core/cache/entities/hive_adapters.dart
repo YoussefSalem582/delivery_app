@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:hive/hive.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:delivery_app/core/architecture/entities/cache_metadata_entity.dart';
-import 'package:delivery_app/core/architecture/entities/location_entity.dart';
-import 'package:delivery_app/core/architecture/entities/route_cache_entity.dart';
-import 'package:delivery_app/core/architecture/entities/notification_entity.dart';
-import 'package:delivery_app/core/architecture/entities/order_entity.dart';
-import 'package:delivery_app/core/architecture/entities/pending_sync_entity.dart';
-import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
-import 'package:delivery_app/core/architecture/entities/user_entity.dart';
+import 'package:delivery_app/core/cache/entities/cache_metadata_entity.dart';
+import 'package:delivery_app/core/cache/entities/pending_sync_entity.dart';
+import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_entity.dart';
+import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/location_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/route_cache_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 
 class LocationEntityAdapter extends TypeAdapter<LocationEntity> {
   @override
