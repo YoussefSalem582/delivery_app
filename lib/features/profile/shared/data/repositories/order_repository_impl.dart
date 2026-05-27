@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-import 'package:delivery_app/core/architecture/datasources/cache_metadata_local_datasource.dart';
-import 'package:delivery_app/core/architecture/datasources/order_local_datasource.dart';
-import 'package:delivery_app/core/architecture/datasources/order_remote_datasource.dart';
-import 'package:delivery_app/core/architecture/entities/order_entity.dart';
-import 'package:delivery_app/core/architecture/repositories/order_repository.dart';
+import 'package:delivery_app/core/cache/datasources/cache_metadata_local_datasource.dart';
+import 'package:delivery_app/features/profile/shared/data/datasources/order_local_datasource.dart';
+import 'package:delivery_app/features/profile/shared/data/datasources/order_remote_datasource.dart';
+import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
+import 'package:delivery_app/features/profile/shared/domain/repositories/order_repository.dart';
 import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/utils/cache_freshness.dart';
 

@@ -1,24 +1,23 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:delivery_app/core/architecture/entities/order_entity.dart';
-import 'package:delivery_app/core/architecture/entities/user_entity.dart';
-import 'package:delivery_app/core/theme/nokta_colors.dart';
-import 'package:delivery_app/core/theme/theme_cubit.dart';
+import 'package:delivery_app/config/routes/route_names.dart';
+import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
+import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
+import 'package:delivery_app/shared/spacing/app_spacing.dart';
+import 'package:delivery_app/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
-import 'package:delivery_app/core/widgets/nokta_offline_banner.dart';
+import 'package:delivery_app/shared/widgets/banners/offline_banner.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
-import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
-import 'package:delivery_app/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
+import 'package:delivery_app/features/profile/orders/presentation/bloc/order_bloc.dart';
+import 'package:delivery_app/features/profile/profile_view/presentation/bloc/profile_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
-import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 
-@RoutePage()
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
@@ -49,10 +48,10 @@ class _ProfilePageState extends State<ProfilePage> {
               body: Skeletonizer(
                 enabled: true,
                 child: ListView(
-                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   children: const [
                     SkeletonListTile(),
-                    SizedBox(height: NoktaSpacing.lg),
+                    SizedBox(height: AppSpacing.lg),
                     SkeletonTripCard(),
                     SkeletonTripCard(),
                   ],
@@ -116,7 +115,7 @@ class _ProfileContent extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: NoktaSpacing.sm),
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: CircleAvatar(
               radius: 16,
               backgroundColor: scheme.surfaceContainerHigh,
@@ -129,18 +128,18 @@ class _ProfileContent extends StatelessWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(NoktaSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
         children: [
-          if (isOffline) const NoktaOfflineSectionBanner(),
+          if (isOffline) const OfflineSectionBanner(),
           _ProfileHeader(user: user),
-          const SizedBox(height: NoktaSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           _WalletCard(balance: user.walletBalance),
-          const SizedBox(height: NoktaSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           _TabBar(
             selectedIndex: tabIndex,
             onChanged: onTabChanged,
           ),
-          const SizedBox(height: NoktaSpacing.md),
+          const SizedBox(height: AppSpacing.md),
           if (tabIndex == 0) _OrdersTab() else _SettingsTab(user: user),
         ],
       ),
@@ -210,7 +209,7 @@ class _ProfileHeader extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: NoktaSpacing.sm),
+        const SizedBox(height: AppSpacing.sm),
         Text(user.name, style: Theme.of(context).textTheme.titleLarge),
         Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
       ],
@@ -229,7 +228,7 @@ class _WalletCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(NoktaSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -238,7 +237,7 @@ class _WalletCard extends StatelessWidget {
               ? [scheme.surfaceContainerHigh, scheme.surfaceContainer]
               : [scheme.surface, scheme.surfaceContainerHigh],
         ),
-        borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
           color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 1),
         ),
@@ -275,7 +274,7 @@ class _WalletCard extends StatelessWidget {
                         Text('balance'.tr(), style: Theme.of(context).textTheme.labelSmall),
                       ],
                     ),
-                    const SizedBox(height: NoktaSpacing.xs),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       '${balance.toStringAsFixed(2)} EGP',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -290,13 +289,13 @@ class _WalletCard extends StatelessWidget {
                 icon: const Icon(Icons.add, size: 18),
                 label: Text('top_up'.tr()),
                 style: FilledButton.styleFrom(
-                  minimumSize: const Size(0, NoktaSpacing.buttonHeight),
+                  minimumSize: const Size(0, AppSpacing.buttonHeight),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   backgroundColor: isDark ? scheme.primaryContainer : scheme.primary,
                   foregroundColor: scheme.onPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   ),
                 ),
               ),
@@ -398,7 +397,7 @@ class _OrdersTab extends StatelessWidget {
         if (state is OrderLoaded) {
           if (state.orders.isEmpty) {
             return Padding(
-              padding: const EdgeInsets.all(NoktaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Center(
                 child: Text(
                   'no_orders'.tr(),
@@ -411,10 +410,10 @@ class _OrdersTab extends StatelessWidget {
           }
           return Column(
             children: [
-              if (state.isOffline) const NoktaOfflineSectionBanner(),
+              if (state.isOffline) const OfflineSectionBanner(),
               ...state.orders.map(
                 (order) => Padding(
-                  padding: const EdgeInsets.only(bottom: NoktaSpacing.sm),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: _OrderTile(order: order),
                 ),
               ),
@@ -442,7 +441,7 @@ class _SettingsTab extends StatelessWidget {
         Material(
           color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             side: BorderSide(
               color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
             ),
@@ -455,10 +454,11 @@ class _SettingsTab extends StatelessWidget {
                 title: 'dark_mode'.tr(),
                 showDivider: true,
                 trailing: Switch.adaptive(
-                  value: context.watch<ThemeCubit>().state == ThemeMode.dark,
+                  value: context.watch<SettingsCubit>().state.themeMode ==
+                      ThemeMode.dark,
                   activeTrackColor: scheme.primary.withValues(alpha: 0.5),
                   activeThumbColor: scheme.primary,
-                  onChanged: (v) => context.read<ThemeCubit>().toggleDark(v),
+                  onChanged: (v) => context.read<SettingsCubit>().toggleDark(v),
                 ),
               ),
               _SettingsTile(
@@ -466,7 +466,7 @@ class _SettingsTab extends StatelessWidget {
                 title: 'language'.tr(),
                 showDivider: true,
                 trailing: DropdownButton<String>(
-                  value: context.watch<LocaleCubit>().state,
+                  value: context.watch<SettingsCubit>().state.locale.languageCode,
                   underline: const SizedBox.shrink(),
                   dropdownColor: isDark ? scheme.surfaceContainerHighest : null,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -478,7 +478,7 @@ class _SettingsTab extends StatelessWidget {
                   ],
                   onChanged: (code) {
                     if (code == null) return;
-                    context.read<LocaleCubit>().setLocale(code);
+                    context.read<SettingsCubit>().setLocale(Locale(code));
                     context.setLocale(Locale(code));
                   },
                 ),
@@ -497,14 +497,14 @@ class _SettingsTab extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: NoktaSpacing.lg),
+        const SizedBox(height: AppSpacing.lg),
         SizedBox(
           width: double.infinity,
-          height: NoktaSpacing.buttonHeight,
+          height: AppSpacing.buttonHeight,
           child: OutlinedButton.icon(
             onPressed: () {
               context.read<AuthBloc>().add(const AuthLogoutRequested());
-              context.router.replaceAll([const SplashRoute()]);
+              context.goNamed(RouteNames.splash);
             },
             icon: Icon(Icons.logout, color: scheme.error),
             label: Text(
@@ -518,7 +518,7 @@ class _SettingsTab extends StatelessWidget {
               foregroundColor: scheme.error,
               side: BorderSide(color: scheme.error.withValues(alpha: 0.45)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               ),
             ),
           ),
@@ -558,7 +558,7 @@ class _SettingsTile extends StatelessWidget {
               Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
           onTap: onTap,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           hoverColor: isDark
               ? scheme.surfaceContainerHighest.withValues(alpha: 0.5)
@@ -567,8 +567,8 @@ class _SettingsTile extends StatelessWidget {
         if (showDivider)
           Divider(
             height: 1,
-            indent: NoktaSpacing.md,
-            endIndent: NoktaSpacing.md,
+            indent: AppSpacing.md,
+            endIndent: AppSpacing.md,
             color: scheme.outlineVariant.withValues(alpha: isDark ? 0.35 : 0.5),
           ),
       ],
@@ -619,10 +619,10 @@ class _OrderTile extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(NoktaSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         border: Border.all(
           color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
         ),
@@ -642,7 +642,7 @@ class _OrderTile extends StatelessWidget {
               color: _statusColor(order.status, scheme),
             ),
           ),
-          const SizedBox(width: NoktaSpacing.sm),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

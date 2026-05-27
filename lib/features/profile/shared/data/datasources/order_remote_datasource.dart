@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:delivery_app/core/architecture/entities/order_entity.dart';
+import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
 import 'package:delivery_app/core/network/api_endpoints.dart';
 
 class OrderRemoteDataSource {

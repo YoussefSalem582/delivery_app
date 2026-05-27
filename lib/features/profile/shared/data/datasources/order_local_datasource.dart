@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:delivery_app/core/architecture/entities/order_entity.dart';
+import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
 import 'package:delivery_app/core/utils/constants.dart';
 
 class OrderLocalDataSource {
