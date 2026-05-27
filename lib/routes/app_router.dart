@@ -7,12 +7,14 @@ import 'package:delivery_app/features/auth/presentation/pages/onboarding_page.da
 import 'package:delivery_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/register_page.dart';
 import 'package:delivery_app/features/home/presentation/pages/home_map_page.dart';
+import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:delivery_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:delivery_app/features/splash/presentation/pages/splash_page.dart';
 import 'package:delivery_app/features/trips/presentation/pages/tracking_page.dart';
 import 'package:delivery_app/features/trips/presentation/pages/trip_detail_page.dart';
 import 'package:delivery_app/features/trips/presentation/pages/trip_list_page.dart';
+import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +72,12 @@ class MainShellPage extends StatelessWidget {
           body: child,
           bottomNavigationBar: NoktaBottomNavBar(
             selectedIndex: tabsRouter.activeIndex,
-            onDestinationSelected: tabsRouter.setActiveIndex,
+            onDestinationSelected: (index) {
+              tabsRouter.setActiveIndex(index);
+              if (index == 2) {
+                sl<NotificationBloc>().add(const NotificationLoadRequested());
+              }
+            },
             destinations: [
               NoktaNavDestination(
                 icon: Icons.home_outlined,

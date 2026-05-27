@@ -35,6 +35,7 @@ import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
+import 'package:delivery_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_detail_bloc.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_list_bloc.dart';
 import 'package:delivery_app/routes/app_router.dart';
@@ -146,6 +147,12 @@ Future<void> initDependencies() async {
   sl.registerFactory(() => MapBloc());
   sl.registerFactory(() => TrackingBloc(sl()));
   sl.registerFactory(() => OrderBloc(sl(), sl()));
+  sl.registerFactory(
+    () => ProfileBloc(
+      authRepository: sl(),
+      networkStatus: sl(),
+    ),
+  );
   sl.registerLazySingleton(() => NotificationBloc(sl()));
 
   sl.registerLazySingleton<AppRouter>(() => AppRouter());

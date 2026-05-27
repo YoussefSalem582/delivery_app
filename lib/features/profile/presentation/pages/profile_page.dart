@@ -1,13 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/architecture/entities/order_entity.dart';
-import 'package:delivery_app/core/architecture/repositories/auth_repository.dart';
+import 'package:delivery_app/core/architecture/entities/user_entity.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
+import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/core/widgets/nokta_offline_banner.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
+import 'package:delivery_app/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -29,14 +31,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<OrderBloc>()..add(const OrderLoadRequested()),
-      child: FutureBuilder(
-        future: sl<AuthRepository>().getProfile(),
-        initialData: sl<AuthRepository>().cachedUser,
-        builder: (context, snapshot) {
-          final user = snapshot.data;
-          if (snapshot.connectionState != ConnectionState.done && user == null) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => sl<ProfileBloc>()..add(const ProfileLoadRequested()),
+        ),
+        BlocProvider(
+          create: (_) => sl<OrderBloc>()..add(const OrderLoadRequested()),
+        ),
+      ],
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          if (state is ProfileLoading || state is ProfileInitial) {
             return Scaffold(
               backgroundColor: Theme.of(context).colorScheme.surface,
               appBar: AppBar(title: Text('profile_title'.tr())),
@@ -54,52 +60,89 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             );
           }
-          final scheme = Theme.of(context).colorScheme;
-          final isDark = Theme.of(context).brightness == Brightness.dark;
-
-          return Scaffold(
-            backgroundColor: isDark ? scheme.surfaceContainerLow : scheme.surface,
-            appBar: AppBar(
-              backgroundColor: scheme.surface,
-              title: Text('profile_title'.tr()),
-              leading: IconButton(
-                icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
-                onPressed: () {},
+          if (state is ProfileError) {
+            return Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              appBar: AppBar(title: Text('profile_title'.tr())),
+              body: ErrorView(
+                message: state.message,
+                onRetry: () => context
+                    .read<ProfileBloc>()
+                    .add(const ProfileLoadRequested()),
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: NoktaSpacing.sm),
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: scheme.surfaceContainerHigh,
-                    child: Text(
-                      (user?.name ?? 'D')[0].toUpperCase(),
-                      style: TextStyle(color: scheme.primary, fontSize: 14),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            body: ListView(
-              padding: const EdgeInsets.all(NoktaSpacing.md),
-              children: [
-                _ProfileHeader(user: user),
-                const SizedBox(height: NoktaSpacing.lg),
-                _WalletCard(balance: user?.walletBalance ?? 0),
-                const SizedBox(height: NoktaSpacing.lg),
-                _TabBar(
-                  selectedIndex: _tabIndex,
-                  onChanged: (i) => setState(() => _tabIndex = i),
-                ),
-                const SizedBox(height: NoktaSpacing.md),
-                if (_tabIndex == 0)
-                  _OrdersTab()
-                else
-                  _SettingsTab(user: user),
-              ],
-            ),
-          );
+            );
+          }
+          if (state is ProfileLoaded) {
+            return _ProfileContent(
+              user: state.user,
+              isOffline: state.isOffline,
+              tabIndex: _tabIndex,
+              onTabChanged: (i) => setState(() => _tabIndex = i),
+            );
+          }
+          return const SizedBox.shrink();
         },
+      ),
+    );
+  }
+}
+
+class _ProfileContent extends StatelessWidget {
+  const _ProfileContent({
+    required this.user,
+    required this.isOffline,
+    required this.tabIndex,
+    required this.onTabChanged,
+  });
+
+  final UserEntity user;
+  final bool isOffline;
+  final int tabIndex;
+  final ValueChanged<int> onTabChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: isDark ? scheme.surfaceContainerLow : scheme.surface,
+      appBar: AppBar(
+        backgroundColor: scheme.surface,
+        title: Text('profile_title'.tr()),
+        leading: IconButton(
+          icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
+          onPressed: () {},
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: NoktaSpacing.sm),
+            child: CircleAvatar(
+              radius: 16,
+              backgroundColor: scheme.surfaceContainerHigh,
+              child: Text(
+                user.name[0].toUpperCase(),
+                style: TextStyle(color: scheme.primary, fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(NoktaSpacing.md),
+        children: [
+          if (isOffline) const NoktaOfflineSectionBanner(),
+          _ProfileHeader(user: user),
+          const SizedBox(height: NoktaSpacing.lg),
+          _WalletCard(balance: user.walletBalance),
+          const SizedBox(height: NoktaSpacing.lg),
+          _TabBar(
+            selectedIndex: tabIndex,
+            onChanged: onTabChanged,
+          ),
+          const SizedBox(height: NoktaSpacing.md),
+          if (tabIndex == 0) _OrdersTab() else _SettingsTab(user: user),
+        ],
       ),
     );
   }
@@ -108,7 +151,7 @@ class _ProfilePageState extends State<ProfilePage> {
 class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({required this.user});
 
-  final dynamic user;
+  final UserEntity user;
 
   @override
   Widget build(BuildContext context) {
@@ -141,8 +184,8 @@ class _ProfileHeader extends StatelessWidget {
                       ],
               ),
               child: AvatarImage(
-                imageUrl: user?.avatarUrl,
-                fallback: user?.name ?? 'D',
+                imageUrl: user.avatarUrl,
+                fallback: user.name,
                 radius: 42,
               ),
             ),
@@ -168,8 +211,8 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: NoktaSpacing.sm),
-        Text(user?.name ?? 'demo_user'.tr(), style: Theme.of(context).textTheme.titleLarge),
-        Text(user?.email ?? 'demo@delivery.app', style: Theme.of(context).textTheme.bodyMedium),
+        Text(user.name, style: Theme.of(context).textTheme.titleLarge),
+        Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
@@ -387,7 +430,7 @@ class _OrdersTab extends StatelessWidget {
 class _SettingsTab extends StatelessWidget {
   const _SettingsTab({required this.user});
 
-  final dynamic user;
+  final UserEntity user;
 
   @override
   Widget build(BuildContext context) {
