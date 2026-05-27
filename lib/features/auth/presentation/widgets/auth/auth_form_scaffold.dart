@@ -1,4 +1,5 @@
 import 'package:delivery_app/core/theme/nokta_colors.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/onboarding/onboarding_background.dart';
 import 'package:flutter/material.dart';
 
 class AuthFormDotBackground extends StatelessWidget {
@@ -20,36 +21,76 @@ class AuthFormDotBackground extends StatelessWidget {
   }
 }
 
+enum AuthFormBackground { dots, gradient }
+
 class AuthFormScaffold extends StatelessWidget {
   const AuthFormScaffold({
     super.key,
     required this.appBar,
     required this.form,
+    this.background = AuthFormBackground.dots,
+    this.alignTop = false,
   });
 
   final PreferredSizeWidget appBar;
   final Widget form;
+  final AuthFormBackground background;
+  final bool alignTop;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
+    final bg = switch (background) {
+      AuthFormBackground.dots => const AuthFormDotBackground(),
+      AuthFormBackground.gradient => const OnboardingBackground(),
+    };
+
+    final scrollChild = ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: form,
+    );
+
     return Scaffold(
       backgroundColor: scheme.surface,
+      extendBodyBehindAppBar: background == AuthFormBackground.gradient,
       appBar: appBar,
       body: Stack(
         children: [
-          const AuthFormDotBackground(),
+          bg,
           SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(NoktaSpacing.md),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: form,
-                ),
-              ),
-            ),
+            child: alignTop
+                ? LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: NoktaSpacing.lg,
+                          vertical: NoktaSpacing.md,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight - NoktaSpacing.md * 2,
+                          ),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                const Spacer(flex: 1),
+                                scrollChild,
+                                const Spacer(flex: 2),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(NoktaSpacing.md),
+                      child: scrollChild,
+                    ),
+                  ),
           ),
         ],
       ),

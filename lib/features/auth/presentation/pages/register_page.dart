@@ -1,12 +1,14 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/app_toast.dart';
-import 'package:delivery_app/core/widgets/nokta_brand_icon.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/auth/presentation/forms/login_inputs.dart';
 import 'package:delivery_app/features/auth/presentation/forms/register_inputs.dart';
 import 'package:delivery_app/features/auth/presentation/utils/auth_navigation.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_credential_header.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_scaffold.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/auth/login_demo_chip.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/auth/register_demo_chip.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/register_form_card.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -27,6 +29,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _nameFocusNode = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _confirmFocusNode = FocusNode();
 
   NameInput _name = const NameInput.pure();
   EmailInput _email = const EmailInput.pure();
@@ -57,7 +63,29 @@ class _RegisterPageState extends State<RegisterPage> {
     _confirmPasswordController
       ..removeListener(_onConfirmPasswordChanged)
       ..dispose();
+    _nameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmFocusNode.dispose();
     super.dispose();
+  }
+
+  void _fillDemoProfile() {
+    _nameController.text = RegisterDemoChip.demoName;
+    _emailController.text = LoginDemoChip.demoEmail;
+    _passwordController.text = LoginDemoChip.demoPassword;
+    _confirmPasswordController.text = LoginDemoChip.demoPassword;
+    setState(() {
+      _name = NameInput.dirty(RegisterDemoChip.demoName);
+      _email = EmailInput.dirty(LoginDemoChip.demoEmail);
+      _password = PasswordInput.dirty(LoginDemoChip.demoPassword);
+      _confirmPassword = ConfirmPasswordInput.dirty(
+        LoginDemoChip.demoPassword,
+        password: LoginDemoChip.demoPassword,
+      );
+      _acceptedTerms = true;
+    });
+    _confirmFocusNode.requestFocus();
   }
 
   void _onNameChanged() {
@@ -180,25 +208,38 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       },
       child: AuthFormScaffold(
+        background: AuthFormBackground.gradient,
+        alignTop: true,
         appBar: AppBar(
-          backgroundColor: scheme.surface.withValues(alpha: 0.92),
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: scheme.onSurface,
+            ),
             onPressed: () => _goBack(context),
           ),
         ),
         form: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: NoktaBrandIcon(size: 48, filled: false),
+            const AuthCredentialHeader(
+              titleKey: 'register_title',
+              subtitleKey: 'register_subtitle',
             ),
-            const SizedBox(height: NoktaSpacing.md),
+            const SizedBox(height: NoktaSpacing.xl),
             RegisterFormCard(
               nameController: _nameController,
               emailController: _emailController,
               passwordController: _passwordController,
               confirmPasswordController: _confirmPasswordController,
+              nameFocusNode: _nameFocusNode,
+              emailFocusNode: _emailFocusNode,
+              passwordFocusNode: _passwordFocusNode,
+              confirmFocusNode: _confirmFocusNode,
               nameErrorText: _nameErrorText(),
               emailErrorText: _emailErrorText(),
               passwordErrorText: _passwordErrorText(),
@@ -207,6 +248,7 @@ class _RegisterPageState extends State<RegisterPage> {
               onTermsChanged: (v) => setState(() => _acceptedTerms = v),
               loading: loading,
               onSubmit: loading ? null : () => _submit(context),
+              onFillDemo: _fillDemoProfile,
               onSignIn: () => _goToLogin(context),
             ),
           ],

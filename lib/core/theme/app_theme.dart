@@ -77,6 +77,16 @@ class AppTheme {
           elevation: 0,
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(64, NoktaSpacing.buttonHeight),
+          foregroundColor: colorScheme.primary,
+          textStyle: textTheme.labelLarge?.copyWith(color: colorScheme.primary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+          ),
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
         height: NoktaSpacing.bottomNavHeight,
         elevation: 0,

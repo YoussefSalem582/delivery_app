@@ -14,6 +14,9 @@ class NoktaTextField extends StatefulWidget {
     this.textInputAction,
     this.errorText,
     this.onChanged,
+    this.focusNode,
+    this.onSubmitted,
+    this.autofillHints,
   });
 
   final TextEditingController controller;
@@ -26,6 +29,9 @@ class NoktaTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final String? errorText;
   final ValueChanged<String>? onChanged;
+  final FocusNode? focusNode;
+  final ValueChanged<String>? onSubmitted;
+  final Iterable<String>? autofillHints;
 
   @override
   State<NoktaTextField> createState() => _NoktaTextFieldState();
@@ -46,10 +52,13 @@ class _NoktaTextFieldState extends State<NoktaTextField> {
 
     return TextFormField(
       controller: widget.controller,
+      focusNode: widget.focusNode,
       keyboardType: widget.keyboardType,
       obscureText: _obscured,
       validator: widget.validator,
       onChanged: widget.onChanged,
+      onFieldSubmitted: widget.onSubmitted,
+      autofillHints: widget.autofillHints,
       textInputAction: widget.textInputAction,
       style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(

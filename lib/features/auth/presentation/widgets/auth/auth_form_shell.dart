@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 class AuthFormShell extends StatelessWidget {
   const AuthFormShell({
     super.key,
-    required this.titleKey,
-    required this.subtitleKey,
+    this.titleKey,
+    this.subtitleKey,
+    this.showHeader = true,
     this.footer,
     required this.children,
   });
 
-  final String titleKey;
-  final String subtitleKey;
+  final String? titleKey;
+  final String? subtitleKey;
+  final bool showHeader;
   final List<Widget> children;
   final Widget? footer;
 
@@ -40,18 +42,27 @@ class AuthFormShell extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            titleKey,
-            style: textTheme.titleLarge,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: NoktaSpacing.xs),
-          Text(
-            subtitleKey,
-            style: textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: NoktaSpacing.lg),
+          if (showHeader && titleKey != null) ...[
+            Text(
+              titleKey!,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (subtitleKey != null) ...[
+              const SizedBox(height: NoktaSpacing.xs),
+              Text(
+                subtitleKey!,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  height: 1.35,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            const SizedBox(height: NoktaSpacing.lg),
+          ],
           ...children,
           if (footer != null) ...[
             const SizedBox(height: NoktaSpacing.md),

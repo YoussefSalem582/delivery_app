@@ -1,11 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
-import 'package:delivery_app/core/widgets/nokta_brand_icon.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/auth/presentation/forms/login_inputs.dart';
 import 'package:delivery_app/features/auth/presentation/utils/auth_navigation.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_scaffold.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/auth/login_demo_chip.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/login_form_card.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_credential_header.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +22,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController(text: 'demo@delivery.app');
-  final _passwordController = TextEditingController(text: 'password');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
 
   EmailInput _email = const EmailInput.pure();
   PasswordInput _password = const PasswordInput.pure();
@@ -42,6 +45,8 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController
       ..removeListener(_onPasswordChanged)
       ..dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -51,6 +56,16 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onPasswordChanged() {
     setState(() => _password = PasswordInput.dirty(_passwordController.text));
+  }
+
+  void _fillDemoCredentials() {
+    _emailController.text = LoginDemoChip.demoEmail;
+    _passwordController.text = LoginDemoChip.demoPassword;
+    setState(() {
+      _email = EmailInput.dirty(LoginDemoChip.demoEmail);
+      _password = PasswordInput.dirty(LoginDemoChip.demoPassword);
+    });
+    _passwordFocusNode.requestFocus();
   }
 
   bool get _isValid => Formz.validate([_email, _password]);
@@ -108,41 +123,43 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final loading = context.watch<AuthBloc>().state is AuthLoading;
 
     return AuthFormScaffold(
+      background: AuthFormBackground.gradient,
+      alignTop: true,
       appBar: AppBar(
-        backgroundColor: scheme.surface.withValues(alpha: 0.92),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: scheme.onSurface,
+          ),
           onPressed: () => _goBack(context),
         ),
       ),
       form: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Center(
-            child: Hero(
-              tag: 'app_logo',
-              child: NoktaBrandIcon(size: 56),
-            ),
+          const AuthCredentialHeader(
+            titleKey: 'login_title',
+            subtitleKey: 'login_subtitle',
           ),
-          const SizedBox(height: NoktaSpacing.sm),
-          Text(
-            'app_name'.tr(),
-            style: textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: NoktaSpacing.md),
+          const SizedBox(height: NoktaSpacing.xl),
           LoginFormCard(
             emailController: _emailController,
             passwordController: _passwordController,
+            emailFocusNode: _emailFocusNode,
+            passwordFocusNode: _passwordFocusNode,
             emailErrorText: _emailErrorText(),
             passwordErrorText: _passwordErrorText(),
             loading: loading,
             onSubmit: loading ? null : () => _submit(context),
             onForgotPassword: () => _goToForgotPassword(context),
+            onFillDemo: _fillDemoCredentials,
             onCreateAccount: () => _goToRegister(context),
           ),
         ],
