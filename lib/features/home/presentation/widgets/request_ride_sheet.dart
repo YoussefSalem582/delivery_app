@@ -1,5 +1,5 @@
 import 'package:delivery_app/core/theme/nokta_colors.dart';
-import 'package:delivery_app/core/utils/constants.dart';
+import 'package:delivery_app/core/utils/demo_destinations.dart';
 import 'package:delivery_app/core/widgets/nokta_bottom_nav_bar.dart';
 import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
 import 'package:delivery_app/core/widgets/nokta_ride_option.dart';
@@ -12,11 +12,13 @@ class RequestRideSheet extends StatefulWidget {
     required this.pickupLat,
     required this.pickupLng,
     this.initialDropoff,
+    this.initialDropoffKey,
   });
 
   final double pickupLat;
   final double pickupLng;
   final String? initialDropoff;
+  final String? initialDropoffKey;
 
   @override
   State<RequestRideSheet> createState() => _RequestRideSheetState();
@@ -31,7 +33,10 @@ class _RequestRideSheetState extends State<RequestRideSheet> {
     super.initState();
     _pickupController = TextEditingController(text: 'Current Location');
     _dropoffController = TextEditingController(
-      text: widget.initialDropoff ?? 'City Mall',
+      text: widget.initialDropoff ??
+          (widget.initialDropoffKey != null
+              ? DemoDestinations.labelKey(widget.initialDropoffKey!).tr()
+              : 'City Mall'),
     );
   }
 
@@ -43,14 +48,20 @@ class _RequestRideSheetState extends State<RequestRideSheet> {
   }
 
   void _continue() {
+    final dropoff = DemoDestinations.nearPickup(
+      pickupLat: widget.pickupLat,
+      pickupLng: widget.pickupLng,
+      key: widget.initialDropoffKey ?? 'default',
+    );
+
     Navigator.of(context).pop(
       RideRequestDraft(
         pickupAddress: _pickupController.text,
         dropoffAddress: _dropoffController.text,
         pickupLat: widget.pickupLat,
         pickupLng: widget.pickupLng,
-        dropoffLat: AppConstants.defaultDropoffLat,
-        dropoffLng: AppConstants.defaultDropoffLng,
+        dropoffLat: dropoff.latitude,
+        dropoffLng: dropoff.longitude,
       ),
     );
   }

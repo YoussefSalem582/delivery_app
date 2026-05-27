@@ -16,8 +16,19 @@ class MockApiInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (options.extra['skipMockInterceptor'] == true ||
-        options.uri.isAbsolute && !options.uri.host.contains('localhost')) {
+    if (options.extra['skipMockInterceptor'] == true) {
+      handler.next(options);
+      return;
+    }
+
+    final host = options.uri.host;
+    final mockHost = Uri.parse(ApiEndpoints.baseUrl).host;
+    final isMockRequest = host.isEmpty ||
+        host == mockHost ||
+        host.contains('localhost') ||
+        host == '127.0.0.1';
+
+    if (!isMockRequest) {
       handler.next(options);
       return;
     }

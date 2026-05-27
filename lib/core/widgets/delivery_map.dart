@@ -4,7 +4,6 @@ import 'package:delivery_app/core/widgets/animated_map_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 
 class DeliveryMap extends StatefulWidget {
@@ -88,6 +87,23 @@ class DeliveryMapState extends State<DeliveryMap> with TickerProviderStateMixin 
     }
   }
 
+  List<MapMarkerData> get _allMarkers {
+    final markers = List<MapMarkerData>.from(widget.markers);
+    if (widget.showUserLocation &&
+        !markers.any((m) => m.icon == Icons.my_location)) {
+      markers.insert(
+        0,
+        MapMarkerData(
+          point: widget.center,
+          color: Theme.of(context).colorScheme.primaryContainer,
+          icon: Icons.my_location,
+          size: 32,
+        ),
+      );
+    }
+    return markers;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -121,27 +137,8 @@ class DeliveryMapState extends State<DeliveryMap> with TickerProviderStateMixin 
               ),
             ],
           ),
-        if (widget.showUserLocation)
-          CurrentLocationLayer(
-            alignPositionOnUpdate: widget.followCenter
-                ? AlignOnUpdate.always
-                : AlignOnUpdate.never,
-            alignDirectionOnUpdate: AlignOnUpdate.never,
-            headingStream: Stream<LocationMarkerHeading?>.empty(),
-            style: LocationMarkerStyle(
-              marker: DefaultLocationMarker(
-                color: scheme.primaryContainer,
-              ),
-              markerSize: const Size(28, 28),
-              accuracyCircleColor: scheme.primary.withValues(alpha: 0.15),
-              showHeadingSector: false,
-            ),
-          ),
         MarkerLayer(
-          markers: widget.markers
-              .where(
-                (m) => !(widget.showUserLocation && m.icon == Icons.my_location),
-              )
+          markers: _allMarkers
               .map(
                 (m) => Marker(
                   point: m.point,

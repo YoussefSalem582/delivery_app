@@ -92,19 +92,19 @@ class HomeDestinationPanel extends StatelessWidget {
                   _QuickChip(
                     icon: Icons.home_outlined,
                     label: 'quick_home'.tr(),
-                    onTap: () => onQuickDestination?.call('quick_home'.tr()),
+                    onTap: () => onQuickDestination?.call('home'),
                   ),
                   const SizedBox(width: NoktaSpacing.sm),
                   _QuickChip(
                     icon: Icons.work_outline,
                     label: 'quick_work'.tr(),
-                    onTap: () => onQuickDestination?.call('quick_work'.tr()),
+                    onTap: () => onQuickDestination?.call('work'),
                   ),
                   const SizedBox(width: NoktaSpacing.sm),
                   _QuickChip(
                     icon: Icons.flight_takeoff,
                     label: 'quick_airport'.tr(),
-                    onTap: () => onQuickDestination?.call('quick_airport'.tr()),
+                    onTap: () => onQuickDestination?.call('airport'),
                   ),
                 ],
               ),

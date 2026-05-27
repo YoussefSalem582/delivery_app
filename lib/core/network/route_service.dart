@@ -1,3 +1,4 @@
+import 'package:delivery_app/core/utils/demo_destinations.dart';
 import 'package:dio/dio.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -36,6 +37,15 @@ class RouteService {
     final cached = _memoryCache[cacheKey];
     if (cached != null) return cached;
 
+    const distanceCalc = Distance();
+    final straightMeters = distanceCalc(pickup, dropoff);
+    if (straightMeters > DemoDestinations.maxOsrmDistanceMeters) {
+      _talker.info(
+        '[RouteService] Route exceeds OSRM demo range, using straight line',
+      );
+      return _fallbackRoute(pickup, dropoff, straightMeters);
+    }
+
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         '$_osrmBase/route/v1/driving/'
@@ -47,13 +57,19 @@ class RouteService {
         },
         options: Options(
           extra: {'skipMockInterceptor': true},
+          validateStatus: (status) => status != null && status < 500,
         ),
       );
+
+      if (response.statusCode == 400) {
+        _talker.info('[RouteService] OSRM returned no route, using straight line');
+        return _fallbackRoute(pickup, dropoff, straightMeters);
+      }
 
       final data = response.data;
       final routes = data?['routes'] as List<dynamic>?;
       if (routes == null || routes.isEmpty) {
-        return _fallbackRoute(pickup, dropoff);
+        return _fallbackRoute(pickup, dropoff, straightMeters);
       }
 
       final route = routes.first as Map<String, dynamic>;
@@ -78,11 +94,15 @@ class RouteService {
       return result;
     } catch (e, st) {
       _talker.handle(e, st, '[RouteService] Falling back to straight line');
-      return _fallbackRoute(pickup, dropoff);
+      return _fallbackRoute(pickup, dropoff, straightMeters);
     }
   }
 
-  RouteResult _fallbackRoute(LatLng pickup, LatLng dropoff) {
+  RouteResult _fallbackRoute(
+    LatLng pickup,
+    LatLng dropoff, [
+    double? straightMeters,
+  ]) {
     const steps = 30;
     final points = List.generate(steps + 1, (i) {
       final t = i / steps;
@@ -92,7 +112,7 @@ class RouteService {
       );
     });
     const distance = Distance();
-    final meters = distance(pickup, dropoff);
+    final meters = straightMeters ?? distance(pickup, dropoff);
     const avgSpeedMps = 8.33; // ~30 km/h
     return RouteResult(
       points: points,

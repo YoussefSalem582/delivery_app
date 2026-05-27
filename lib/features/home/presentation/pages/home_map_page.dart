@@ -31,7 +31,7 @@ class _HomeMapPageState extends State<HomeMapPage> {
   Future<void> _startRideFlow(
     BuildContext context,
     MapReady mapState, {
-    String? dropoffLabel,
+    String? dropoffKey,
   }) async {
     final draft = await showModalBottomSheet<RideRequestDraft>(
       context: context,
@@ -40,7 +40,7 @@ class _HomeMapPageState extends State<HomeMapPage> {
       builder: (_) => RequestRideSheet(
         pickupLat: mapState.userPosition.latitude,
         pickupLng: mapState.userPosition.longitude,
-        initialDropoff: dropoffLabel,
+        initialDropoffKey: dropoffKey,
       ),
     );
 
@@ -187,8 +187,8 @@ class _HomeMapPageState extends State<HomeMapPage> {
                     bottom: 0,
                     child: HomeDestinationPanel(
                       onSearchTap: () => _startRideFlow(context, state),
-                      onQuickDestination: (label) =>
-                          _startRideFlow(context, state, dropoffLabel: label),
+                      onQuickDestination: (key) =>
+                          _startRideFlow(context, state, dropoffKey: key),
                     ),
                   ),
               ],
