@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/core/utils/constants.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -124,33 +125,43 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 }
 
 class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
-  TrackingBloc() : super(const TrackingInitial()) {
+  TrackingBloc(this._routeService) : super(const TrackingInitial()) {
     on<TrackingStarted>(_onStarted);
     on<TrackingTick>(_onTick);
     on<TrackingStopped>(_onStopped);
   }
 
+  final RouteService _routeService;
   Timer? _timer;
   List<LatLng> _route = [];
+  int _initialEtaMinutes = 12;
 
   Future<void> _onStarted(
     TrackingStarted event,
     Emitter<TrackingState> emit,
   ) async {
-    _route = _interpolateRoute(
-      LatLng(event.trip.pickupLat, event.trip.pickupLng),
-      LatLng(event.trip.dropoffLat, event.trip.dropoffLng),
-      30,
+    emit(TrackingLoading(trip: event.trip));
+
+    final pickup = LatLng(event.trip.pickupLat, event.trip.pickupLng);
+    final dropoff = LatLng(event.trip.dropoffLat, event.trip.dropoffLng);
+    final routeResult = await _routeService.getRoute(
+      pickup: pickup,
+      dropoff: dropoff,
     );
+
+    _route = routeResult.points;
+    _initialEtaMinutes = routeResult.etaMinutes;
+
     emit(
       TrackingActive(
         trip: event.trip,
         route: _route,
         driverPosition: _route.first,
         progress: 0,
-        etaMinutes: 12,
+        etaMinutes: _initialEtaMinutes,
       ),
     );
+
     _timer?.cancel();
     var index = 0;
     _timer = Timer.periodic(const Duration(seconds: 2), (_) {
@@ -167,7 +178,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       current.copyWith(
         driverPosition: _route[event.index],
         progress: progress,
-        etaMinutes: ((1 - progress) * 12).ceil().clamp(1, 99),
+        etaMinutes: ((1 - progress) * _initialEtaMinutes).ceil().clamp(1, 99),
       ),
     );
   }
@@ -177,16 +188,6 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     Emitter<TrackingState> emit,
   ) async {
     _timer?.cancel();
-  }
-
-  List<LatLng> _interpolateRoute(LatLng start, LatLng end, int steps) {
-    return List.generate(steps + 1, (i) {
-      final t = i / steps;
-      return LatLng(
-        start.latitude + (end.latitude - start.latitude) * t,
-        start.longitude + (end.longitude - start.longitude) * t,
-      );
-    });
   }
 
   @override

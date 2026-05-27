@@ -3,9 +3,11 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_list_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTripRepository extends Mock implements TripRepository {}
@@ -14,9 +16,15 @@ class MockConnectivity extends Mock implements Connectivity {}
 
 class MockFcmService extends Mock implements FcmService {}
 
+class MockRouteService extends Mock implements RouteService {}
+
 void main() {
   late MockTripRepository tripRepository;
   late MockConnectivity connectivity;
+
+  setUpAll(() {
+    registerFallbackValue(const LatLng(0, 0));
+  });
 
   setUp(() {
     tripRepository = MockTripRepository();
@@ -123,8 +131,27 @@ void main() {
   });
 
   blocTest<TrackingBloc, TrackingState>(
-    'interpolates route on tracking start',
-    build: () => TrackingBloc(),
+    'loads route on tracking start',
+    build: () {
+      final routeService = MockRouteService();
+      when(
+        () => routeService.getRoute(
+          pickup: any(named: 'pickup'),
+          dropoff: any(named: 'dropoff'),
+        ),
+      ).thenAnswer(
+        (_) async => RouteResult(
+          points: [
+            const LatLng(30, 31),
+            const LatLng(30.05, 31.05),
+            const LatLng(30.1, 31.1),
+          ],
+          distanceMeters: 5000,
+          durationSeconds: 600,
+        ),
+      );
+      return TrackingBloc(routeService);
+    },
     act: (bloc) => bloc.add(
       TrackingStarted(
         TripEntity(
@@ -142,6 +169,9 @@ void main() {
         ),
       ),
     ),
-    expect: () => [isA<TrackingActive>()],
+    expect: () => [
+      isA<TrackingLoading>(),
+      isA<TrackingActive>(),
+    ],
   );
 }

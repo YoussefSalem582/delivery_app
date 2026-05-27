@@ -151,6 +151,15 @@ class TrackingInitial extends TrackingState {
   const TrackingInitial();
 }
 
+class TrackingLoading extends TrackingState {
+  const TrackingLoading({required this.trip});
+
+  final TripEntity trip;
+
+  @override
+  List<Object?> get props => [trip];
+}
+
 class TrackingActive extends TrackingState {
   const TrackingActive({
     required this.trip,
