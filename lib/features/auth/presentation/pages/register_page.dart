@@ -1,12 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
-import 'package:delivery_app/core/utils/app_toast.dart';
 import 'package:delivery_app/core/widgets/nokta_brand_icon.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/auth/presentation/forms/login_inputs.dart';
+import 'package:delivery_app/features/auth/presentation/utils/auth_navigation.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_card.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_scaffold.dart';
-import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _submit(BuildContext context) {
+    dismissAuthKeyboard();
     setState(() {
       _email = EmailInput.dirty(_emailController.text);
       _password = PasswordInput.dirty(_passwordController.text);
@@ -90,66 +90,60 @@ class _RegisterPageState extends State<RegisterPage> {
         );
   }
 
+  void _goToLogin(BuildContext context) {
+    dismissAuthKeyboard();
+    context.router.navigate(const LoginRoute());
+  }
+
+  void _goBack(BuildContext context) {
+    dismissAuthKeyboard();
+    context.router.maybePop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final loading = context.watch<AuthBloc>().state is AuthLoading;
 
-    return BlocProvider(
-      create: (_) => sl<AuthBloc>(),
-      child: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthAuthenticated) {
-            context.router.replaceAll([const MainShellRoute()]);
-          } else if (state is AuthError) {
-            AppToast.error(context, state.message);
-          }
-        },
-        builder: (context, state) {
-          final loading = state is AuthLoading;
-
-          return AuthFormScaffold(
-            appBar: AppBar(
-              backgroundColor: scheme.surface.withValues(alpha: 0.92),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_rounded),
-                onPressed: () => context.router.maybePop(),
+    return AuthFormScaffold(
+      appBar: AppBar(
+        backgroundColor: scheme.surface.withValues(alpha: 0.92),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () => _goBack(context),
+        ),
+      ),
+      form: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Center(
+            child: NoktaBrandIcon(size: 56),
+          ),
+          const SizedBox(height: NoktaSpacing.md),
+          AuthFormCard(
+            titleKey: 'register_title',
+            subtitleKey: 'register_subtitle',
+            hintKey: 'register_hint',
+            buttonKey: 'register_cta',
+            emailController: _emailController,
+            passwordController: _passwordController,
+            emailErrorText: _emailErrorText(),
+            passwordErrorText: _passwordErrorText(),
+            loading: loading,
+            onSubmit: _isValid && !loading ? () => _submit(context) : null,
+            footer: TextButton(
+              onPressed: () => _goToLogin(context),
+              child: Text(
+                'register_has_account'.tr(),
+                style: textTheme.labelLarge?.copyWith(
+                  color: scheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            form: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: NoktaBrandIcon(size: 56),
-                ),
-                const SizedBox(height: NoktaSpacing.md),
-                AuthFormCard(
-                  titleKey: 'register_title',
-                  subtitleKey: 'register_subtitle',
-                  hintKey: 'register_hint',
-                  buttonKey: 'register_cta',
-                  emailController: _emailController,
-                  passwordController: _passwordController,
-                  emailErrorText: _emailErrorText(),
-                  passwordErrorText: _passwordErrorText(),
-                  loading: loading,
-                  onSubmit:
-                      _isValid && !loading ? () => _submit(context) : null,
-                  footer: TextButton(
-                    onPressed: () => context.router.replace(const LoginRoute()),
-                    child: Text(
-                      'register_has_account'.tr(),
-                      style: textTheme.labelLarge?.copyWith(
-                        color: scheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

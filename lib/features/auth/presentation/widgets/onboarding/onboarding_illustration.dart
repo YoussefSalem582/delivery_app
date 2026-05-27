@@ -42,7 +42,7 @@ class OnboardingIllustration extends StatelessWidget {
           child: showBrandLogo
               ? Hero(
                   tag: 'app_logo',
-                  child: NoktaBrandIcon(size: 88, filled: false),
+                  child: NoktaBrandIcon(size: 52, filled: false),
                 )
               : Icon(
                   slide.icon,

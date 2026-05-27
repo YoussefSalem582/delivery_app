@@ -3,6 +3,7 @@ import 'package:delivery_app/core/network/offline_cubit.dart';
 import 'package:delivery_app/core/sync/sync_service.dart';
 import 'package:delivery_app/core/theme/app_theme.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
+import 'package:delivery_app/core/utils/nokta_logo_cache.dart';
 import 'package:delivery_app/core/utils/talker_setup.dart';
 import 'package:delivery_app/core/widgets/nokta_offline_banner.dart';
 import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
@@ -31,6 +32,7 @@ Future<void> main() async {
   }
 
   await initDependencies();
+  await precacheNoktaLogo();
 
   final savedLocale = sl<LocaleCubit>().state;
   if (savedLocale == 'ar') {

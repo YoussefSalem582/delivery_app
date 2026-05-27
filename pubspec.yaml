@@ -44,6 +44,7 @@ dependencies:
   formz: ^0.8.0
   cached_network_image: ^3.4.1
   path_provider: ^2.1.5
+  flutter_svg: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -60,4 +61,4 @@ flutter:
     - assets/mock/
     - assets/translations/
     - assets/lottie/
-    - assets/logo.png
+    - assets/logo.svg

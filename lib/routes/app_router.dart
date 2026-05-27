@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/widgets/nokta_bottom_nav_bar.dart';
 import 'package:delivery_app/features/auth/presentation/pages/auth_choice_page.dart';
+import 'package:delivery_app/features/auth/presentation/pages/auth_credential_shell_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/login_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/onboarding_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/register_page.dart';
@@ -23,8 +24,13 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: SplashRoute.page, initial: true),
         AutoRoute(page: OnboardingRoute.page),
         AutoRoute(page: AuthChoiceRoute.page),
-        AutoRoute(page: LoginRoute.page),
-        AutoRoute(page: RegisterRoute.page),
+        AutoRoute(
+          page: AuthCredentialShellRoute.page,
+          children: [
+            AutoRoute(page: LoginRoute.page, initial: true),
+            AutoRoute(page: RegisterRoute.page),
+          ],
+        ),
         AutoRoute(
           page: MainShellRoute.page,
           children: [

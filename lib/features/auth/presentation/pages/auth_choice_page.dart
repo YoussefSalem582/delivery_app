@@ -40,10 +40,14 @@ class AuthChoicePage extends StatelessWidget {
                           const AuthChoiceHeader(),
                           const Spacer(flex: 2),
                           AuthChoiceOptions(
-                            onSignUp: () =>
-                                context.router.push(const RegisterRoute()),
-                            onSignIn: () =>
-                                context.router.push(const LoginRoute()),
+                            onSignUp: () => context.router.push(
+                              AuthCredentialShellRoute(
+                                children: const [RegisterRoute()],
+                              ),
+                            ),
+                            onSignIn: () => context.router.push(
+                              const AuthCredentialShellRoute(),
+                            ),
                           ),
                           const Spacer(),
                           const AuthChoiceLegalNote(),

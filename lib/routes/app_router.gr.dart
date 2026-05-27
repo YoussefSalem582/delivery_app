@@ -27,6 +27,22 @@ class AuthChoiceRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [AuthCredentialShellPage]
+class AuthCredentialShellRoute extends PageRouteInfo<void> {
+  const AuthCredentialShellRoute({List<PageRouteInfo>? children})
+    : super(AuthCredentialShellRoute.name, initialChildren: children);
+
+  static const String name = 'AuthCredentialShellRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AuthCredentialShellPage();
+    },
+  );
+}
+
+/// generated route for
 /// [HomeMapPage]
 class HomeMapRoute extends PageRouteInfo<void> {
   const HomeMapRoute({List<PageRouteInfo>? children})
