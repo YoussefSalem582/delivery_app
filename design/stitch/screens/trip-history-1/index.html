@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Nokta - Trips</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#424656",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#c2c6d8",
+                        "primary-fixed": "#dae1ff",
+                        "inverse-on-surface": "#eff1f4",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#00201b",
+                        "on-secondary-container": "#007262",
+                        "on-primary-fixed": "#001849",
+                        "surface-dim": "#d8dadd",
+                        "on-tertiary-fixed": "#271900",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f7f9fc",
+                        "on-primary-container": "#f8f7ff",
+                        "inverse-primary": "#b3c5ff",
+                        "tertiary": "#765300",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "surface-container-low": "#f2f4f7",
+                        "secondary": "#006b5c",
+                        "secondary-fixed": "#65fade",
+                        "surface-container": "#eceef1",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffba20",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#e6e8eb",
+                        "on-tertiary-container": "#fff6ee",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1e",
+                        "outline": "#727687",
+                        "on-background": "#191c1e",
+                        "primary-container": "#0066ff",
+                        "surface": "#f7f9fc",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed-variant": "#003fa4",
+                        "on-tertiary-fixed-variant": "#5e4200",
+                        "secondary-container": "#65fade",
+                        "tertiary-container": "#956a00",
+                        "on-secondary-fixed-variant": "#005045",
+                        "primary": "#0050cb",
+                        "surface-tint": "#0054d6",
+                        "secondary-fixed-dim": "#41ddc2",
+                        "surface-variant": "#e0e3e6",
+                        "tertiary-fixed": "#ffdea8",
+                        "background": "#f7f9fc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "2xl": "1rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "safe": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col font-body-lg">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background docked full-width top-0 flat no shadows flex justify-between items-center w-full px-margin-mobile h-14 sticky z-40">
+<button aria-label="Menu" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-title-lg font-title-lg font-bold text-primary dark:text-inverse-primary">Trips</h1>
+<button aria-label="Profile" class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors">
+<img alt="User profile photo" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2cgMtn4I3MoaKEDFQlEcccQ_cNNQ8eSszR7ZgBVV7s04K5zom1Bi67QGLvix2UQEdt2XCxKeJT42q6W3W4V9MDBlFi9jlrmQNkwJtqxI59gODs0Cn9jrz8vSeAsiMzfASKtKkuMGkwI8eu3zpBIwOrhxwnW63vn1lDj-TXpLp-ELXhUJWRgwp7hz90Fmd4JdTzd0GcG3N91q1_HHc_NjjBM7U5BOvYofhutqf5HGyVSaaeQwgtI5lOTPbx3aukgnQbPnLARPmr3Kh"/>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-margin-mobile py-lg pb-24 md:px-margin-desktop max-w-3xl mx-auto w-full">
+<!-- Filter Tabs (Optional Enhancement) -->
+<div class="flex gap-sm mb-lg overflow-x-auto no-scrollbar py-sm">
+<button class="h-[32px] px-lg rounded-full bg-primary text-on-primary font-label-lg text-label-lg whitespace-nowrap">All</button>
+<button class="h-[32px] px-lg rounded-full bg-surface-container text-on-surface font-label-lg text-label-lg whitespace-nowrap">Personal</button>
+<button class="h-[32px] px-lg rounded-full bg-surface-container text-on-surface font-label-lg text-label-lg whitespace-nowrap">Business</button>
+</div>
+<!-- Trip List -->
+<div class="flex flex-col gap-md">
+<!-- Trip Card 1 (Completed) -->
+<article class="bg-surface-bright rounded-2xl p-md border border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Today, 10:42 AM</span>
+</div>
+<div class="font-label-lg text-label-lg text-primary">$24.50</div>
+</div>
+<div class="flex items-stretch gap-md mb-md">
+<!-- Timeline Visual -->
+<div class="flex flex-col items-center py-xs">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-[2px] h-full bg-surface-variant my-1"></div>
+<div class="w-2 h-2 rounded-full border-2 border-primary bg-surface-bright"></div>
+</div>
+<!-- Addresses -->
+<div class="flex flex-col justify-between py-xs flex-1">
+<div class="font-title-lg text-title-lg text-on-surface line-clamp-1">742 Evergreen Terrace</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-sm line-clamp-1">Springfield Nuclear Power Plant</div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-sm border-t border-surface-variant">
+<div class="flex items-center gap-xs text-secondary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                        Completed
+                    </div>
+<button class="text-primary font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity">Details</button>
+</div>
+</article>
+<!-- Trip Card 2 (Cancelled) -->
+<article class="bg-surface-bright rounded-2xl p-md border border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Yesterday, 6:15 PM</span>
+</div>
+<div class="font-label-lg text-label-lg text-on-surface-variant line-through">$18.00</div>
+</div>
+<div class="flex items-stretch gap-md mb-md opacity-60">
+<div class="flex flex-col items-center py-xs">
+<div class="w-2 h-2 rounded-full bg-on-surface-variant"></div>
+<div class="w-[2px] h-full bg-surface-variant my-1"></div>
+<div class="w-2 h-2 rounded-full border-2 border-on-surface-variant bg-surface-bright"></div>
+</div>
+<div class="flex flex-col justify-between py-xs flex-1">
+<div class="font-title-lg text-title-lg text-on-surface line-clamp-1">Downtown Central Station</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-sm line-clamp-1">100 Tech Blvd, Innovation Park</div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-sm border-t border-surface-variant">
+<div class="flex items-center gap-xs text-error font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+                        Cancelled
+                    </div>
+<button class="text-primary font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity">Details</button>
+</div>
+</article>
+<!-- Trip Card 3 (Completed) -->
+<article class="bg-surface-bright rounded-2xl p-md border border-outline-variant hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span>Oct 24, 08:30 AM</span>
+</div>
+<div class="font-label-lg text-label-lg text-primary">$42.80</div>
+</div>
+<div class="flex items-stretch gap-md mb-md">
+<div class="flex flex-col items-center py-xs">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<div class="w-[2px] h-full bg-surface-variant my-1"></div>
+<div class="w-2 h-2 rounded-full border-2 border-primary bg-surface-bright"></div>
+</div>
+<div class="flex flex-col justify-between py-xs flex-1">
+<div class="font-title-lg text-title-lg text-on-surface line-clamp-1">International Airport (Terminal 1)</div>
+<div class="font-body-md text-body-md text-on-surface-variant mt-sm line-clamp-1">Grand Hotel, City Center</div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-sm border-t border-surface-variant">
+<div class="flex items-center gap-xs text-secondary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                        Completed
+                    </div>
+<button class="text-primary font-label-lg text-label-lg opacity-0 group-hover:opacity-100 transition-opacity">Details</button>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center bg-surface-container-lowest dark:bg-inverse-surface px-4 pb-safe shadow-[0px_-4px_12px_rgba(0,0,0,0.08)] h-[56px] md:hidden">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline w-16 hover:bg-surface-variant dark:hover:bg-surface-container-high h-full rounded-lg transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="home">home</span>
+<span class="font-label-md text-label-md mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary dark:text-inverse-primary relative after:content-[''] after:w-1 after:h-1 after:bg-primary dark:after:bg-inverse-primary after:rounded-full after:mt-1 w-16 hover:bg-surface-variant dark:hover:bg-surface-container-high h-full rounded-lg transition-colors scale-95 duration-150 group">
+<span class="material-symbols-outlined filled group-hover:scale-110 transition-transform" data-icon="directions_car">directions_car</span>
+<span class="font-label-md text-label-md mt-1">Trips</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline w-16 hover:bg-surface-variant dark:hover:bg-surface-container-high h-full rounded-lg transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="notifications">notifications</span>
+<span class="font-label-md text-label-md mt-1">Alerts</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline w-16 hover:bg-surface-variant dark:hover:bg-surface-container-high h-full rounded-lg transition-colors group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="person">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nokta - Trip Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "outline": "#727687",
+                        "inverse-surface": "#2d3133",
+                        "on-surface-variant": "#424656",
+                        "surface-container": "#eceef1",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#0054d6",
+                        "surface-container-highest": "#e0e3e6",
+                        "primary": "#0050cb",
+                        "on-primary": "#ffffff",
+                        "surface": "#f7f9fc",
+                        "surface-variant": "#e0e3e6",
+                        "surface-container-low": "#f2f4f7",
+                        "background": "#f7f9fc",
+                        "surface-container-high": "#e6e8eb",
+                        "outline-variant": "#c2c6d8",
+                        "primary-container": "#0066ff",
+                        "on-primary-container": "#f8f7ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "16px",
+                        "btn": "12px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "safe": "env(safe-area-inset-bottom)",
+                        "13": "3.25rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .timeline-line {
+            position: absolute;
+            left: 11px;
+            top: 24px;
+            bottom: -8px;
+            width: 2px;
+            background-color: theme('colors.outline-variant');
+            z-index: 0;
+        }
+        .timeline-line.active {
+            background-color: theme('colors.primary');
+        }
+        .timeline-step:last-child .timeline-line {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md antialiased min-h-screen flex flex-col md:hidden">
+<!-- TopAppBar (Transactional - Nav hidden) -->
+<header class="bg-surface flex justify-between items-center w-full px-margin-mobile h-14 sticky top-0 z-50">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="text-title-lg font-title-lg font-bold text-primary flex-1 text-center pr-10">Trip Details</h1>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-margin-mobile py-4 flex flex-col gap-4 overflow-y-auto pb-safe">
+<!-- Hero Card: Trip Summary -->
+<section class="bg-surface-container-lowest rounded-card p-4 border border-outline-variant shadow-sm relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<span class="bg-primary-container text-on-primary-container text-label-md font-label-md px-3 py-1 rounded-full inline-block">In Progress</span>
+<span class="text-body-md font-body-md text-on-surface-variant text-right">Est. arrival 10:45 AM</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex flex-col items-center gap-1">
+<div class="w-3 h-3 rounded-full bg-on-surface"></div>
+<div class="w-0.5 h-6 bg-outline-variant"></div>
+<div class="w-3 h-3 rounded-full bg-primary border-2 border-surface-container-lowest outline outline-1 outline-primary"></div>
+</div>
+<div class="flex flex-col flex-1 gap-3">
+<div>
+<p class="text-label-md font-label-md text-outline">Pickup</p>
+<p class="text-body-lg font-body-lg font-semibold text-on-surface truncate">123 Main St</p>
+</div>
+<div>
+<p class="text-label-md font-label-md text-outline">Drop-off</p>
+<p class="text-body-lg font-body-lg font-semibold text-on-surface truncate">City Mall</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Driver Info Card -->
+<section class="bg-surface-container-lowest rounded-card p-4 border border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container shrink-0">
+<img alt="Ahmed Hassan profile photo" class="w-full h-full object-cover" data-alt="A closely cropped, high-quality professional headshot of a middle-eastern male driver named Ahmed. He has a warm, trustworthy expression and short dark hair. The lighting is bright and even, set against a neutral, light-mode suitable gray background. The image style is clean, modern, and perfectly suited for a ride-hailing app's user profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChNL0FJHhFlPEqmrjiPLZXPpgbZBx6XH_VzPej0GP5FwxgL4BpEjppyVZEvf1hSNSPq9bBlydjOL5qUmlrneu_3n2PiPYEN5yTQxUzbLFM-k_CUIxleUpCf_nKSaMzbmEKTkF71z3C9wtvBjxROM90_tGQKOiFbbHunV9mTJsMFUDRGIHCqGFXWiX6JjA9DhDo_xUdwsxgx9ZuwWmuj9KpYZbhJYDCqmuo3J7LveWTlp387edtv4eP33oxnLuBqHEJOOOjM_BpnDdz"/>
+</div>
+<div>
+<h2 class="text-label-lg font-label-lg text-on-surface">Ahmed Hassan</h2>
+<p class="text-body-md font-body-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">star</span> 4.9 (124 rides)
+                    </p>
+</div>
+</div>
+<div class="flex gap-2">
+<button aria-label="Message Driver" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+</button>
+<button aria-label="Call Driver" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">call</span>
+</button>
+</div>
+</section>
+<!-- Status Timeline -->
+<section class="bg-surface-container-lowest rounded-card p-5 border border-outline-variant">
+<h3 class="text-label-lg font-label-lg text-on-surface mb-6">Trip Status</h3>
+<div class="relative flex flex-col gap-6 pl-2">
+<!-- Step 1 -->
+<div class="timeline-step relative flex items-start gap-4">
+<div class="timeline-line active"></div>
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-on-primary text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<p class="text-label-lg font-label-lg text-on-surface">Requested</p>
+<p class="text-body-md font-body-md text-outline">10:15 AM</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="timeline-step relative flex items-start gap-4">
+<div class="timeline-line active"></div>
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-on-primary text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<p class="text-label-lg font-label-lg text-on-surface">Accepted</p>
+<p class="text-body-md font-body-md text-outline">10:16 AM</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="timeline-step relative flex items-start gap-4">
+<div class="timeline-line active"></div>
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10 shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-on-primary text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<p class="text-label-lg font-label-lg text-on-surface">Driver Arrived</p>
+<p class="text-body-md font-body-md text-outline">10:22 AM</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="timeline-step relative flex items-start gap-4">
+<div class="timeline-line"></div>
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10 shrink-0 mt-0.5 outline outline-2 outline-offset-2 outline-primary-fixed">
+<span class="material-symbols-outlined text-on-primary text-[14px]" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+</div>
+<div>
+<p class="text-label-lg font-label-lg text-primary">In Progress</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Estimated arrival at 10:45 AM</p>
+</div>
+</div>
+<!-- Step 5 -->
+<div class="timeline-step relative flex items-start gap-4">
+<div class="timeline-line"></div>
+<div class="w-6 h-6 rounded-full bg-surface-variant flex items-center justify-center z-10 shrink-0 mt-0.5 border border-outline-variant">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+</div>
+<div>
+<p class="text-label-lg font-label-lg text-outline">Completed</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Fare Row -->
+<section class="flex justify-between items-center py-2 px-1">
+<span class="text-body-lg font-body-lg text-on-surface-variant">Fare</span>
+<span class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">$12.50</span>
+</section>
+<div class="h-6"></div> <!-- Spacer -->
+</main>
+<!-- Action Buttons Area (Fixed Bottom) -->
+<div class="bg-surface-container-lowest border-t border-outline-variant p-margin-mobile pt-4 pb-[calc(16px+env(safe-area-inset-bottom))] flex flex-col gap-3 shadow-[0px_-4px_12px_rgba(0,0,0,0.04)] z-40 sticky bottom-0">
+<button class="h-13 w-full bg-primary text-on-primary rounded-btn text-label-lg font-label-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">navigation</span>
+            Track Trip
+        </button>
+<button class="h-13 w-full bg-transparent text-primary border-2 border-primary rounded-btn text-label-lg font-label-lg flex items-center justify-center active:scale-[0.98] transition-transform hover:bg-primary-container hover:bg-opacity-10">
+            Complete Trip
+        </button>
+</div>
+</body></html>

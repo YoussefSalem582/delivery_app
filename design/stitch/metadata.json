@@ -1,0 +1,109 @@
+{
+  "projectId": "13507971777862616201",
+  "projectTitle": "Nokta Mobile Design System",
+  "screens": {
+    "design-system": {
+      "title": "Design System",
+      "screenId": "asset-stub-assets-09dd73e0a1f944569d356b8d9303fd8f-1779878399307",
+      "assetId": "09dd73e0a1f944569d356b8d9303fd8f",
+      "note": "Design system asset (not a screen). Exported as design-system.json via listDesignSystems.",
+      "jsonPath": "design/stitch/screens/design-system/design-system.json"
+    },
+    "home-dark": {
+      "title": "Home (Dark Mode)",
+      "screenId": "53f1d312790a474f8439e5a5dfa4c143",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2M4YjBlNzE4MzI2YzQ3Njc5MGI3MjM1NzUxMjFhM2QyEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ujSbk8uubZMYFfhiTto3bM5cU6ersiPh_V3Fh0vvHljS8cHTi9fO4VXLQBNogam3t7jGTTFlH1ZGViBVNkJgyanlOXNTnOQbpq16dvuu92_ETumOTaG_6H8w_RWxnZUDqQjjPZr6hr0Yzki5ZwmnDV0bZG9-uczu6SioaJeUX91Fq8ISSAiLGrLumpND0EFsj2hlZ3TbNqCMIDg8-5s51m7LYPa-L1ccYATSR3HWsMgkZAajxsGdqe_67g=w1280",
+      "htmlPath": "design\\stitch\\screens\\home-dark\\index.html",
+      "imagePath": "design\\stitch\\screens\\home-dark\\screen.png"
+    },
+    "home-light": {
+      "title": "Home (Light Mode)",
+      "screenId": "464789107fd64015adee3aecd2efad66",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzA3M2M2ODQzOTAwMTRmNWE5YTc1ZWZhOThjNjZlYTdkEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ugYUpKw3jGxSAclyU6eGYepOENq4r0BWsIfNeZk4rGH2RAGhOkxvj0ovEYl7xLoGP1CuyjimdDhFZU6W-hzYPLZOAI7caRfPISSihKgurRRgnVIyMbJGd1DjHZxe6daLrNkouLNMdHQf4Ur2TFVELkFcDRx0l2BBPVNi-eH-t7ceb1rYEdYsXpGsn95RK8xPe7gwQ_4wURn2_GytpzOhfwin2OL17V78JXTaepzcK4vc3cthgA7y5wdoDMM=w1280",
+      "htmlPath": "design\\stitch\\screens\\home-light\\index.html",
+      "imagePath": "design\\stitch\\screens\\home-light\\screen.png"
+    },
+    "ride-selection": {
+      "title": "Ride Selection",
+      "screenId": "704b6bca68664685b367389178d5bcba",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzI2NzdhNDQ2MDEwNzQ2NTdhZDAwMGIyNTM3YjAxMzBiEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0uhUzcUsbfBspDn0KHGy3Hi2XntIqIXitqS2m_xSpyh5X8xKS4_QpxpymhB2JLtAG9a0ZoUk1If3Ff9uNawBrfummxMoPl9XoilL_IaFjeqL82EbkA1ACUTWyagF1BUww4qt4TVEvaPKATLMGPPosKC23WAnQkeVTQe6zdOmvIfnwIyTQ5yk1xJSc00axTbxJn2O2lFD9bldyPwCy34RCMsTekmnWsLg9gegzXdAOlbEzlof18XMLJr_obdZ=w1280",
+      "htmlPath": "design\\stitch\\screens\\ride-selection\\index.html",
+      "imagePath": "design\\stitch\\screens\\ride-selection\\screen.png"
+    },
+    "trip-history-1": {
+      "title": "Trip History",
+      "screenId": "c08879569c904aa6ad90b26357566e0e",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzBiMzA2MzEzNjYzNTRjOTc5ODg0N2Q5MDY1MTMzYmQ5EgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ujKNedOIuCiUvl4Mg6yNCaUzwWr_97RgImGYUwq4ak7ECmNg3oRAzSpB5azhnFsWjIIMLzgsJLFS0PrzxwAC2drxks-2ZUQ07mZLqt6Ov-vNnnZwF9Yu9O7IzHF-X58gYsXHnL7KEmuIZ0vl_bJbFY_eGlHyysoSoSbesQ_ESwpzEdrm0y86o_6nXl_7P5taD_0DIg6BvjJLkfeXyVvwR_IMak0v03MN67a4zE9YuhzeqearIejv8xnpuh2=w1280",
+      "htmlPath": "design\\stitch\\screens\\trip-history-1\\index.html",
+      "imagePath": "design\\stitch\\screens\\trip-history-1\\screen.png"
+    },
+    "splash": {
+      "title": "Splash Screen",
+      "screenId": "e5175406c2d34bdb8f875897919ce178",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzkwNGEwMWY0NGRiZDQ0ZTA5YjBiY2Q1ZDQ5M2NlZmU0EgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ugant9C55OOn5p4z1pZaP85dGJzYBNW4rDlvHOzS7hW7PcXuAj5VrTHILbMvrcWdrK0ndEeGamhIgIB-I8eWBHMpgeFGVPgLTxd9IeW_cr_c_xHJg-pPu4wLIAEEDhbgzOUYR6ec5IKdfwcyqgqTjyCP9LSxE6feZqS-Uk_AkAOhXuwHRhFOkb1JcAxPui9St5fic9KULk49roOKT0EJ5WEHbuaSbIMdZiu3VlLATofNitKAg6Lkw4qq70=w1280",
+      "htmlPath": "design\\stitch\\screens\\splash\\index.html",
+      "imagePath": "design\\stitch\\screens\\splash\\screen.png"
+    },
+    "login": {
+      "title": "Login Screen",
+      "screenId": "c21a65556e5a444fbf39ed7b5c126f52",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzlhYTA0ZDNlMGVmODRjMTI5NTk1MmJhOGMyMzQ1Y2RkEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ug12Mksi701hbK1h6nx4142yN5ZDV4nL2Wnm36-R6tmAnHIS1dyNZtNTvQ-hzOnMM8FnQ91e_RQ7YhYnw5v_hD0Uzy4A8Mz7ZeX1TDf2EZlsLJpd9f25zrZYxJ3P_GFmDq5drL-1VWCwHbRD0xbQwK_w5R7sfr2N_6FlRTayDTanMrw7SUd-Bfti2HjqSrWja7KfSWAjE2-e85PAEBLqaVamQfUO_zn7peOf1bjyPHoXbCYFVp5jmLY0UQ=w1280",
+      "htmlPath": "design\\stitch\\screens\\login\\index.html",
+      "imagePath": "design\\stitch\\screens\\login\\screen.png"
+    },
+    "main-map": {
+      "title": "Main Map View",
+      "screenId": "72305331c20e4dbbae6be771782938bf",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2E1YzVjOGJmMzM4MjQ1ZmQ5OGYxMzNlYzFmMTc5NWI2EgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ujx2DQyZi9x7n68RGbMyQupmU8NPfWUhF9xA1FgqbhevS20DfkOyABK8-dEC6XqsuoNnKhLZB_8pjECY0BLOkSf4knaPnjGScme34MSGrnuNFuXmzn5FP4KEQ6Fd8iA9JBCzX_czsVY3VDV5exqik7n_6SUwyW-j7tmtzv76SdhnRuwsgVGVPzHkDHp2h6dyDEWUP2SmmmNSzW-1pUkdv7AYHMPIClVGkwmtQ8QeL_e_K1k2YH2Z7TCvLc3=w1280",
+      "htmlPath": "design\\stitch\\screens\\main-map\\index.html",
+      "imagePath": "design\\stitch\\screens\\main-map\\screen.png"
+    },
+    "ride-request-sheet": {
+      "title": "Ride Request Sheet",
+      "screenId": "ddf4f1cb1118472b883b5a7e78a3c137",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2Y5Zjk2Y2I0NjBiMjQ1YjlhMmNhMjM1YjA1N2Y1NTA1EgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ujrYsGRlwdyzXbNbAVo8WJd1fKnU30z2fZ_G5NZTvkos3lVFV1LwRRVfCqf3O56dZlzQQvLQa9L-XqWEAT3iSH3fdjH6KH9VJLOZzEFSMNOfWPP-SDRPPttvDXRNZMePb4WqI_4Z7Z8NqpcdZEtBpxR6q7JtiHKNuNchXKCopDcs8YKpIuD-RjfleeNYwD7-KGOb0AzoBZHgo7j4_mwQjOC1e4mODebBAYKp6RC7DUI1ZkITLd1N1y1PDNu=w1280",
+      "htmlPath": "design\\stitch\\screens\\ride-request-sheet\\index.html",
+      "imagePath": "design\\stitch\\screens\\ride-request-sheet\\screen.png"
+    },
+    "trip-history-2": {
+      "title": "Trip History",
+      "screenId": "ba9e9f3971804c6091629023ba50d8e2",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2MxZTY0ZDRkMTY5MDQ2ODZiZTU3MzBjZDNiYjUwZWNkEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0uiFra9Aq4gq8TckHzf6TbIg05mAS4yzH5_HHWLkTRiB7XDPi-Ozc2DtHUamq49p83SJJFwQRjFtqDvRLxmi4pvJR32aktpqKtTs-ZappHzP-wnGaYlfPcODscJjiCG2nA7hKXLaJRRPRx0NhU7Fo8JTBKSdtpEuVY5t2dImSxRWuwJqfap7dDxmEVikfVHGj1eFlK37FdCT_LjPexmPHFEDE8vThTW6qvZN0DoSNhS7Rl23zxbKysRYFO-H=w1280",
+      "htmlPath": "design\\stitch\\screens\\trip-history-2\\index.html",
+      "imagePath": "design\\stitch\\screens\\trip-history-2\\screen.png"
+    },
+    "trip-details": {
+      "title": "Trip Details",
+      "screenId": "ae83d0eeec70420fae375ae3ae1969fb",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzRhMTBhYWM4MzA2MTQxOGQ5N2Y0Mzc3MmEzNDdkOGVhEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0uisfCIUtRMnI6y7ayVhgN8YllUMpeyBqAl704M5g87DQC6EMIu61_zV9XwTx23HCzeDe9MEKnAu2y9OfV5u-vcag98noxVxvVNWjEzvNcaJ3eD6AaImOX9lG5Rd2GLrFFAMR4XciDR2ZA-JizOUliA5DYGG9zLnhfL85DFTxLkKPSccFC04wKNbkLNDDvz_YUlC8ayvO0hz8m6dZuOGTorX3tziMzbM-v7OCwIpcHxNyClFoCqq9q6NOyAk=w1280",
+      "htmlPath": "design\\stitch\\screens\\trip-details\\index.html",
+      "imagePath": "design\\stitch\\screens\\trip-details\\screen.png"
+    },
+    "live-tracking": {
+      "title": "Live Tracking",
+      "screenId": "5ba5dcb9d3b64d7a9d532e56961ae1d1",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzIyODFkOTdiZWFhZTRiOWFiMjRjNjE4ZTgyN2NmMmU4EgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ugGlYfOob0VlhDSfx3BVj4hbYBmniuVDhXUEUNH9wtig-2dEmQCrkUplLqxHP1r3OwfJxZDm3BkfC14OlV1yA-zCDtv_dLPThXbl8H4Z-s1JooSr7hHI3jzOyI0xdvO25CfsQf5GjMgFvyrZ8-EesTab94DgQBLxIbOxBJNmtdPJcjea9lAnH0ErtKSDVhLXzVWZevXIfx9p7HUixIDAAI-Zcvfd4cubxhiGYecKrDbb4UcKaoLqfwxFTw=w1280",
+      "htmlPath": "design\\stitch\\screens\\live-tracking\\index.html",
+      "imagePath": "design\\stitch\\screens\\live-tracking\\screen.png"
+    },
+    "profile-settings": {
+      "title": "Profile & Settings",
+      "screenId": "acb11d2709d8438683ecfd13db757582",
+      "htmlUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2IxMTljZjZkMmQyYjQ1NmViMWFhYmEyY2Q2YzZhNTljEgsSBxCIk8O83hoYAZIBJAoKcHJvamVjdF9pZBIWQhQxMzUwNzk3MTc3Nzg2MjYxNjIwMQ&filename=&opi=89354086",
+      "imageUrl": "https://lh3.googleusercontent.com/aida/ADBb0ugD1IA5Ys-ExLuECZW-tVZOgt3ZzH1AkqMOoHsSgxctpVKBrj5kYKT70ZzkSl58w-xfCKsBOqWSXnTx5NQ3yq-zrIlXVHk37eWieSTRzqjaWZmQmzYvKYkhUw7mNPn7vgAloaGci48Di2p7EgYjmLiTgM-xjUhddrBqAWmsjaUctcE9WwI69PIMQtv6Io-7jywq_gzMgGA4HkUBKevunRjNSvZ6WrM92Z6O39ZapU_KUNcgGSjuwOAJEi3D=w1280",
+      "htmlPath": "design\\stitch\\screens\\profile-settings\\index.html",
+      "imagePath": "design\\stitch\\screens\\profile-settings\\screen.png"
+    }
+  }
+}

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nokta - Splash Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#191c1e",
+                        "on-primary-container": "#f8f7ff",
+                        "surface-container": "#eceef1",
+                        "surface-variant": "#e0e3e6",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f7f9fc",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#001849",
+                        "on-tertiary-fixed": "#271900",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f2f4f7",
+                        "on-primary-fixed-variant": "#003fa4",
+                        "tertiary-fixed": "#ffdea8",
+                        "on-tertiary-container": "#fff6ee",
+                        "surface-bright": "#f7f9fc",
+                        "secondary-fixed": "#65fade",
+                        "on-secondary-fixed": "#00201b",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#b3c5ff",
+                        "error-container": "#ffdad6",
+                        "on-background": "#191c1e",
+                        "tertiary-fixed-dim": "#ffba20",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#005045",
+                        "secondary": "#006b5c",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#eff1f4",
+                        "secondary-container": "#65fade",
+                        "surface-tint": "#0054d6",
+                        "outline-variant": "#c2c6d8",
+                        "tertiary": "#765300",
+                        "surface-container-highest": "#e0e3e6",
+                        "on-surface-variant": "#424656",
+                        "on-secondary-container": "#007262",
+                        "on-tertiary-fixed-variant": "#5e4200",
+                        "primary": "#0050cb",
+                        "surface": "#f7f9fc",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "surface-container-high": "#e6e8eb",
+                        "primary-container": "#0066ff",
+                        "tertiary-container": "#956a00",
+                        "surface-dim": "#d8dadd",
+                        "secondary-fixed-dim": "#41ddc2",
+                        "primary-fixed": "#dae1ff",
+                        "outline": "#727687",
+                        "inverse-surface": "#2d3133",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'spin-slow': 'spin 1.5s linear infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fc; /* Matching surface background */
+        }
+        
+        .loader-ring {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(0, 102, 255, 0.1); /* Background ring using primary-container with opacity */
+            border-top-color: #0066ff; /* Primary blue for the active part */
+            border-radius: 50%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen bg-surface flex flex-col items-center justify-center p-margin-mobile overflow-hidden antialiased">
+<!-- Main Content Container with Fade-In Animation -->
+<main class="flex flex-col items-center justify-center w-full max-w-sm mx-auto opacity-0 animate-fade-in-up">
+<!-- Logo Icon -->
+<div class="mb-4 text-primary">
+<span class="material-symbols-outlined text-[64px]" style="font-variation-settings: 'FILL' 1;">
+                directions_car
+            </span>
+</div>
+<!-- App Name -->
+<h1 class="font-display-lg text-display-lg text-on-surface mb-12 tracking-tight">
+            Nokta
+        </h1>
+<!-- Loading Indicator -->
+<div class="mb-6">
+<div class="loader-ring animate-spin-slow"></div>
+</div>
+<!-- Subtitle -->
+<p class="font-body-lg text-body-lg text-on-surface-variant text-center">
+            Loading your ride experience...
+        </p>
+</main>
+<script>
+        // Optional: Simple script to transition away after a delay (simulating load)
+        // In a real app, this would be handled by the routing/state management.
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                // e.g., window.location.href = '/home';
+                console.log('Splash screen finished. Ready to navigate.');
+            }, 3000);
+        });
+    </script>
+</body></html>

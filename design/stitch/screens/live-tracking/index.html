@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Nokta - Live Trip Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d8dadd",
+                        "on-secondary-container": "#007262",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#65fade",
+                        "tertiary-fixed-dim": "#ffba20",
+                        "primary-container": "#0066ff",
+                        "surface-variant": "#e0e3e6",
+                        "tertiary": "#765300",
+                        "inverse-primary": "#b3c5ff",
+                        "surface-bright": "#f7f9fc",
+                        "on-secondary-fixed": "#00201b",
+                        "surface-container": "#eceef1",
+                        "surface": "#f7f9fc",
+                        "secondary": "#006b5c",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "outline-variant": "#c2c6d8",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eff1f4",
+                        "tertiary-fixed": "#ffdea8",
+                        "on-tertiary-fixed": "#271900",
+                        "on-primary-fixed-variant": "#003fa4",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#956a00",
+                        "error": "#ba1a1a",
+                        "outline": "#727687",
+                        "surface-container-low": "#f2f4f7",
+                        "inverse-surface": "#2d3133",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fc",
+                        "on-surface-variant": "#424656",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dae1ff",
+                        "surface-container-high": "#e6e8eb",
+                        "on-surface": "#191c1e",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5e4200",
+                        "secondary-fixed-dim": "#41ddc2",
+                        "secondary-container": "#65fade",
+                        "on-tertiary-container": "#fff6ee",
+                        "primary": "#0050cb",
+                        "on-primary-fixed": "#001849",
+                        "on-secondary-fixed-variant": "#005045",
+                        "on-primary-container": "#f8f7ff",
+                        "on-primary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "surface-tint": "#0054d6",
+                        "surface-container-highest": "#e0e3e6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "card": "16px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "xs": "4px",
+                        "xl": "32px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "margin-desktop": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    "boxShadow": {
+                        "level2": "0px 4px 12px rgba(0,0,0,0.08)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>.map-bg {
+    background-color: #e5e5e5;
+    /* Fallback */
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDUTkDEzkuOAeX5qV1tL1hRJxXEoIbD5PAVanMLWJWoQAfF4aoY7rI2wOoyBVNwXyu-5Td7BV7SGxAFLyj_YrpjbWTvFQWwxSzplVBXpRp-hEhNXqzFjKnG0x8-D-ztLa-3WYPmlD6q8rjCBHdyRNML8YJovvV08S5S_cKJGWgJTvpMQmd5IB_QhuXx3UY3Hhy6uccNI4_iQem2LNf3_WEOu_I4I98yy6XA8saRjOWZmd96Fzh80b4V3UfCqu_QvHCpCPrA88ddxbxV);
+    background-size: cover;
+    background-position: center
+    }
+/* Map route polyline mockup */
+.route-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(15deg);
+    width: 250px;
+    height: 6px;
+    background-color: #0050cb;
+    /* primary */
+    border-radius: 3px;
+    box-shadow: 0 0 4px rgba(0, 80, 203, 0.5)
+    }
+/* Moving car animation */
+@keyframes drive {
+    0% {
+        transform: translateX(-120px) translateY(-10px) rotate(15deg);
+        } 100% {
+        transform: translateX(100px) translateY(50px) rotate(15deg);
+        }
+    }
+.moving-car {
+    animation: drive 10s linear infinite
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background h-screen w-full overflow-hidden relative flex flex-col font-body-md antialiased selection:bg-primary selection:text-on-primary">
+<!-- Map Background Level 0 -->
+<div class="absolute inset-0 map-bg z-0" data-alt="A clean, modern top-down street map visualization of a bustling city center. The map is designed in a minimalist, light-mode style with soft gray roads, subtle green park areas, and light beige building blocks. The visual aesthetic is reminiscent of premium ride-hailing apps, prioritizing clarity and high contrast for navigation routes." data-location="Cairo, Egypt" style="">
+<!-- Route Polyline -->
+<div class="route-line z-10"></div>
+<!-- Pickup Pin (Green) -->
+<div class="absolute top-1/2 left-1/2 -translate-x-[120px] -translate-y-[20px] z-20 flex flex-col items-center">
+<div class="bg-secondary text-on-secondary p-1 rounded-full shadow-md">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">trip_origin</span>
+</div>
+<div class="w-1 h-3 bg-secondary"></div>
+</div>
+<!-- Drop-off Pin (Red) -->
+<div class="absolute top-1/2 left-1/2 translate-x-[110px] translate-y-[45px] z-20 flex flex-col items-center">
+<div class="bg-error text-on-error p-1 rounded-full shadow-md">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<div class="w-1 h-3 bg-error"></div>
+</div>
+<!-- Moving Car Marker -->
+<div class="absolute top-1/2 left-1/2 moving-car z-30">
+<div class="bg-surface-container-lowest p-2 rounded-full shadow-level2 border border-surface-variant flex items-center justify-center relative">
+<!-- Inner blue dot indicating direction -->
+<div class="absolute -top-1 right-0 w-3 h-3 bg-primary rounded-full border-2 border-surface-container-lowest"></div>
+<span class="material-symbols-outlined text-primary text-[24px]" style="font-variation-settings: 'FILL' 1;">local_taxi</span>
+</div>
+</div>
+</div>
+<!-- Top App Bar (From Shared Components JSON) - Suppressed standard TopAppBar for specific requirements -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-14 bg-surface dark:bg-background docked full-width top-0 z-50">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant bg-surface-container-lowest shadow-sm">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-title-lg font-title-lg font-bold text-primary dark:text-inverse-primary truncate flex-1 text-center px-4 drop-shadow-md bg-surface-container-lowest/80 backdrop-blur-sm rounded-full py-1 mx-2">
+            Live Tracking
+        </h1>
+<div class="w-10 h-10"></div> <!-- Spacer for center alignment -->
+</header>
+<!-- Main Canvas Area (Empty, filled by map) -->
+<main class="flex-1 relative z-10 pointer-events-none">
+<!-- Floating Actions -->
+<div class="absolute right-4 bottom-32 pointer-events-auto flex flex-col gap-3">
+<button aria-label="Recenter Map" class="w-14 h-14 bg-surface-container-lowest rounded-full shadow-level2 flex items-center justify-center text-primary hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[28px]">my_location</span>
+</button>
+</div>
+</main>
+<!-- Bottom ETA Card Overlay -->
+<div class="absolute bottom-4 left-4 right-4 z-40">
+<div class="bg-surface-container-lowest rounded-card shadow-level2 border border-surface-variant p-4 pointer-events-auto">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wide">ETA</span>
+<span class="text-display-lg font-display-lg text-primary leading-none mt-1">8 min</span>
+</div>
+<!-- Status Chip -->
+<div class="bg-primary-container text-on-primary-container px-3 py-1.5 rounded-full flex items-center gap-1.5 h-[32px]">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-md font-label-md whitespace-nowrap">In Progress</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-outline-variant/30 my-3"></div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden shrink-0 border border-outline-variant/20 relative">
+<!-- Using generic gradient placeholder as requested to avoid data URIs -->
+<div class="w-full h-full bg-gradient-to-br from-surface-dim to-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">person</span>
+</div>
+</div>
+<div class="flex flex-col flex-1">
+<span class="text-label-lg font-label-lg text-on-surface">Driver: Ahmed Hassan</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-body-md font-body-md text-on-surface-variant">4.9</span>
+<span class="text-on-surface-variant mx-1">•</span>
+<span class="text-body-md font-body-md text-on-surface-variant">Silver Toyota Corolla</span>
+</div>
+</div>
+<button class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">call</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Navigation Suppressed intentionally: Linear/Transactional intent (Live Tracking implies focused journey, back action present) -->
+</body></html>

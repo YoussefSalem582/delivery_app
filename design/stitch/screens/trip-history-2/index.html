@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nokta - My Trips</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#65fade",
+                      "on-background": "#191c1e",
+                      "background": "#f7f9fc",
+                      "surface-container-high": "#e6e8eb",
+                      "surface-bright": "#f7f9fc",
+                      "outline-variant": "#c2c6d8",
+                      "secondary": "#006b5c",
+                      "on-tertiary-fixed-variant": "#5e4200",
+                      "surface": "#f7f9fc",
+                      "surface-variant": "#e0e3e6",
+                      "tertiary-container": "#956a00",
+                      "surface-container-low": "#f2f4f7",
+                      "on-secondary-container": "#007262",
+                      "inverse-primary": "#b3c5ff",
+                      "on-error": "#ffffff",
+                      "tertiary": "#765300",
+                      "primary-fixed-dim": "#b3c5ff",
+                      "surface-dim": "#d8dadd",
+                      "inverse-on-surface": "#eff1f4",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#41ddc2",
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#dae1ff",
+                      "primary-container": "#0066ff",
+                      "on-primary-container": "#f8f7ff",
+                      "tertiary-fixed-dim": "#ffba20",
+                      "on-tertiary-fixed": "#271900",
+                      "outline": "#727687",
+                      "on-tertiary-container": "#fff6ee",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#424656",
+                      "tertiary-fixed": "#ffdea8",
+                      "surface-container-lowest": "#ffffff",
+                      "on-surface": "#191c1e",
+                      "on-secondary-fixed-variant": "#005045",
+                      "surface-container-highest": "#e0e3e6",
+                      "on-secondary-fixed": "#00201b",
+                      "primary": "#0050cb",
+                      "on-primary-fixed": "#001849",
+                      "secondary-container": "#65fade",
+                      "on-secondary": "#ffffff",
+                      "surface-container": "#eceef1",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#0054d6",
+                      "on-primary-fixed-variant": "#003fa4"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "xl": "32px",
+                      "unit": "4px",
+                      "lg": "24px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "32px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Inter"],
+                      "label-md": ["Inter"],
+                      "label-lg": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "title-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                      "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+                      "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                      "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                      "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "title-lg": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container text-on-surface antialiased h-screen w-full flex justify-center overflow-hidden">
+<!-- Mobile Device Simulator Container -->
+<div class="w-full max-w-md bg-background h-full relative flex flex-col shadow-2xl overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background flex justify-between items-center w-full px-margin-mobile h-14 z-10 relative">
+<button class="text-primary dark:text-inverse-primary hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors rounded-full p-2 -ml-2 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-title-lg font-title-lg font-bold text-primary dark:text-inverse-primary">My Trips</h1>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden flex-shrink-0 cursor-pointer hover:bg-surface-container transition-colors">
+<div class="w-full h-full bg-cover bg-center" data-alt="A close-up, brightly lit portrait of a young professional in a modern urban setting. The lighting is soft and neutral, fitting a corporate or tech-forward mobile application profile picture. The background is slightly blurred, emphasizing a clean, modern aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCRNDpLdxoFAu9FNuj3tAWUA45GMDAbR5Mg8w84tgrYurrh7Q3rTo17qpXbhDafYxHUb4UdWFmPwoDF8-znFYPUVscmlPHniWmM52ivcR-Sk_PhD-AiAaQ92QqKjgvkb83lr7Q7_oORkKkFxXepT25ew_AjzAeahRHD5NE6uUyen-Uog1osZLjQBCGUmR9l6UGMsWSoL6v6TYWCFuT1TUJ67XgZLQP1_kjnsRBd0_HWfmBWmhrDbsQKtttGGRpD8oXvwOow1vl1r22u')"></div>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto px-margin-mobile pt-4 pb-[80px] flex flex-col gap-4 relative">
+<!-- Pull-to-refresh Indicator (Visual Only) -->
+<div class="flex justify-center items-center py-2 opacity-60">
+<span class="material-symbols-outlined animate-spin text-outline" data-icon="refresh">refresh</span>
+</div>
+<!-- Offline Badge -->
+<div class="bg-error-container text-on-error-container rounded-lg p-3 flex items-center gap-3 w-full shadow-sm">
+<span class="material-symbols-outlined" data-icon="cloud_off">cloud_off</span>
+<span class="text-body-md font-body-md font-medium">You are currently offline. Showing cached trips.</span>
+</div>
+<!-- Trip Card: In Progress (Highlighted) -->
+<article class="bg-surface-container-lowest border border-primary-container rounded-xl p-4 flex flex-col gap-4 shadow-[0px_4px_12px_rgba(0,102,255,0.08)] relative overflow-hidden">
+<!-- Highlight accent bar -->
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col gap-1">
+<span class="bg-primary-container text-on-primary-container text-label-md font-label-md px-3 py-1 rounded-full self-start inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trip_origin" style="font-variation-settings: 'FILL' 1;">trip_origin</span>
+                            In Progress
+                        </span>
+<div class="mt-2 text-label-md font-label-md text-outline">Today, 2:15 PM</div>
+</div>
+<div class="text-title-lg font-title-lg font-bold text-on-surface">$24.50</div>
+</div>
+<div class="flex gap-4 items-stretch pl-2 mt-2">
+<div class="flex flex-col items-center justify-between py-1">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="radio_button_checked" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+<div class="w-0.5 flex-1 bg-outline-variant my-1 rounded-full"></div>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="location_on">location_on</span>
+</div>
+<div class="flex flex-col justify-between py-1 gap-4">
+<div>
+<p class="text-label-lg font-label-lg font-bold text-on-surface">123 Tech Avenue</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Innovation District, Building B</p>
+</div>
+<div>
+<p class="text-body-lg font-body-lg text-on-surface">456 Enterprise Blvd</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Corporate Park North</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Trip Card: Completed -->
+<article class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col gap-4 relative">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<span class="bg-secondary-container text-on-secondary-container text-label-md font-label-md px-3 py-1 rounded-full self-start inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle">check_circle</span>
+                            Completed
+                        </span>
+<div class="mt-2 text-label-md font-label-md text-outline">Yesterday, 9:30 AM</div>
+</div>
+<div class="text-title-lg font-title-lg font-bold text-on-surface">$15.00</div>
+</div>
+<div class="flex gap-4 items-stretch mt-2">
+<div class="flex flex-col items-center justify-between py-1">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="radio_button_checked">radio_button_checked</span>
+<div class="w-0.5 flex-1 bg-outline-variant my-1 rounded-full"></div>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="location_on">location_on</span>
+</div>
+<div class="flex flex-col justify-between py-1 gap-4">
+<div>
+<p class="text-label-lg font-label-lg font-bold text-on-surface">789 Startup Road</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Co-working Space</p>
+</div>
+<div>
+<p class="text-body-lg font-body-lg text-on-surface">101 Market Street</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Financial District</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Trip Card: Cancelled -->
+<article class="bg-surface-container-low border border-outline-variant rounded-xl p-4 flex flex-col gap-4 relative opacity-80">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<span class="bg-surface-variant text-on-surface-variant text-label-md font-label-md px-3 py-1 rounded-full self-start inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="cancel">cancel</span>
+                            Cancelled
+                        </span>
+<div class="mt-2 text-label-md font-label-md text-outline">Oct 24, 6:00 PM</div>
+</div>
+<div class="text-title-lg font-title-lg font-bold text-on-surface-variant line-through">$0.00</div>
+</div>
+<div class="flex gap-4 items-stretch mt-2">
+<div class="flex flex-col items-center justify-between py-1">
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="radio_button_checked">radio_button_checked</span>
+<div class="w-0.5 flex-1 bg-outline-variant my-1 rounded-full"></div>
+<span class="material-symbols-outlined text-outline text-[18px]" data-icon="location_on">location_on</span>
+</div>
+<div class="flex flex-col justify-between py-1 gap-4">
+<div>
+<p class="text-label-lg font-label-lg font-bold text-on-surface-variant">222 Main Street</p>
+</div>
+<div>
+<p class="text-body-lg font-body-lg text-on-surface-variant">333 Central Park West</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center bg-surface-container-lowest dark:bg-inverse-surface px-4 pb-safe h-[56px] shadow-[0px_-4px_12px_rgba(0,0,0,0.08)] max-w-md mx-auto right-0">
+<!-- Home (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant dark:hover:bg-surface-container-high w-full h-full transition-colors rounded-lg">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-label-md font-label-md mt-1">Home</span>
+</button>
+<!-- Trips (Active) -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-inverse-primary relative after:content-[''] after:w-1 after:h-1 after:bg-primary dark:after:bg-inverse-primary after:rounded-full after:mt-1 hover:bg-surface-variant dark:hover:bg-surface-container-high w-full h-full transition-colors rounded-lg scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="directions_car" style="font-variation-settings: 'FILL' 1;">directions_car</span>
+<span class="text-label-md font-label-md mt-1">Trips</span>
+</button>
+<!-- Alerts (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant dark:hover:bg-surface-container-high w-full h-full transition-colors rounded-lg">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="text-label-md font-label-md mt-1">Alerts</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-variant dark:hover:bg-surface-container-high w-full h-full transition-colors rounded-lg">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-label-md font-label-md mt-1">Profile</span>
+</button>
+</nav>
+</div>
+</body></html>

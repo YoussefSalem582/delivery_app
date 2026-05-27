@@ -1,3 +1,10 @@
+# Cursor MCP config may contain API keys
+.cursor/
+
+# Stitch fetch scripts
+scripts/node_modules/
+scripts/package-lock.json
+
 # Miscellaneous
 *.class
 *.log
