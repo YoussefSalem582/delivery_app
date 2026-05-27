@@ -4,6 +4,105 @@ import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
+/// Shared trip summary used in list cards and detail hero transitions.
+class NoktaTripHeroCard extends StatelessWidget {
+  const NoktaTripHeroCard({
+    super.key,
+    required this.trip,
+    this.highlighted = false,
+  });
+
+  final TripEntity trip;
+  final bool highlighted;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        padding: const EdgeInsets.all(NoktaSpacing.md),
+        decoration: BoxDecoration(
+          color: highlighted
+              ? scheme.surfaceContainerLowest
+              : scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+          border: Border.all(
+            color: highlighted ? scheme.primaryContainer : scheme.outlineVariant,
+          ),
+          boxShadow: highlighted
+              ? [
+                  BoxShadow(
+                    color: scheme.primaryContainer.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      NoktaStatusChip(status: trip.status, compact: true),
+                      const SizedBox(height: NoktaSpacing.sm),
+                      Text(
+                        formatTripDate(trip.createdAt),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelSmall
+                            ?.copyWith(color: scheme.outline),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: NoktaSpacing.sm),
+                Text(
+                  '${trip.fare.toStringAsFixed(2)} EGP',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ],
+            ),
+            const SizedBox(height: NoktaSpacing.md),
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: NoktaTripRouteColumn(
+                pickup: trip.pickupAddress,
+                dropoff: trip.dropoffAddress,
+                dimmed: !highlighted,
+              ),
+            ),
+            if (trip.isPendingSync) ...[
+              const SizedBox(height: NoktaSpacing.sm),
+              Row(
+                children: [
+                  Icon(Icons.cloud_off, size: 14, color: scheme.error),
+                  const SizedBox(width: 4),
+                  Text(
+                    'offline_mode'.tr(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: scheme.error,
+                        ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class NoktaTripCard extends StatelessWidget {
   const NoktaTripCard({
     super.key,
@@ -30,103 +129,26 @@ class NoktaTripCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
           onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              color: _highlighted
-                  ? scheme.surfaceContainerLowest
-                  : scheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
-              border: Border.all(
-                color: _highlighted
-                    ? scheme.primaryContainer
-                    : scheme.outlineVariant,
-              ),
-              boxShadow: _highlighted
-                  ? [
-                      BoxShadow(
-                        color: scheme.primaryContainer.withValues(alpha: 0.08),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Stack(
-              children: [
-                if (_highlighted)
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 4,
-                      decoration: BoxDecoration(
-                        color: scheme.primaryContainer,
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(NoktaSpacing.radiusMd),
-                        ),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              NoktaTripHeroCard(trip: trip, highlighted: _highlighted),
+              if (_highlighted)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 4,
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      borderRadius: const BorderRadius.horizontal(
+                        left: Radius.circular(NoktaSpacing.radiusMd),
                       ),
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.all(NoktaSpacing.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                NoktaStatusChip(status: trip.status, compact: true),
-                                const SizedBox(height: NoktaSpacing.sm),
-                                Text(
-                                  formatTripDate(trip.createdAt),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .labelSmall
-                                      ?.copyWith(color: scheme.outline),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            '${trip.fare.toStringAsFixed(2)} EGP',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: NoktaSpacing.md),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: NoktaTripRouteColumn(
-                          pickup: trip.pickupAddress,
-                          dropoff: trip.dropoffAddress,
-                          dimmed: !_highlighted,
-                        ),
-                      ),
-                      if (trip.isPendingSync) ...[
-                        const SizedBox(height: NoktaSpacing.sm),
-                        Row(
-                          children: [
-                            Icon(Icons.cloud_off, size: 14, color: scheme.error),
-                            const SizedBox(width: 4),
-                            Text(
-                              'offline_mode'.tr(),
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: scheme.error,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
                 ),
-              ],
-            ),
+            ],
           ),
         ),
       ),

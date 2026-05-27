@@ -3,6 +3,7 @@ import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
+import 'package:delivery_app/core/widgets/nokta_trip_card.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_detail_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
@@ -57,8 +58,6 @@ class _TripDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(NoktaSpacing.md),
       child: Column(
@@ -66,33 +65,11 @@ class _TripDetailBody extends StatelessWidget {
         children: [
           Hero(
             tag: 'trip_${trip.id}',
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                padding: const EdgeInsets.all(NoktaSpacing.md),
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerLowest,
-                  borderRadius: BorderRadius.circular(NoktaSpacing.radiusLg),
-                  border: Border.all(color: scheme.outlineVariant),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        NoktaStatusChip(status: trip.status),
-                        Text(
-                          '${trip.fare.toStringAsFixed(2)} EGP',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: NoktaSpacing.md),
-                    _RouteSummary(pickup: trip.pickupAddress, dropoff: trip.dropoffAddress),
-                  ],
-                ),
-              ),
+            child: NoktaTripHeroCard(
+              trip: trip,
+              highlighted: trip.status == TripStatus.inProgress ||
+                  trip.status == TripStatus.accepted ||
+                  trip.status == TripStatus.driverArrived,
             ),
           ),
           const SizedBox(height: NoktaSpacing.md),
@@ -141,73 +118,6 @@ class _TripDetailBody extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-class _RouteSummary extends StatelessWidget {
-  const _RouteSummary({required this.pickup, required this.dropoff});
-
-  final String pickup;
-  final String dropoff;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: scheme.onSurface,
-                shape: BoxShape.circle,
-              ),
-            ),
-            Container(
-              width: 2,
-              height: 24,
-              color: scheme.outlineVariant,
-            ),
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: scheme.primary,
-                shape: BoxShape.circle,
-                border: Border.all(color: scheme.surfaceContainerLowest, width: 2),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(width: NoktaSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('pickup'.tr(), style: Theme.of(context).textTheme.labelSmall),
-              Text(
-                pickup,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: NoktaSpacing.md),
-              Text('dropoff'.tr(), style: Theme.of(context).textTheme.labelSmall),
-              Text(
-                dropoff,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

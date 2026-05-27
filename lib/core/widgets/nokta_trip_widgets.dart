@@ -114,6 +114,8 @@ class NoktaTripRouteColumn extends StatelessWidget {
             children: [
               Text(
                 pickup,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: textTheme.labelLarge?.copyWith(
                   color: scheme.onSurface,
                   fontWeight: FontWeight.w700,
@@ -122,7 +124,12 @@ class NoktaTripRouteColumn extends StatelessWidget {
               if (pickupSubtitle != null)
                 Text(pickupSubtitle!, style: textTheme.bodyMedium),
               const SizedBox(height: NoktaSpacing.md),
-              Text(dropoff, style: textTheme.bodyLarge),
+              Text(
+                dropoff,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodyLarge,
+              ),
               if (dropoffSubtitle != null)
                 Text(dropoffSubtitle!, style: textTheme.bodyMedium),
             ],
