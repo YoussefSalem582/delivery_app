@@ -7,5 +7,6 @@ class ApiEndpoints {
 
   static String tripById(String id) => '/trips/$id';
   static String tripStatus(String id) => '/trips/$id/status';
+  static String driverReviews(String driverId) => '/drivers/$driverId/reviews';
   static const requestTrip = '/trips/request';
 }

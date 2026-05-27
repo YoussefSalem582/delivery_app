@@ -173,5 +173,8 @@
   "driver_rating": "{} rating",
   "driver_vehicle": "Vehicle",
   "driver_total_rides": "{} trips completed",
-  "view_driver_profile": "View driver profile"
+  "view_driver_profile": "View driver profile",
+  "driver_reviews_title": "Ratings & Reviews",
+  "driver_review_count": "{} reviews",
+  "no_reviews": "No reviews yet"
 }

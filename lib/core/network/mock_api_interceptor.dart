@@ -102,6 +102,20 @@ class MockApiInterceptor extends Interceptor {
       return _ok(options, data);
     }
 
+    if (method == 'GET' &&
+        path.startsWith('/drivers/') &&
+        path.endsWith('/reviews')) {
+      final segments = path.split('/');
+      final driverId = segments[2];
+      final allReviews =
+          await _loadJsonList('assets/mock/driver_reviews.json');
+      final filtered = allReviews
+          .cast<Map<String, dynamic>>()
+          .where((r) => r['driverId'] == driverId)
+          .toList();
+      return _ok(options, filtered);
+    }
+
     if (method == 'POST' && path == ApiEndpoints.requestTrip) {
       final body = options.data as Map<String, dynamic>? ?? {};
       final now = DateTime.now().toUtc().toIso8601String();

@@ -4,6 +4,8 @@ import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/driver_profile/presentation/bloc/driver_profile_bloc.dart';
+import 'package:delivery_app/features/trips/driver_profile/presentation/widgets/driver_rating_summary_card.dart';
+import 'package:delivery_app/features/trips/driver_profile/presentation/widgets/driver_review_card.dart';
 import 'package:delivery_app/features/trips/driver_profile/presentation/widgets/driver_profile_stats_row.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
@@ -148,6 +150,37 @@ class _DriverProfileBody extends StatelessWidget {
               value: profile.phone!,
             ),
           ],
+          const SizedBox(height: AppSpacing.xl),
+          Text(
+            'driver_reviews_title'.tr(),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          if (profile.ratingSummary != null)
+            DriverRatingSummaryCard(summary: profile.ratingSummary!)
+          else if (profile.rating != null)
+            _OverallRatingFallback(rating: profile.rating!)
+          else
+            const SizedBox.shrink(),
+          const SizedBox(height: AppSpacing.md),
+          if (profile.reviews.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+              child: Center(
+                child: Text(
+                  'no_reviews'.tr(),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
+            )
+          else
+            ...profile.reviews.map(
+              (review) => DriverReviewCard(review: review),
+            ),
           if (profile.hasPhone) ...[
             const SizedBox(height: AppSpacing.xl),
             AppButton(
@@ -174,6 +207,65 @@ class _DriverProfileBody extends StatelessWidget {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _OverallRatingFallback extends StatelessWidget {
+  const _OverallRatingFallback({required this.rating});
+
+  final double rating;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            rating.toStringAsFixed(1),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: scheme.primary,
+                  fontWeight: FontWeight.w700,
+                ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: List.generate(
+                  5,
+                  (index) => Icon(
+                    index < rating.round()
+                        ? Icons.star
+                        : Icons.star_border,
+                    size: 18,
+                    color: AppColors.tertiaryFixedDim,
+                  ),
+                ),
+              ),
+              Text(
+                'driver_rating'.tr(args: [rating.toStringAsFixed(1)]),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
         ],
       ),
     );

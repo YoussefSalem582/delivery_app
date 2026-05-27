@@ -173,5 +173,8 @@
   "driver_rating": "تقييم {}",
   "driver_vehicle": "المركبة",
   "driver_total_rides": "{} رحلة مكتملة",
-  "view_driver_profile": "عرض ملف السائق"
+  "view_driver_profile": "عرض ملف السائق",
+  "driver_reviews_title": "التقييمات والمراجعات",
+  "driver_review_count": "{} مراجعة",
+  "no_reviews": "لا توجد مراجعات بعد"
 }

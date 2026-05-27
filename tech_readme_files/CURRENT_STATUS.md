@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Driver profile screen added (trip detail + tracking entry points).
+> **Last Updated:** May 27, 2026 — Driver profile includes ratings breakdown and review cards (mock API).
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)

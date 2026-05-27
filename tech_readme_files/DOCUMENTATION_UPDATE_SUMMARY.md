@@ -6,7 +6,12 @@
 
 ## 2026-05-27 — Driver profile screen
 
-**What changed:** Added trip-scoped driver profile page with merged trip/mock driver data and chat/call actions.
+**What changed:** Added trip-scoped driver profile page with merged trip/mock driver data, chat/call actions, and ratings & reviews section.
+
+**Ratings & reviews:**
+
+- Mock data in `assets/mock/driver_reviews.json` served via `/drivers/:id/reviews`
+- `DriverRatingSummaryCard` (average + star distribution bars) and `DriverReviewCard` list on profile page
 
 **Screen / route:**
 

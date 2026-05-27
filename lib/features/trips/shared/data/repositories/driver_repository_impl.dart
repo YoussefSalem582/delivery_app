@@ -1,11 +1,14 @@
 import 'package:delivery_app/features/trips/shared/data/datasources/driver_remote_datasource.dart';
+import 'package:delivery_app/features/trips/shared/data/datasources/driver_review_remote_datasource.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/driver_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/driver_review_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/repositories/driver_repository.dart';
 
 class DriverRepositoryImpl implements DriverRepository {
-  DriverRepositoryImpl(this._remote);
+  DriverRepositoryImpl(this._remote, this._reviewRemote);
 
   final DriverRemoteDataSource _remote;
+  final DriverReviewRemoteDataSource _reviewRemote;
   List<DriverEntity>? _cache;
 
   @override
@@ -21,5 +24,10 @@ class DriverRepositoryImpl implements DriverRepository {
       if (driver.name == name) return driver;
     }
     return null;
+  }
+
+  @override
+  Future<List<DriverReviewEntity>> getReviews(String driverId) async {
+    return _reviewRemote.fetchReviews(driverId);
   }
 }

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "rev-001",
+    "driverId": "driver-001",
+    "authorName": "Omar K.",
+    "rating": 5,
+    "comment": "Very professional and arrived on time. Smooth ride!",
+    "createdAt": "2026-05-22T14:30:00.000Z"
+  },
+  {
+    "id": "rev-002",
+    "driverId": "driver-001",
+    "authorName": "Layla M.",
+    "rating": 5,
+    "comment": "Clean car and friendly conversation. Highly recommend.",
+    "createdAt": "2026-05-18T09:15:00.000Z"
+  },
+  {
+    "id": "rev-003",
+    "driverId": "driver-001",
+    "authorName": "Karim S.",
+    "rating": 4,
+    "comment": "Good driver, took a slightly longer route but was safe.",
+    "createdAt": "2026-05-10T19:45:00.000Z"
+  },
+  {
+    "id": "rev-004",
+    "driverId": "driver-001",
+    "authorName": "Nadia H.",
+    "rating": 5,
+    "comment": "Excellent service as always. My go-to driver!",
+    "createdAt": "2026-05-05T11:00:00.000Z"
+  },
+  {
+    "id": "rev-005",
+    "driverId": "driver-002",
+    "authorName": "Hassan A.",
+    "rating": 5,
+    "comment": "Sara was punctual and the ride felt very safe.",
+    "createdAt": "2026-05-21T16:20:00.000Z"
+  },
+  {
+    "id": "rev-006",
+    "driverId": "driver-002",
+    "authorName": "Mona F.",
+    "rating": 4,
+    "comment": "Nice car and polite driver. Would ride again.",
+    "createdAt": "2026-05-15T08:30:00.000Z"
+  },
+  {
+    "id": "rev-007",
+    "driverId": "driver-002",
+    "authorName": "Tarek B.",
+    "rating": 5,
+    "comment": "Helped with my bags and knew the best route.",
+    "createdAt": "2026-05-08T13:10:00.000Z"
+  }
+]
