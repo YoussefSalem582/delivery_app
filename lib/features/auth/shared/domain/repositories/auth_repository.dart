@@ -13,5 +13,6 @@ abstract class AuthRepository {
   UserEntity? get cachedUser;
   Future<UserEntity> getProfile({bool forceRefresh = false});
   Future<UserEntity> updateWalletBalance(double amount);
+  Future<UserEntity> updateProfile({required String name});
   bool isLoggedIn();
 }

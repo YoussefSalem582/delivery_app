@@ -6,3 +6,10 @@ Future<void> launchPhoneCall(String phone) async {
     await launchUrl(uri);
   }
 }
+
+Future<void> launchSms(String phone) async {
+  final uri = Uri(scheme: 'sms', path: phone);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  }
+}

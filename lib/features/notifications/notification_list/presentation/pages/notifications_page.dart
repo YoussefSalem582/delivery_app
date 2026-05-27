@@ -5,6 +5,7 @@ import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/notifications/notification_list/presentation/bloc/notification_bloc.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,11 +21,9 @@ class NotificationsPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
+          automaticallyImplyLeading: false,
+          leading: const ShellAppBarLogo(),
           title: Text('notifications_title'.tr()),
-          leading: IconButton(
-            icon: Icon(Icons.menu, color: Theme.of(context).colorScheme.onSurfaceVariant),
-            onPressed: () {},
-          ),
           actions: [
             BlocBuilder<NotificationBloc, NotificationState>(
               builder: (context, state) {

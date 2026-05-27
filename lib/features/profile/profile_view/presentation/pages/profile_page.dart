@@ -5,11 +5,14 @@ import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
+import 'package:delivery_app/shared/widgets/banners/app_toast.dart';
 import 'package:delivery_app/shared/widgets/banners/offline_banner.dart';
+import 'package:delivery_app/shared/widgets/inputs/app_text_field.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/profile/orders/presentation/bloc/order_bloc.dart';
 import 'package:delivery_app/features/profile/profile_view/presentation/bloc/profile_bloc.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -108,11 +111,9 @@ class _ProfileContent extends StatelessWidget {
       backgroundColor: isDark ? scheme.surfaceContainerLow : scheme.surface,
       appBar: AppBar(
         backgroundColor: scheme.surface,
+        automaticallyImplyLeading: false,
+        leading: const ShellAppBarLogo(),
         title: Text('profile_title'.tr()),
-        leading: IconButton(
-          icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
-          onPressed: () {},
-        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
@@ -191,20 +192,23 @@ class _ProfileHeader extends StatelessWidget {
             Positioned(
               bottom: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: isDark ? scheme.primaryContainer : scheme.primary,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+              child: GestureDetector(
+                onTap: () => _showEditProfileSheet(context, user),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isDark ? scheme.primaryContainer : scheme.primary,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.edit, size: 16, color: scheme.onPrimary),
                 ),
-                child: Icon(Icons.edit, size: 16, color: scheme.onPrimary),
               ),
             ),
           ],
@@ -285,7 +289,7 @@ class _WalletCard extends StatelessWidget {
                 ),
               ),
               FilledButton.icon(
-                onPressed: () {},
+                onPressed: () => _showTopUpSheet(context),
                 icon: const Icon(Icons.add, size: 18),
                 label: Text('top_up'.tr()),
                 style: FilledButton.styleFrom(
@@ -618,59 +622,214 @@ class _OrderTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _showOrderDetailsSheet(context, order),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: _statusBg(order.status, scheme, isDark),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _statusIcon(order.status),
-              size: 20,
-              color: _statusColor(order.status, scheme),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          decoration: BoxDecoration(
+            color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            border: Border.all(
+              color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
             ),
           ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _statusBg(order.status, scheme, isDark),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _statusIcon(order.status),
+                  size: 20,
+                  color: _statusColor(order.status, scheme),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _statusLabel(order.status),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                '${order.amount.toStringAsFixed(2)} EGP',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+void _showTopUpSheet(BuildContext context) {
+  final scheme = Theme.of(context).colorScheme;
+  const amounts = [50.0, 100.0, 200.0];
+
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'select_top_up_amount'.tr(),
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            ...amounts.map(
+              (amount) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    side: BorderSide(color: scheme.outlineVariant),
+                  ),
+                  title: Text('${amount.toStringAsFixed(0)} EGP'),
+                  trailing: const Icon(Icons.add_circle_outline),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    context.read<ProfileBloc>().add(
+                          ProfileWalletTopUpRequested(amount: amount),
+                        );
+                    AppToast.success(context, 'wallet_top_up_success'.tr());
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+void _showEditProfileSheet(BuildContext context, UserEntity user) {
+  final nameController = TextEditingController(text: user.name);
+
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (sheetContext) {
+      final bottomInset = MediaQuery.viewInsetsOf(sheetContext).bottom;
+
+      return Padding(
+        padding: EdgeInsets.only(bottom: bottomInset),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  order.title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  'edit_profile'.tr(),
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  _statusLabel(order.status),
-                  style: Theme.of(context).textTheme.bodyMedium,
+                const SizedBox(height: AppSpacing.md),
+                AppTextField(
+                  controller: nameController,
+                  labelText: 'full_name'.tr(),
+                  hintText: 'full_name_hint'.tr(),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                FilledButton(
+                  onPressed: () {
+                    final name = nameController.text.trim();
+                    if (name.length < 2) {
+                      AppToast.error(context, 'error_name_short'.tr());
+                      return;
+                    }
+                    Navigator.of(sheetContext).pop();
+                    context.read<ProfileBloc>().add(
+                          ProfileUpdateRequested(name: name),
+                        );
+                    AppToast.success(context, 'profile_updated'.tr());
+                  },
+                  child: Text('save'.tr()),
                 ),
               ],
             ),
           ),
-          Text(
-            '${order.amount.toStringAsFixed(2)} EGP',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: scheme.onSurface,
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ],
+        ),
+      );
+    },
+  );
+}
+
+void _showOrderDetailsSheet(BuildContext context, OrderEntity order) {
+  final dateFormat = DateFormat.yMMMd().add_jm();
+
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'order_details'.tr(),
+              style: Theme.of(context).textTheme.titleMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(order.title),
+              subtitle: Text(dateFormat.format(order.createdAt)),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('status'.tr()),
+              trailing: Text(_orderStatusLabel(order.status)),
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('fare'.tr()),
+              trailing: Text('${order.amount.toStringAsFixed(2)} EGP'),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+String _orderStatusLabel(OrderStatus status) {
+  return switch (status) {
+    OrderStatus.delivered => 'order_delivered'.tr(),
+    OrderStatus.pending => 'order_pending'.tr(),
+    OrderStatus.inTransit => 'order_inTransit'.tr(),
+  };
 }

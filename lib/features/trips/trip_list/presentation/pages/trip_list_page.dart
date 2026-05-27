@@ -7,6 +7,8 @@ import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_car
 import 'package:delivery_app/shared/widgets/banners/offline_banner.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/trip_list/presentation/bloc/trip_list_bloc.dart';
+import 'package:delivery_app/shared/widgets/navigation/profile_avatar_button.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -26,29 +28,16 @@ class TripListPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
+          automaticallyImplyLeading: false,
+          leading: const ShellAppBarLogo(),
           title: Text('trips_title'.tr()),
-          leading: IconButton(
-            icon: Icon(Icons.menu, color: Theme.of(context).colorScheme.onSurfaceVariant),
-            onPressed: () {},
-          ),
           actions: [
             IconButton(
               tooltip: 'simulate_offline'.tr(),
               onPressed: () => sl<SyncService>().syncAll(),
               icon: const Icon(Icons.sync),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: AppSpacing.sm),
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-                child: Icon(
-                  Icons.person,
-                  size: 18,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-            ),
+            const ProfileAvatarButton(),
           ],
         ),
         body: BlocBuilder<TripListBloc, TripListState>(

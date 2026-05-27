@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Functional UI controls** — Shell tab AppBars use Nokta logo instead of stub hamburger menus; `ProfileAvatarButton` navigates to profile tab; wallet top-up, profile edit, order details, ride payment/promo pickers, and trip-detail driver call/SMS wired with demo actions.
+- Shared widgets: `ShellAppBarLogo`, `ProfileAvatarButton`; `launchSms` in `phone_launcher.dart`; `AuthRepository.updateProfile`; Profile BLoC events `ProfileWalletTopUpRequested`, `ProfileUpdateRequested`.
+- Localization keys for wallet top-up, driver messaging, payment/promo, profile edit, and order details (EN + AR).
 - **AI agent documentation surface** — Canonical [`AGENTS.md`](AGENTS.md) plus tool shims ([`CLAUDE.md`](CLAUDE.md), [`CURSOR.md`](CURSOR.md), [`.codex/AGENTS.md`](.codex/AGENTS.md), [`.github/copilot-instructions.md`](.github/copilot-instructions.md)), [`.agents/skills/`](.agents/skills/) (3 project-tuned + 19 official Flutter/Dart skills), [`.cursor/rules/`](.cursor/rules/), [`.claude/commands/`](.claude/commands/), [`tech_readme_files/`](tech_readme_files/) doc map, and doc-hygiene scripts + CI ([`.github/workflows/docs.yml`](.github/workflows/docs.yml)).
 
 ## [1.0.0] - 2026-05-27

@@ -23,6 +23,8 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         super(const ProfileInitial()) {
     on<ProfileLoadRequested>(_onLoad);
     on<ProfileRefreshRequested>(_onRefresh);
+    on<ProfileWalletTopUpRequested>(_onWalletTopUp);
+    on<ProfileUpdateRequested>(_onUpdateProfile);
   }
 
   final GetProfileUseCase _getProfile;
@@ -61,5 +63,29 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       (Failure failure) => emit(ProfileError(failure.message)),
       (UserEntity user) => emit(ProfileLoaded(user: user, isOffline: isOffline)),
     );
+  }
+
+  Future<void> _onWalletTopUp(
+    ProfileWalletTopUpRequested event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final current = state;
+    if (current is! ProfileLoaded) return;
+
+    final updated = await _authRepository.updateWalletBalance(event.amount);
+    final isOffline = !(await _networkStatus.isOnline);
+    emit(ProfileLoaded(user: updated, isOffline: isOffline));
+  }
+
+  Future<void> _onUpdateProfile(
+    ProfileUpdateRequested event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final current = state;
+    if (current is! ProfileLoaded) return;
+
+    final updated = await _authRepository.updateProfile(name: event.name);
+    final isOffline = !(await _networkStatus.isOnline);
+    emit(ProfileLoaded(user: updated, isOffline: isOffline));
   }
 }

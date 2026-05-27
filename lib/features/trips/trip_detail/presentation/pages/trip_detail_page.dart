@@ -3,6 +3,7 @@ import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.d
 import 'package:delivery_app/config/theme/app_colors.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/core/utils/map_launcher.dart';
+import 'package:delivery_app/core/utils/phone_launcher.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/shared/widgets/buttons/app_button.dart';
@@ -48,7 +49,12 @@ class TripDetailPage extends StatelessWidget {
               );
             }
             if (state is TripDetailError) {
-              return ErrorView(message: state.message);
+              return ErrorView(
+                message: state.message,
+                onRetry: () => context
+                    .read<TripDetailBloc>()
+                    .add(TripDetailLoadRequested(tripId)),
+              );
             }
             if (state is TripDetailLoaded) {
               return _TripDetailBody(trip: state.trip);
@@ -201,9 +207,25 @@ class _DriverCard extends StatelessWidget {
               ],
             ),
           ),
-          _DriverActionButton(icon: Icons.chat_bubble_outline, onPressed: () {}),
-          const SizedBox(width: AppSpacing.sm),
-          _DriverActionButton(icon: Icons.call, onPressed: () {}),
+          if (phone != null && phone!.isNotEmpty) ...[
+            Semantics(
+              label: 'message_driver'.tr(),
+              button: true,
+              child: _DriverActionButton(
+                icon: Icons.chat_bubble_outline,
+                onPressed: () => launchSms(phone!),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Semantics(
+              label: 'call_driver'.tr(),
+              button: true,
+              child: _DriverActionButton(
+                icon: Icons.call,
+                onPressed: () => launchPhoneCall(phone!),
+              ),
+            ),
+          ],
         ],
       ),
     );

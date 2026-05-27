@@ -14,6 +14,24 @@ class ProfileRefreshRequested extends ProfileEvent {
   const ProfileRefreshRequested();
 }
 
+class ProfileWalletTopUpRequested extends ProfileEvent {
+  const ProfileWalletTopUpRequested({required this.amount});
+
+  final double amount;
+
+  @override
+  List<Object?> get props => [amount];
+}
+
+class ProfileUpdateRequested extends ProfileEvent {
+  const ProfileUpdateRequested({required this.name});
+
+  final String name;
+
+  @override
+  List<Object?> get props => [name];
+}
+
 abstract class ProfileState extends Equatable {
   const ProfileState();
   @override

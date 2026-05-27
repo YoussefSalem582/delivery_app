@@ -142,5 +142,18 @@
   "trips_tab": "Trips",
   "notifications_tab": "Alerts",
   "profile_tab": "Profile",
-  "open_in_maps": "Open in Maps"
+  "open_in_maps": "Open in Maps",
+  "wallet_top_up_success": "Wallet topped up successfully",
+  "select_top_up_amount": "Select top-up amount",
+  "message_driver": "Message driver",
+  "payment_method": "Payment method",
+  "payment_cash": "Cash",
+  "promo_apply": "Apply",
+  "promo_applied": "Promo code applied",
+  "edit_profile": "Edit profile",
+  "profile_updated": "Profile updated",
+  "order_details": "Order details",
+  "save": "Save",
+  "promo_code_hint": "Enter promo code",
+  "cancel": "Cancel"
 }

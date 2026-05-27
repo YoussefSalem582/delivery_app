@@ -136,4 +136,12 @@ class AuthRepositoryImpl implements AuthRepository {
     await _local.saveUser(updated);
     return updated;
   }
+
+  @override
+  Future<UserEntity> updateProfile({required String name}) async {
+    final user = await getProfile();
+    final updated = user.copyWith(name: name);
+    await _local.saveUser(updated);
+    return updated;
+  }
 }

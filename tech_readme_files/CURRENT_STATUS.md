@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Initial AI agent documentation surface added (AGENTS.md, tool shims, skills, tech_readme_files, doc CI).
+> **Last Updated:** May 27, 2026 — All main-shell buttons/icons wired (logo AppBar, profile nav, wallet top-up, driver contact, payment/promo pickers).
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
@@ -27,14 +27,14 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Feature | Status |
 |---------|--------|
 | Auth (splash, onboarding, login, register) | ✅ Demo complete |
-| Home / map / ride request | ✅ Demo complete |
-| Trips (list, detail, tracking) | ✅ Demo complete |
+| Home / map / ride request | ✅ Demo complete (payment/promo pickers wired) |
+| Trips (list, detail, tracking) | ✅ Demo complete (driver call/SMS on detail) |
 | Notifications | ✅ Demo complete |
-| Profile / orders | ✅ Demo complete |
+| Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |
 | Settings (theme, locale) | ✅ Complete |
 | Real backend integration | 🚧 Mock API only |
 | Production auth (secure storage) | 🚧 Planned |
-| Payments / wallet (real) | 🚧 Planned |
+| Payments / wallet (real) | 🚧 Demo top-up only (Hive-local) |
 
 ## Testing
 

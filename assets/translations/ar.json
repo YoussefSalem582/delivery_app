@@ -142,5 +142,18 @@
   "trips_tab": "الرحلات",
   "notifications_tab": "التنبيهات",
   "profile_tab": "الملف",
-  "open_in_maps": "فتح في الخرائط"
+  "open_in_maps": "فتح في الخرائط",
+  "wallet_top_up_success": "تم شحن المحفظة بنجاح",
+  "select_top_up_amount": "اختر مبلغ الشحن",
+  "message_driver": "مراسلة السائق",
+  "payment_method": "طريقة الدفع",
+  "payment_cash": "نقداً",
+  "promo_apply": "تطبيق",
+  "promo_applied": "تم تطبيق كود الخصم",
+  "edit_profile": "تعديل الملف",
+  "profile_updated": "تم تحديث الملف",
+  "order_details": "تفاصيل الطلب",
+  "save": "حفظ",
+  "promo_code_hint": "أدخل كود الخصم",
+  "cancel": "إلغاء"
 }

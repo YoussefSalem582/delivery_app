@@ -13,6 +13,8 @@ import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.d
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/home_destination_panel.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/request_ride_sheet.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_selection_sheet.dart';
+import 'package:delivery_app/shared/widgets/navigation/profile_avatar_button.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -113,23 +115,14 @@ class _HomeMapPageState extends State<HomeMapPage> {
             extendBodyBehindAppBar: true,
             appBar: AppBar(
               backgroundColor: scheme.surface.withValues(alpha: isDark ? 0.92 : 1),
+              automaticallyImplyLeading: false,
+              leading: const ShellAppBarLogo(),
               title: Text(
                 'app_name'.tr(),
                 style: TextStyle(color: scheme.primary),
               ),
-              leading: IconButton(
-                icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
-                onPressed: () {},
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: AppSpacing.sm),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: scheme.surfaceContainerHigh,
-                    child: Icon(Icons.person, color: scheme.primary, size: 22),
-                  ),
-                ),
+              actions: const [
+                ProfileAvatarButton(radius: 20),
               ],
             ),
             body: Stack(

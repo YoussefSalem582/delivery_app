@@ -1,5 +1,6 @@
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/shared/widgets/banners/app_toast.dart';
+import 'package:delivery_app/shared/widgets/inputs/app_text_field.dart';
 import 'package:delivery_app/shared/widgets/navigation/app_bottom_nav_bar.dart';
 import 'package:delivery_app/shared/widgets/buttons/app_button.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_option_card.dart';
@@ -21,9 +22,88 @@ class RideSelectionSheet extends StatefulWidget {
 class _RideSelectionSheetState extends State<RideSelectionSheet> {
   final _options = RideOption.defaults();
   RideTier _selected = RideTier.economy;
+  String _paymentMethodKey = 'payment_card';
+  String? _appliedPromo;
 
   RideOption get _selectedOption =>
       _options.firstWhere((o) => o.tier == _selected);
+
+  Future<void> _showPaymentMethodSheet() async {
+    final scheme = Theme.of(context).colorScheme;
+    final methods = [
+      ('payment_cash', Icons.payments_outlined),
+      ('payment_card', Icons.credit_card),
+    ];
+
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: Text(
+                  'payment_method'.tr(),
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+              ...methods.map(
+                (method) => ListTile(
+                  leading: Icon(method.$2, color: scheme.primary),
+                  title: Text(method.$1.tr()),
+                  onTap: () => Navigator.of(sheetContext).pop(method.$1),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (selected != null && mounted) {
+      setState(() => _paymentMethodKey = selected);
+    }
+  }
+
+  Future<void> _showPromoDialog() async {
+    final controller = TextEditingController(text: _appliedPromo ?? '');
+
+    final applied = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('promo'.tr()),
+          content: AppTextField(
+            controller: controller,
+            hintText: 'promo_code_hint'.tr(),
+            textInputAction: TextInputAction.done,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text('cancel'.tr()),
+            ),
+            FilledButton(
+              onPressed: () {
+                final code = controller.text.trim();
+                if (code.isEmpty) return;
+                Navigator.of(dialogContext).pop(code);
+              },
+              child: Text('promo_apply'.tr()),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (applied != null && mounted) {
+      setState(() => _appliedPromo = applied);
+      AppToast.info(context, 'promo_applied'.tr());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,15 +168,17 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                       children: [
                         Expanded(
                           child: _PaymentChip(
-                            label: 'payment_card'.tr(),
+                            label: _paymentMethodKey.tr(),
                             icon: Icons.credit_card,
+                            onTap: _showPaymentMethodSheet,
                           ),
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         _PaymentChip(
-                          label: 'promo'.tr(),
+                          label: _appliedPromo ?? 'promo'.tr(),
                           icon: null,
                           compact: true,
+                          onTap: _showPromoDialog,
                         ),
                       ],
                     ),
@@ -138,11 +220,13 @@ class _PaymentChip extends StatelessWidget {
     required this.label,
     this.icon,
     this.compact = false,
+    this.onTap,
   });
 
   final String label;
   final IconData? icon;
   final bool compact;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -152,47 +236,59 @@ class _PaymentChip extends StatelessWidget {
         );
 
     if (compact) {
-      return Container(
-        height: AppSpacing.buttonHeight,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        decoration: BoxDecoration(
-          color: scheme.surfaceContainerLow,
+      return Material(
+        color: scheme.surfaceContainerLow,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(color: scheme.outlineVariant),
+          side: BorderSide(color: scheme.outlineVariant),
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: textStyle,
-            overflow: TextOverflow.ellipsis,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: AppSpacing.buttonHeight,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            child: Center(
+              child: Text(
+                label,
+                style: textStyle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ),
         ),
       );
     }
 
-    return Container(
-      height: AppSpacing.buttonHeight,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLow,
+    return Material(
+      color: scheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: scheme.outlineVariant),
+        side: BorderSide(color: scheme.outlineVariant),
       ),
-      child: Row(
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 20, color: scheme.primary),
-            const SizedBox(width: AppSpacing.sm),
-          ],
-          Expanded(
-            child: Text(
-              label,
-              style: textStyle,
-              overflow: TextOverflow.ellipsis,
-            ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          height: AppSpacing.buttonHeight,
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 20, color: scheme.primary),
+                const SizedBox(width: AppSpacing.sm),
+              ],
+              Expanded(
+                child: Text(
+                  label,
+                  style: textStyle,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(Icons.expand_more, color: scheme.onSurfaceVariant),
+            ],
           ),
-          Icon(Icons.expand_more, color: scheme.onSurfaceVariant),
-        ],
+        ),
       ),
     );
   }
