@@ -1,0 +1,8 @@
+{
+  "id": "user-001",
+  "name": "Demo User",
+  "email": "demo@delivery.app",
+  "phone": "+201000000000",
+  "walletBalance": 250.00,
+  "avatarUrl": ""
+}

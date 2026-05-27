@@ -1,0 +1,32 @@
+[
+  {
+    "id": "trip-001",
+    "pickupAddress": "Downtown Station",
+    "dropoffAddress": "Airport Terminal 2",
+    "pickupLat": 30.0444,
+    "pickupLng": 31.2357,
+    "dropoffLat": 30.1219,
+    "dropoffLng": 31.4056,
+    "status": "completed",
+    "driverName": "Ahmed Hassan",
+    "driverPhone": "+201234567890",
+    "fare": 125.50,
+    "createdAt": "2026-05-20T10:30:00.000Z",
+    "updatedAt": "2026-05-20T11:15:00.000Z"
+  },
+  {
+    "id": "trip-002",
+    "pickupAddress": "City Mall",
+    "dropoffAddress": "Tech Park",
+    "pickupLat": 30.0626,
+    "pickupLng": 31.2497,
+    "dropoffLat": 30.0131,
+    "dropoffLng": 31.2089,
+    "status": "inProgress",
+    "driverName": "Sara Mohamed",
+    "driverPhone": "+201987654321",
+    "fare": 85.00,
+    "createdAt": "2026-05-25T14:00:00.000Z",
+    "updatedAt": "2026-05-25T14:20:00.000Z"
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "order-001",
+    "title": "Food Delivery - Burger House",
+    "amount": 45.00,
+    "status": "delivered",
+    "createdAt": "2026-05-22T18:30:00.000Z"
+  },
+  {
+    "id": "order-002",
+    "title": "Package Delivery - Documents",
+    "amount": 30.00,
+    "status": "pending",
+    "createdAt": "2026-05-24T09:15:00.000Z"
+  },
+  {
+    "id": "order-003",
+    "title": "Grocery Delivery",
+    "amount": 120.75,
+    "status": "inTransit",
+    "createdAt": "2026-05-25T11:00:00.000Z"
+  }
+]

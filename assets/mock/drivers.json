@@ -1,0 +1,20 @@
+[
+  {
+    "id": "driver-001",
+    "name": "Ahmed Hassan",
+    "phone": "+201234567890",
+    "rating": 4.9,
+    "vehicle": "Toyota Corolla - White",
+    "lat": 30.0500,
+    "lng": 31.2400
+  },
+  {
+    "id": "driver-002",
+    "name": "Sara Mohamed",
+    "phone": "+201987654321",
+    "rating": 4.8,
+    "vehicle": "Hyundai Elantra - Silver",
+    "lat": 30.0550,
+    "lng": 31.2450
+  }
+]
