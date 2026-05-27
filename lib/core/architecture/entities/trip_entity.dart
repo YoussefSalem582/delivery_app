@@ -21,6 +21,7 @@ class TripEntity extends HiveObject {
     required this.status,
     this.driverName,
     this.driverPhone,
+    this.driverAvatarUrl,
     required this.fare,
     required this.createdAt,
     required this.updatedAt,
@@ -37,6 +38,7 @@ class TripEntity extends HiveObject {
   final TripStatus status;
   final String? driverName;
   final String? driverPhone;
+  final String? driverAvatarUrl;
   final double fare;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -53,6 +55,7 @@ class TripEntity extends HiveObject {
     TripStatus? status,
     String? driverName,
     String? driverPhone,
+    String? driverAvatarUrl,
     double? fare,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -69,6 +72,7 @@ class TripEntity extends HiveObject {
       status: status ?? this.status,
       driverName: driverName ?? this.driverName,
       driverPhone: driverPhone ?? this.driverPhone,
+      driverAvatarUrl: driverAvatarUrl ?? this.driverAvatarUrl,
       fare: fare ?? this.fare,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -87,6 +91,7 @@ class TripEntity extends HiveObject {
         'status': status.name,
         'driverName': driverName,
         'driverPhone': driverPhone,
+        'driverAvatarUrl': driverAvatarUrl,
         'fare': fare,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
@@ -107,6 +112,7 @@ class TripEntity extends HiveObject {
       ),
       driverName: json['driverName'] as String?,
       driverPhone: json['driverPhone'] as String?,
+      driverAvatarUrl: json['driverAvatarUrl'] as String?,
       fare: (json['fare'] as num).toDouble(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
