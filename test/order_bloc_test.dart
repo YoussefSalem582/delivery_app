@@ -1,24 +1,45 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:delivery_app/core/architecture/entities/order_entity.dart';
-import 'package:delivery_app/core/architecture/repositories/order_repository.dart';
+import 'package:dartz/dartz.dart';
 import 'package:delivery_app/core/network/network_status.dart';
-import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
+import 'package:delivery_app/core/usecase/usecase.dart';
+import 'package:delivery_app/features/profile/orders/presentation/bloc/order_bloc.dart';
+import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
+import 'package:delivery_app/features/profile/shared/domain/usecases/order_usecases.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockOrderRepository extends Mock implements OrderRepository {}
+class MockGetCachedOrdersUseCase extends Mock implements GetCachedOrdersUseCase {}
+
+class MockGetOrdersUseCase extends Mock implements GetOrdersUseCase {}
+
+class MockRefreshOrdersUseCase extends Mock implements RefreshOrdersUseCase {}
 
 class MockNetworkStatus extends Mock implements NetworkStatus {}
 
 void main() {
-  late MockOrderRepository orderRepository;
+  late MockGetCachedOrdersUseCase getCachedOrders;
+  late MockGetOrdersUseCase getOrders;
+  late MockRefreshOrdersUseCase refreshOrders;
   late MockNetworkStatus networkStatus;
 
+  setUpAll(() {
+    registerFallbackValue(const NoParams());
+  });
+
   setUp(() {
-    orderRepository = MockOrderRepository();
+    getCachedOrders = MockGetCachedOrdersUseCase();
+    getOrders = MockGetOrdersUseCase();
+    refreshOrders = MockRefreshOrdersUseCase();
     networkStatus = MockNetworkStatus();
     when(() => networkStatus.isOnline).thenAnswer((_) async => true);
   });
+
+  OrderBloc buildBloc() => OrderBloc(
+        getCachedOrders: getCachedOrders,
+        getOrders: getOrders,
+        refreshOrders: refreshOrders,
+        networkStatus: networkStatus,
+      );
 
   group('OrderBloc', () {
     final orders = [
@@ -53,9 +74,10 @@ void main() {
     blocTest<OrderBloc, OrderState>(
       'emits cached orders then refreshed list when data differs',
       build: () {
-        when(() => orderRepository.getCachedOrders()).thenReturn(cachedOrders);
-        when(() => orderRepository.getOrders()).thenAnswer((_) async => freshOrders);
-        return OrderBloc(orderRepository, networkStatus);
+        when(() => getCachedOrders(any()))
+            .thenAnswer((_) async => Right(cachedOrders));
+        when(() => getOrders(any())).thenAnswer((_) async => Right(freshOrders));
+        return buildBloc();
       },
       act: (bloc) => bloc.add(const OrderLoadRequested()),
       expect: () => [

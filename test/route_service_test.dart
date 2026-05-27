@@ -1,6 +1,6 @@
-import 'package:delivery_app/core/architecture/datasources/route_cache_local_datasource.dart';
-import 'package:delivery_app/core/architecture/entities/hive_adapters.dart';
-import 'package:delivery_app/core/architecture/entities/route_cache_entity.dart';
+import 'package:delivery_app/core/cache/datasources/route_cache_local_datasource.dart';
+import 'package:delivery_app/core/cache/entities/hive_adapters.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/route_cache_entity.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';

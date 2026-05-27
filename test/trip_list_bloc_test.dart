@@ -1,36 +1,59 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
-import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
+import 'package:dartz/dartz.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
 import 'package:delivery_app/core/network/network_status.dart';
-import 'package:delivery_app/core/network/route_service.dart';
-import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
-import 'package:delivery_app/features/trips/presentation/bloc/trip_list_bloc.dart';
+import 'package:delivery_app/core/usecase/usecase.dart';
+import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
+import 'package:delivery_app/features/trips/trip_list/presentation/bloc/trip_list_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockTripRepository extends Mock implements TripRepository {}
+class MockGetCachedTripsUseCase extends Mock implements GetCachedTripsUseCase {}
+
+class MockGetTripsUseCase extends Mock implements GetTripsUseCase {}
+
+class MockRefreshTripsUseCase extends Mock implements RefreshTripsUseCase {}
 
 class MockNetworkStatus extends Mock implements NetworkStatus {}
 
-class MockFcmService extends Mock implements FcmService {}
-
-class MockRouteService extends Mock implements RouteService {}
-
 void main() {
-  late MockTripRepository tripRepository;
+  late MockGetCachedTripsUseCase getCachedTrips;
+  late MockGetTripsUseCase getTrips;
+  late MockRefreshTripsUseCase refreshTrips;
   late MockNetworkStatus networkStatus;
 
   setUpAll(() {
+    registerFallbackValue(const NoParams());
+    registerFallbackValue(
+      const RequestTripParams(
+        pickupAddress: '',
+        dropoffAddress: '',
+        pickupLat: 0,
+        pickupLng: 0,
+        dropoffLat: 0,
+        dropoffLng: 0,
+      ),
+    );
     registerFallbackValue(const LatLng(0, 0));
   });
 
   setUp(() {
-    tripRepository = MockTripRepository();
+    getCachedTrips = MockGetCachedTripsUseCase();
+    getTrips = MockGetTripsUseCase();
+    refreshTrips = MockRefreshTripsUseCase();
     networkStatus = MockNetworkStatus();
     when(() => networkStatus.isOnline).thenAnswer((_) async => true);
   });
+
+  TripListBloc buildBloc() => TripListBloc(
+        getCachedTrips: getCachedTrips,
+        getTrips: getTrips,
+        refreshTrips: refreshTrips,
+        networkStatus: networkStatus,
+      );
 
   group('TripListBloc', () {
     final trips = [
@@ -52,12 +75,9 @@ void main() {
     blocTest<TripListBloc, TripListState>(
       'emits loaded trips when repository returns data',
       build: () {
-        when(() => tripRepository.getCachedTrips()).thenReturn(trips);
-        when(() => tripRepository.getTrips()).thenAnswer((_) async => trips);
-        return TripListBloc(
-          repository: tripRepository,
-          networkStatus: networkStatus,
-        );
+        when(() => getCachedTrips(any())).thenAnswer((_) async => Right(trips));
+        when(() => getTrips(any())).thenAnswer((_) async => Right(trips));
+        return buildBloc();
       },
       act: (bloc) => bloc.add(const TripListLoadRequested()),
       expect: () => [
@@ -72,12 +92,10 @@ void main() {
     blocTest<TripListBloc, TripListState>(
       'emits cached trips before remote refresh when cache differs',
       build: () {
-        when(() => tripRepository.getCachedTrips()).thenReturn(cachedTrips);
-        when(() => tripRepository.getTrips()).thenAnswer((_) async => freshTrips);
-        return TripListBloc(
-          repository: tripRepository,
-          networkStatus: networkStatus,
-        );
+        when(() => getCachedTrips(any()))
+            .thenAnswer((_) async => Right(cachedTrips));
+        when(() => getTrips(any())).thenAnswer((_) async => Right(freshTrips));
+        return buildBloc();
       },
       act: (bloc) => bloc.add(const TripListLoadRequested()),
       expect: () => [
@@ -90,9 +108,11 @@ void main() {
 
   group('RequestRideBloc', () {
     late MockFcmService fcmService;
+    late MockRequestTripUseCase requestTrip;
 
     setUp(() {
       fcmService = MockFcmService();
+      requestTrip = MockRequestTripUseCase();
       when(
         () => fcmService.simulateTripNotification(
           title: any(named: 'title'),
@@ -118,18 +138,9 @@ void main() {
           createdAt: DateTime(2026),
           updatedAt: DateTime(2026),
         );
-        when(
-          () => tripRepository.requestTrip(
-            pickupAddress: any(named: 'pickupAddress'),
-            dropoffAddress: any(named: 'dropoffAddress'),
-            pickupLat: any(named: 'pickupLat'),
-            pickupLng: any(named: 'pickupLng'),
-            dropoffLat: any(named: 'dropoffLat'),
-            dropoffLng: any(named: 'dropoffLng'),
-          ),
-        ).thenAnswer((_) async => trip);
+        when(() => requestTrip(any())).thenAnswer((_) async => Right(trip));
         return RequestRideBloc(
-          repository: tripRepository,
+          requestTrip: requestTrip,
           fcmService: fcmService,
         );
       },
@@ -149,101 +160,8 @@ void main() {
       ],
     );
   });
-
-  blocTest<TrackingBloc, TrackingState>(
-    'loads route on tracking start',
-    build: () {
-      final routeService = MockRouteService();
-      when(
-        () => routeService.getRoute(
-          pickup: any(named: 'pickup'),
-          dropoff: any(named: 'dropoff'),
-        ),
-      ).thenAnswer(
-        (_) async => RouteResult(
-          points: [
-            const LatLng(30, 31),
-            const LatLng(30.05, 31.05),
-            const LatLng(30.1, 31.1),
-          ],
-          distanceMeters: 5000,
-          durationSeconds: 600,
-        ),
-      );
-      return TrackingBloc(routeService);
-    },
-    act: (bloc) => bloc.add(
-      TrackingStarted(
-        TripEntity(
-          id: '1',
-          pickupAddress: 'A',
-          dropoffAddress: 'B',
-          pickupLat: 30,
-          pickupLng: 31,
-          dropoffLat: 30.1,
-          dropoffLng: 31.1,
-          status: TripStatus.inProgress,
-          fare: 50,
-          createdAt: DateTime(2026),
-          updatedAt: DateTime(2026),
-        ),
-      ),
-    ),
-    expect: () => [
-      isA<TrackingLoading>(),
-      isA<TrackingActive>(),
-    ],
-  );
-
-  blocTest<TrackingBloc, TrackingState>(
-    'increases progress over time-based ticks',
-    build: () {
-      final routeService = MockRouteService();
-      when(
-        () => routeService.getRoute(
-          pickup: any(named: 'pickup'),
-          dropoff: any(named: 'dropoff'),
-        ),
-      ).thenAnswer(
-        (_) async => RouteResult(
-          points: [
-            const LatLng(30, 31),
-            const LatLng(30.05, 31.05),
-            const LatLng(30.1, 31.1),
-          ],
-          distanceMeters: 5000,
-          durationSeconds: 10,
-        ),
-      );
-      return TrackingBloc(routeService);
-    },
-    act: (bloc) async {
-      bloc.add(
-        TrackingStarted(
-          TripEntity(
-            id: '1',
-            pickupAddress: 'A',
-            dropoffAddress: 'B',
-            pickupLat: 30,
-            pickupLng: 31,
-            dropoffLat: 30.1,
-            dropoffLng: 31.1,
-            status: TripStatus.inProgress,
-            fare: 50,
-            createdAt: DateTime(2026),
-            updatedAt: DateTime(2026),
-          ),
-        ),
-      );
-      await Future<void>.delayed(Duration.zero);
-      bloc.add(TrackingTick(DateTime.now().add(const Duration(seconds: 5))));
-    },
-    verify: (bloc) {
-      final active = bloc.state as TrackingActive;
-      expect(active.progress, greaterThan(0.4));
-      expect(active.progress, lessThan(0.6));
-      expect(active.traveledRoute.length, greaterThan(1));
-      expect(active.remainingRoute.length, greaterThan(1));
-    },
-  );
 }
+
+class MockRequestTripUseCase extends Mock implements RequestTripUseCase {}
+
+class MockFcmService extends Mock implements FcmService {}

@@ -1,6 +1,6 @@
-import 'package:delivery_app/core/architecture/datasources/pending_sync_local_datasource.dart';
-import 'package:delivery_app/core/architecture/entities/pending_sync_entity.dart';
-import 'package:delivery_app/core/architecture/entities/hive_adapters.dart';
+import 'package:delivery_app/core/cache/datasources/pending_sync_local_datasource.dart';
+import 'package:delivery_app/core/cache/entities/pending_sync_entity.dart';
+import 'package:delivery_app/core/cache/entities/hive_adapters.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
