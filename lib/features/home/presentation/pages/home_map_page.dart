@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
+import 'package:delivery_app/core/utils/app_toast.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
@@ -62,9 +63,7 @@ class _HomeMapPageState extends State<HomeMapPage> {
     }
 
     if (trip != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('trip_requested_success'.tr())),
-      );
+      AppToast.success(context, 'trip_requested_success'.tr());
       context.router.push(TrackingRoute(tripId: trip.id));
     }
   }
@@ -114,15 +113,11 @@ class _HomeMapPageState extends State<HomeMapPage> {
                     center: state.userPosition,
                     zoom: MapConfig.defaultZoom,
                     followCenter: true,
+                    showUserLocation: true,
                     polylines: _previewDraft != null
                         ? _routePoints(_previewDraft!)
                         : const [],
                     markers: [
-                      MapMarkerData(
-                        point: state.userPosition,
-                        color: scheme.primaryContainer,
-                        icon: Icons.my_location,
-                      ),
                       if (_previewDraft != null) ...[
                         MapMarkerData(
                           point: LatLng(
