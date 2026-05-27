@@ -2,10 +2,12 @@ import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
-import 'package:delivery_app/core/widgets/delivery_map.dart';
 import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
+import 'package:delivery_app/core/widgets/nokta_ride_option.dart';
+import 'package:delivery_app/core/widgets/delivery_map.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/features/home/presentation/widgets/request_ride_sheet.dart';
+import 'package:delivery_app/features/home/presentation/widgets/ride_selection_sheet.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -132,16 +134,25 @@ class HomeMapPage extends StatelessWidget {
     BuildContext context,
     MapReady mapState,
   ) async {
+    final draft = await showModalBottomSheet<RideRequestDraft>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => RequestRideSheet(
+        pickupLat: mapState.userPosition.latitude,
+        pickupLng: mapState.userPosition.longitude,
+      ),
+    );
+
+    if (draft == null || !context.mounted) return;
+
     final trip = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider(
         create: (_) => sl<RequestRideBloc>(),
-        child: RequestRideSheet(
-          pickupLat: mapState.userPosition.latitude,
-          pickupLng: mapState.userPosition.longitude,
-        ),
+        child: RideSelectionSheet(draft: draft),
       ),
     );
 

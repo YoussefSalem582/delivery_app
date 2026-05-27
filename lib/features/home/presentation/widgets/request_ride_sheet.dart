@@ -2,10 +2,9 @@ import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/constants.dart';
 import 'package:delivery_app/core/widgets/nokta_bottom_nav_bar.dart';
 import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
-import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
+import 'package:delivery_app/core/widgets/nokta_ride_option.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RequestRideSheet extends StatefulWidget {
   const RequestRideSheet({
@@ -33,6 +32,19 @@ class _RequestRideSheetState extends State<RequestRideSheet> {
     super.dispose();
   }
 
+  void _continue() {
+    Navigator.of(context).pop(
+      RideRequestDraft(
+        pickupAddress: _pickupController.text,
+        dropoffAddress: _dropoffController.text,
+        pickupLat: widget.pickupLat,
+        pickupLng: widget.pickupLng,
+        dropoffLat: AppConstants.defaultDropoffLat,
+        dropoffLng: AppConstants.defaultDropoffLng,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -54,65 +66,38 @@ class _RequestRideSheetState extends State<RequestRideSheet> {
             ),
           ],
         ),
-        child: BlocConsumer<RequestRideBloc, RequestRideState>(
-          listener: (context, state) {
-            if (state is RequestRideSuccess) {
-              Navigator.of(context).pop(state.trip);
-            } else if (state is RequestRideError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
-            }
-          },
-          builder: (context, state) {
-            final loading = state is RequestRideLoading;
-
-            return SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  NoktaSpacing.md,
-                  0,
-                  NoktaSpacing.md,
-                  NoktaSpacing.lg,
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              NoktaSpacing.md,
+              0,
+              NoktaSpacing.md,
+              NoktaSpacing.lg,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const NoktaSheetHandle(),
+                Text(
+                  'request_ride_title'.tr(),
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const NoktaSheetHandle(),
-                    Text(
-                      'request_ride_title'.tr(),
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: NoktaSpacing.lg),
-                    _LocationInputs(
-                      pickupController: _pickupController,
-                      dropoffController: _dropoffController,
-                    ),
-                    const SizedBox(height: NoktaSpacing.lg),
-                    NoktaPrimaryButton(
-                      label: 'confirm_ride'.tr(),
-                      loading: loading,
-                      usePrimaryContainer: true,
-                      onPressed: () {
-                        context.read<RequestRideBloc>().add(
-                              RequestRideSubmitted(
-                                pickupAddress: _pickupController.text,
-                                dropoffAddress: _dropoffController.text,
-                                pickupLat: widget.pickupLat,
-                                pickupLng: widget.pickupLng,
-                                dropoffLat: AppConstants.defaultDropoffLat,
-                                dropoffLng: AppConstants.defaultDropoffLng,
-                              ),
-                            );
-                      },
-                    ),
-                  ],
+                const SizedBox(height: NoktaSpacing.lg),
+                _LocationInputs(
+                  pickupController: _pickupController,
+                  dropoffController: _dropoffController,
                 ),
-              ),
-            );
-          },
+                const SizedBox(height: NoktaSpacing.lg),
+                NoktaPrimaryButton(
+                  label: 'continue'.tr(),
+                  usePrimaryContainer: true,
+                  onPressed: _continue,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
