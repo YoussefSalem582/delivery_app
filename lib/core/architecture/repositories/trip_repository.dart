@@ -14,4 +14,5 @@ abstract class TripRepository {
   Future<TripEntity> updateTripStatus(String id, TripStatus status);
   Future<void> syncPendingChanges();
   List<TripEntity> getCachedTrips();
+  int getPendingRetryCount(String tripId);
 }

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
 import 'package:delivery_app/core/sync/sync_service.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
@@ -107,6 +108,10 @@ class TripListPage extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: NoktaSpacing.md),
                         child: NoktaTripCard(
                           trip: entry.value,
+                          pendingRetryCount:
+                              sl<TripRepository>().getPendingRetryCount(
+                            entry.value.id,
+                          ),
                           onTap: () => context.router.push(
                             TripDetailRoute(tripId: entry.value.id),
                           ),

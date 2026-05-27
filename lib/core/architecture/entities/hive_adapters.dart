@@ -1,7 +1,10 @@
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:delivery_app/core/architecture/entities/cache_metadata_entity.dart';
 import 'package:delivery_app/core/architecture/entities/location_entity.dart';
+import 'package:delivery_app/core/architecture/entities/route_cache_entity.dart';
 import 'package:delivery_app/core/architecture/entities/notification_entity.dart';
 import 'package:delivery_app/core/architecture/entities/order_entity.dart';
 import 'package:delivery_app/core/architecture/entities/pending_sync_entity.dart';
@@ -215,12 +218,17 @@ class PendingSyncEntityAdapter extends TypeAdapter<PendingSyncEntity> {
 
   @override
   PendingSyncEntity read(BinaryReader reader) {
-    return PendingSyncEntity(
+    final entity = PendingSyncEntity(
       id: reader.readString(),
       action: reader.read() as SyncAction,
       payload: jsonDecode(reader.readString()) as Map<String, dynamic>,
       createdAt: DateTime.parse(reader.readString()),
     );
+    try {
+      return entity.copyWith(retryCount: reader.readInt());
+    } catch (_) {
+      return entity;
+    }
   }
 
   @override
@@ -229,6 +237,63 @@ class PendingSyncEntityAdapter extends TypeAdapter<PendingSyncEntity> {
       ..writeString(obj.id)
       ..write(obj.action)
       ..writeString(jsonEncode(obj.payload))
+      ..writeString(obj.createdAt.toIso8601String())
+      ..writeInt(obj.retryCount);
+  }
+}
+
+class CacheMetadataEntityAdapter extends TypeAdapter<CacheMetadataEntity> {
+  @override
+  final int typeId = 9;
+
+  @override
+  CacheMetadataEntity read(BinaryReader reader) {
+    return CacheMetadataEntity(
+      key: reader.readString(),
+      lastFetchedAt: DateTime.parse(reader.readString()),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, CacheMetadataEntity obj) {
+    writer
+      ..writeString(obj.key)
+      ..writeString(obj.lastFetchedAt.toIso8601String());
+  }
+}
+
+class RouteCacheEntityAdapter extends TypeAdapter<RouteCacheEntity> {
+  @override
+  final int typeId = 10;
+
+  @override
+  RouteCacheEntity read(BinaryReader reader) {
+    final pointCount = reader.readInt();
+    final points = <LatLng>[];
+    for (var i = 0; i < pointCount; i++) {
+      points.add(LatLng(reader.readDouble(), reader.readDouble()));
+    }
+    return RouteCacheEntity(
+      cacheKey: reader.readString(),
+      points: points,
+      distanceMeters: reader.readDouble(),
+      durationSeconds: reader.readDouble(),
+      createdAt: DateTime.parse(reader.readString()),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, RouteCacheEntity obj) {
+    writer.writeInt(obj.points.length);
+    for (final p in obj.points) {
+      writer
+        ..writeDouble(p.latitude)
+        ..writeDouble(p.longitude);
+    }
+    writer
+      ..writeString(obj.cacheKey)
+      ..writeDouble(obj.distanceMeters)
+      ..writeDouble(obj.durationSeconds)
       ..writeString(obj.createdAt.toIso8601String());
   }
 }

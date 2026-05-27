@@ -1,8 +1,10 @@
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/core/network/offline_cubit.dart';
 import 'package:delivery_app/core/sync/sync_service.dart';
 import 'package:delivery_app/core/theme/app_theme.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
 import 'package:delivery_app/core/utils/talker_setup.dart';
+import 'package:delivery_app/core/widgets/nokta_offline_banner.dart';
 import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
@@ -68,6 +70,7 @@ class DeliveryApp extends StatelessWidget {
         BlocProvider.value(value: sl<ThemeCubit>()),
         BlocProvider.value(value: sl<LocaleCubit>()),
         BlocProvider.value(value: sl<NotificationBloc>()),
+        BlocProvider.value(value: sl<OfflineCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
@@ -83,6 +86,18 @@ class DeliveryApp extends StatelessWidget {
             darkTheme: AppTheme.dark(locale: localeCode),
             themeMode: themeMode,
             routerConfig: sl<AppRouter>().config(),
+            builder: (context, child) {
+              return BlocBuilder<OfflineCubit, bool>(
+                builder: (context, isOffline) {
+                  return Column(
+                    children: [
+                      if (isOffline) const NoktaGlobalOfflineBanner(),
+                      Expanded(child: child ?? const SizedBox.shrink()),
+                    ],
+                  );
+                },
+              );
+            },
           );
         },
       ),

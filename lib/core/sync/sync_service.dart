@@ -1,30 +1,34 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:delivery_app/core/architecture/repositories/auth_repository.dart';
 import 'package:delivery_app/core/architecture/repositories/order_repository.dart';
 import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
+import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/utils/constants.dart';
 
 class SyncService {
   SyncService({
     required TripRepository tripRepository,
     required OrderRepository orderRepository,
-    required Connectivity connectivity,
+    required AuthRepository authRepository,
+    required NetworkStatus networkStatus,
     required Talker talker,
   })  : _tripRepository = tripRepository,
         _orderRepository = orderRepository,
-        _connectivity = connectivity,
+        _authRepository = authRepository,
+        _networkStatus = networkStatus,
         _talker = talker;
 
   final TripRepository _tripRepository;
   final OrderRepository _orderRepository;
-  final Connectivity _connectivity;
+  final AuthRepository _authRepository;
+  final NetworkStatus _networkStatus;
   final Talker _talker;
 
-  StreamSubscription<List<ConnectivityResult>>? _subscription;
-  List<ConnectivityResult>? _lastResult;
+  StreamSubscription<bool>? _subscription;
+  bool _wasOffline = false;
 
   Future<void> init() async {
     await Workmanager().initialize(callbackDispatcher);
@@ -35,24 +39,23 @@ class SyncService {
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
 
-    _subscription = _connectivity.onConnectivityChanged.listen(_onConnectivity);
+    _wasOffline = !(await _networkStatus.isOnline);
+    _subscription = _networkStatus.onOnlineChanged.listen(_onOnlineChanged);
     _talker.info('[SyncService] Initialized with WorkManager + connectivity listener');
   }
 
-  Future<void> _onConnectivity(List<ConnectivityResult> result) async {
-    final wasOffline = _lastResult?.contains(ConnectivityResult.none) ?? false;
-    final isOnline = !result.contains(ConnectivityResult.none);
-    _lastResult = result;
-
-    if (wasOffline && isOnline) {
+  Future<void> _onOnlineChanged(bool isOnline) async {
+    if (_wasOffline && isOnline) {
       _talker.info('[SyncService] Reconnected — draining pending sync');
       await syncAll();
     }
+    _wasOffline = !isOnline;
   }
 
   Future<void> syncAll() async {
     await _tripRepository.syncPendingChanges();
     await _orderRepository.getOrders(forceRefresh: true);
+    await _authRepository.getProfile(forceRefresh: true);
     _talker.info('[SyncService] Sync complete');
   }
 

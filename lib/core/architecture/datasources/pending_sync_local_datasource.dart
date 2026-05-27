@@ -16,6 +16,10 @@ class PendingSyncLocalDataSource {
     await _box.put(item.id, item);
   }
 
+  Future<void> enqueueOrReplace(PendingSyncEntity item) async {
+    await _box.put(item.id, item);
+  }
+
   Future<void> remove(String id) async {
     await _box.delete(id);
   }

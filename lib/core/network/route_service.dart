@@ -1,3 +1,5 @@
+import 'package:delivery_app/core/architecture/datasources/route_cache_local_datasource.dart';
+import 'package:delivery_app/core/architecture/entities/route_cache_entity.dart';
 import 'package:delivery_app/core/utils/demo_destinations.dart';
 import 'package:delivery_app/core/utils/route_geometry.dart';
 import 'package:dio/dio.dart';
@@ -21,10 +23,11 @@ class RouteResult {
 }
 
 class RouteService {
-  RouteService(this._dio, this._talker);
+  RouteService(this._dio, this._talker, this._routeCache);
 
   final Dio _dio;
   final Talker _talker;
+  final RouteCacheLocalDataSource _routeCache;
 
   static const _osrmBase = 'https://router.project-osrm.org';
   final _memoryCache = <String, RouteResult>{};
@@ -35,8 +38,22 @@ class RouteService {
   }) async {
     final cacheKey =
         '${pickup.latitude},${pickup.longitude}_${dropoff.latitude},${dropoff.longitude}';
-    final cached = _memoryCache[cacheKey];
-    if (cached != null) return cached;
+
+    final memory = _memoryCache[cacheKey];
+    if (memory != null) return memory;
+
+    final disk = _routeCache.get(cacheKey);
+    if (disk != null) {
+      final result = RouteResult(
+        points: disk.points,
+        distanceMeters: disk.distanceMeters,
+        durationSeconds: disk.durationSeconds,
+        fromCache: true,
+      );
+      _memoryCache[cacheKey] = result;
+      _talker.info('[RouteService] Disk cache hit for route');
+      return result;
+    }
 
     const distanceCalc = Distance();
     final straightMeters = distanceCalc(pickup, dropoff);
@@ -92,6 +109,15 @@ class RouteService {
         durationSeconds: (route['duration'] as num).toDouble(),
       );
       _memoryCache[cacheKey] = result;
+      await _routeCache.put(
+        RouteCacheEntity(
+          cacheKey: cacheKey,
+          points: points,
+          distanceMeters: result.distanceMeters,
+          durationSeconds: result.durationSeconds,
+          createdAt: DateTime.now(),
+        ),
+      );
       _talker.info('[RouteService] OSRM route with ${points.length} points');
       return result;
     } catch (e, st) {

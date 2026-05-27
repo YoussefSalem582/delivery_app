@@ -24,6 +24,10 @@ class TripLocalDataSource {
     await _box.put(trip.id, trip);
   }
 
+  Future<void> delete(String id) async {
+    await _box.delete(id);
+  }
+
   Future<void> clear() async {
     await _box.clear();
   }

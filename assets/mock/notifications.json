@@ -1,0 +1,18 @@
+[
+  {
+    "id": "notif-001",
+    "title": "Driver on the way",
+    "body": "Your driver is heading to the pickup location.",
+    "createdAt": "2026-05-25T10:00:00.000Z",
+    "tripId": "trip-001",
+    "isRead": false
+  },
+  {
+    "id": "notif-002",
+    "title": "Trip completed",
+    "body": "Thanks for riding with Nokta.",
+    "createdAt": "2026-05-24T18:30:00.000Z",
+    "tripId": "trip-002",
+    "isRead": true
+  }
+]

@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/features/trips/presentation/bloc/trip_list_bloc.dart';
@@ -12,7 +12,7 @@ import 'package:mocktail/mocktail.dart';
 
 class MockTripRepository extends Mock implements TripRepository {}
 
-class MockConnectivity extends Mock implements Connectivity {}
+class MockNetworkStatus extends Mock implements NetworkStatus {}
 
 class MockFcmService extends Mock implements FcmService {}
 
@@ -20,7 +20,7 @@ class MockRouteService extends Mock implements RouteService {}
 
 void main() {
   late MockTripRepository tripRepository;
-  late MockConnectivity connectivity;
+  late MockNetworkStatus networkStatus;
 
   setUpAll(() {
     registerFallbackValue(const LatLng(0, 0));
@@ -28,9 +28,8 @@ void main() {
 
   setUp(() {
     tripRepository = MockTripRepository();
-    connectivity = MockConnectivity();
-    when(() => connectivity.checkConnectivity())
-        .thenAnswer((_) async => [ConnectivityResult.wifi]);
+    networkStatus = MockNetworkStatus();
+    when(() => networkStatus.isOnline).thenAnswer((_) async => true);
   });
 
   group('TripListBloc', () {
@@ -57,13 +56,34 @@ void main() {
         when(() => tripRepository.getTrips()).thenAnswer((_) async => trips);
         return TripListBloc(
           repository: tripRepository,
-          connectivity: connectivity,
+          networkStatus: networkStatus,
         );
       },
       act: (bloc) => bloc.add(const TripListLoadRequested()),
       expect: () => [
         const TripListLoading(),
         TripListLoaded(trips: trips, isOffline: false),
+      ],
+    );
+
+    final cachedTrips = [trips.first.copyWith(id: 'cached')];
+    final freshTrips = [trips.first.copyWith(id: 'fresh')];
+
+    blocTest<TripListBloc, TripListState>(
+      'emits cached trips before remote refresh when cache differs',
+      build: () {
+        when(() => tripRepository.getCachedTrips()).thenReturn(cachedTrips);
+        when(() => tripRepository.getTrips()).thenAnswer((_) async => freshTrips);
+        return TripListBloc(
+          repository: tripRepository,
+          networkStatus: networkStatus,
+        );
+      },
+      act: (bloc) => bloc.add(const TripListLoadRequested()),
+      expect: () => [
+        const TripListLoading(),
+        TripListLoaded(trips: cachedTrips, isOffline: false),
+        TripListLoaded(trips: freshTrips, isOffline: false),
       ],
     );
   });

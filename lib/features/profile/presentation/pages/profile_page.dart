@@ -4,6 +4,7 @@ import 'package:delivery_app/core/architecture/repositories/auth_repository.dart
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
+import 'package:delivery_app/core/widgets/nokta_offline_banner.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
@@ -35,8 +36,10 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
       child: FutureBuilder(
         future: sl<AuthRepository>().getProfile(),
+        initialData: sl<AuthRepository>().cachedUser,
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
+          final user = snapshot.data;
+          if (snapshot.connectionState != ConnectionState.done && user == null) {
             return Scaffold(
               backgroundColor: Theme.of(context).colorScheme.surface,
               appBar: AppBar(title: Text('profile_title'.tr())),
@@ -54,8 +57,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             );
           }
-
-          final user = snapshot.data;
           final scheme = Theme.of(context).colorScheme;
           final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -369,14 +370,15 @@ class _OrdersTab extends StatelessWidget {
             );
           }
           return Column(
-            children: state.orders
-                .map(
-                  (order) => Padding(
-                    padding: const EdgeInsets.only(bottom: NoktaSpacing.sm),
-                    child: _OrderTile(order: order),
-                  ),
-                )
-                .toList(),
+            children: [
+              if (state.isOffline) const NoktaOfflineSectionBanner(),
+              ...state.orders.map(
+                (order) => Padding(
+                  padding: const EdgeInsets.only(bottom: NoktaSpacing.sm),
+                  child: _OrderTile(order: order),
+                ),
+              ),
+            ],
           );
         }
         return const SizedBox.shrink();

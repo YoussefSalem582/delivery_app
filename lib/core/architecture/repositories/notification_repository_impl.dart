@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:delivery_app/core/architecture/datasources/notification_local_datasource.dart';
 import 'package:delivery_app/core/architecture/entities/notification_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/notification_repository.dart';
@@ -6,9 +9,28 @@ class NotificationRepositoryImpl implements NotificationRepository {
   NotificationRepositoryImpl(this._local);
 
   final NotificationLocalDataSource _local;
+  static bool _seedAttempted = false;
+
+  Future<void> _seedIfEmpty() async {
+    if (_seedAttempted || _local.getAll().isNotEmpty) return;
+    _seedAttempted = true;
+    try {
+      final json = await rootBundle.loadString('assets/mock/notifications.json');
+      final list = jsonDecode(json) as List<dynamic>;
+      final notifications = list
+          .map(
+            (e) => NotificationEntity.fromJson(e as Map<String, dynamic>),
+          )
+          .toList();
+      await _local.saveAll(notifications);
+    } catch (_) {
+      // Asset optional; FCM/simulate still populate notifications.
+    }
+  }
 
   @override
   Future<List<NotificationEntity>> getNotifications() async {
+    await _seedIfEmpty();
     return _local.getAll();
   }
 

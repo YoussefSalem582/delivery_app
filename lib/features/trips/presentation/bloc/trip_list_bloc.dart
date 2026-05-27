@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
+import 'package:delivery_app/core/network/network_status.dart';
 
 part 'trip_list_event.dart';
 part 'trip_list_state.dart';
@@ -10,24 +10,23 @@ part 'trip_list_state.dart';
 class TripListBloc extends Bloc<TripListEvent, TripListState> {
   TripListBloc({
     required TripRepository repository,
-    required Connectivity connectivity,
+    required NetworkStatus networkStatus,
   })  : _repository = repository,
-        _connectivity = connectivity,
+        _networkStatus = networkStatus,
         super(const TripListInitial()) {
     on<TripListLoadRequested>(_onLoad);
     on<TripListRefreshRequested>(_onRefresh);
   }
 
   final TripRepository _repository;
-  final Connectivity _connectivity;
+  final NetworkStatus _networkStatus;
 
   Future<void> _onLoad(
     TripListLoadRequested event,
     Emitter<TripListState> emit,
   ) async {
     emit(const TripListLoading());
-    final connectivity = await _connectivity.checkConnectivity();
-    final isOffline = connectivity.contains(ConnectivityResult.none);
+    final isOffline = !(await _networkStatus.isOnline);
     try {
       final cached = _repository.getCachedTrips();
       if (cached.isNotEmpty) {
@@ -50,11 +49,11 @@ class TripListBloc extends Bloc<TripListEvent, TripListState> {
     }
     try {
       final trips = await _repository.getTrips(forceRefresh: true);
-      final connectivity = await _connectivity.checkConnectivity();
+      final isOffline = !(await _networkStatus.isOnline);
       emit(
         TripListLoaded(
           trips: trips,
-          isOffline: connectivity.contains(ConnectivityResult.none),
+          isOffline: isOffline,
         ),
       );
     } catch (e) {

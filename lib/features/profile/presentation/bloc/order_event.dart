@@ -10,6 +10,10 @@ class OrderLoadRequested extends OrderEvent {
   const OrderLoadRequested();
 }
 
+class OrderRefreshRequested extends OrderEvent {
+  const OrderRefreshRequested();
+}
+
 abstract class OrderState extends Equatable {
   const OrderState();
   @override
@@ -25,10 +29,30 @@ class OrderLoading extends OrderState {
 }
 
 class OrderLoaded extends OrderState {
-  const OrderLoaded(this.orders);
+  const OrderLoaded({
+    required this.orders,
+    this.isOffline = false,
+    this.isRefreshing = false,
+  });
+
   final List<OrderEntity> orders;
+  final bool isOffline;
+  final bool isRefreshing;
+
+  OrderLoaded copyWith({
+    List<OrderEntity>? orders,
+    bool? isOffline,
+    bool? isRefreshing,
+  }) {
+    return OrderLoaded(
+      orders: orders ?? this.orders,
+      isOffline: isOffline ?? this.isOffline,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
+    );
+  }
+
   @override
-  List<Object?> get props => [orders];
+  List<Object?> get props => [orders, isOffline, isRefreshing];
 }
 
 class OrderError extends OrderState {

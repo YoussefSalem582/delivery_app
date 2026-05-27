@@ -30,7 +30,14 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
     TripDetailLoadRequested event,
     Emitter<TripDetailState> emit,
   ) async {
-    emit(const TripDetailLoading());
+    final cachedMatches =
+        _repository.getCachedTrips().where((t) => t.id == event.tripId);
+    final cached = cachedMatches.isEmpty ? null : cachedMatches.first;
+    if (cached != null) {
+      emit(TripDetailLoaded(cached));
+    } else {
+      emit(const TripDetailLoading());
+    }
     try {
       final trip = await _repository.getTripById(event.tripId);
       if (trip == null) {

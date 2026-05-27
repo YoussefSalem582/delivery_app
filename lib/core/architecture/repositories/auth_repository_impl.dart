@@ -1,27 +1,27 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:delivery_app/core/architecture/datasources/auth_local_datasource.dart';
+import 'package:delivery_app/core/architecture/datasources/cache_metadata_local_datasource.dart';
 import 'package:delivery_app/core/architecture/entities/user_entity.dart';
 import 'package:delivery_app/core/architecture/repositories/auth_repository.dart';
 import 'package:delivery_app/core/network/api_endpoints.dart';
+import 'package:delivery_app/core/network/network_status.dart';
+import 'package:delivery_app/core/utils/cache_freshness.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required AuthLocalDataSource local,
     required Dio dio,
-    required Connectivity connectivity,
+    required CacheMetadataLocalDataSource cacheMetadata,
+    required NetworkStatus networkStatus,
   })  : _local = local,
         _dio = dio,
-        _connectivity = connectivity;
+        _cacheMetadata = cacheMetadata,
+        _networkStatus = networkStatus;
 
   final AuthLocalDataSource _local;
   final Dio _dio;
-  final Connectivity _connectivity;
-
-  Future<bool> _isOnline() async {
-    final result = await _connectivity.checkConnectivity();
-    return !result.contains(ConnectivityResult.none);
-  }
+  final CacheMetadataLocalDataSource _cacheMetadata;
+  final NetworkStatus _networkStatus;
 
   @override
   Future<UserEntity> login({
@@ -29,11 +29,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     UserEntity user;
-    if (await _isOnline()) {
+    if (await _networkStatus.isOnline) {
       try {
         final response = await _dio.get<dynamic>(ApiEndpoints.profile);
         user = UserEntity.fromJson(response.data as Map<String, dynamic>)
             .copyWith(email: email, isLoggedIn: true);
+        await _cacheMetadata.markFetched(CacheKeys.profile);
       } on DioException {
         user = UserEntity(
           id: 'local-user',
@@ -66,6 +67,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity?> getCurrentUser() async => _local.getCurrentUser();
 
   @override
+  UserEntity? get cachedUser => _local.getCurrentUser();
+
+  @override
   bool isLoggedIn() {
     final user = _local.getCurrentUser();
     return user?.isLoggedIn ?? false;
@@ -74,16 +78,22 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity> getProfile({bool forceRefresh = false}) async {
     final cached = _local.getCurrentUser();
-    if (cached != null && !forceRefresh && !await _isOnline()) {
+    final lastFetched = _cacheMetadata.getLastFetched(CacheKeys.profile);
+
+    if (cached != null &&
+        !forceRefresh &&
+        (!await _networkStatus.isOnline ||
+            CacheFreshness.isFresh(lastFetched))) {
       return cached;
     }
 
-    if (await _isOnline()) {
+    if (await _networkStatus.isOnline) {
       try {
         final response = await _dio.get<dynamic>(ApiEndpoints.profile);
         final user = UserEntity.fromJson(response.data as Map<String, dynamic>)
-            .copyWith(isLoggedIn: true);
+            .copyWith(isLoggedIn: cached?.isLoggedIn ?? true);
         await _local.saveUser(user);
+        await _cacheMetadata.markFetched(CacheKeys.profile);
         return user;
       } on DioException {
         if (cached != null) return cached;

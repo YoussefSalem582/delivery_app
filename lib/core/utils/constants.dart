@@ -4,6 +4,11 @@ class AppConstants {
   static const userBox = 'user_box';
   static const notificationsBox = 'notifications_box';
   static const pendingSyncBox = 'pending_sync_box';
+  static const cacheMetaBox = 'cache_meta_box';
+  static const routeCacheBox = 'route_cache_box';
+
+  static const cacheTtl = Duration(minutes: 5);
+  static const routeCacheMaxEntries = 50;
 
   static const themeKey = 'theme_mode';
   static const localeKey = 'app_locale';

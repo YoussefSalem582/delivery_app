@@ -5,8 +5,9 @@
 ## Features
 
 - **Clean Architecture** — `data` / `domain` (entities + repos) / `presentation` (BLoC + UI)
-- **Offline-first** — Hive cache for trips, orders, user, notifications; pending sync queue
-- **Dual sync** — `connectivity_plus` reconnect sync + `workmanager` periodic background task
+- **Offline-first** — Hive cache for trips, orders, user, notifications, OSRM routes; pending sync queue with deduped status updates
+- **Unified caching** — 5-minute TTL metadata, stale-while-revalidate in trip/order lists, profile cache-first load, disk route cache (50-entry LRU)
+- **Dual sync** — `NetworkStatus` reconnect sync (trips queue + orders + profile refresh) + `workmanager` stub for background
 - **Maps & tracking** — flutter_map (OpenStreetMap tiles), OSRM road-following routes, tile disk cache, animated camera, live location marker, geolocator, driver polyline animation
 - **Push notifications** — Firebase Cloud Messaging + simulated fallback for demo without Firebase
 - **Themes & i18n** — Dark/light mode, Inter + Cairo typography (locale-aware), English/Arabic with RTL via `easy_localization`
@@ -79,12 +80,27 @@ flutter run
 7. **Profile** — toggle dark mode, switch to Arabic (RTL), long-press avatar for Talker console
 8. **Complete trip** — from trip detail, tap Complete Trip
 
+## Offline & cache behavior
+
+| Resource | Local store | Stale-while-revalidate | Offline writes |
+|----------|-------------|------------------------|----------------|
+| Trips | `trips_box` | Trip list BLoC | Pending sync queue (`createTrip`, `updateTripStatus`) |
+| Orders | `orders_box` | Order tab BLoC | Read-only cache |
+| Profile | `user_box` | Profile `FutureBuilder` + `cachedUser` | Local wallet only |
+| Notifications | `notifications_box` | Seeded from `assets/mock/notifications.json` | FCM / simulate |
+| Routes | `route_cache_box` | Memory → disk → OSRM → straight line | N/A |
+| Map tiles | File cache (`map_tiles/`) | flutter_map_cache | N/A |
+
+- **`NetworkStatus`** — shared link-type online check (Wi‑Fi without internet may still show online).
+- **`SyncService.syncAll()`** — drains trip pending sync, refreshes orders and profile on reconnect or manual sync.
+- **Cache TTL** — remote fetches skipped for 5 minutes when cache is non-empty (`cache_meta_box`), unless `forceRefresh: true`.
+
 ## Architecture
 
 ```
 lib/
 ├── core/architecture/   # entities, repos, datasources
-├── core/network/        # Dio mock API, FCM
+├── core/network/        # Dio mock API, FCM, NetworkStatus, OfflineCubit
 ├── core/sync/           # SyncService + WorkManager
 ├── core/theme/          # AppTheme, ThemeCubit, LocaleCubit
 ├── features/            # splash, auth, home, trips, profile, notifications
@@ -108,7 +124,7 @@ lib/
 flutter test
 ```
 
-Includes `bloc_test` coverage for `TripListBloc` and unit tests for `RouteService` (OSRM parsing + offline fallback).
+Includes `bloc_test` coverage for `TripListBloc` and `OrderBloc`, unit tests for `RouteService` (OSRM parsing, memory/disk cache, offline fallback), and pending sync queue dedupe.
 
 ## Freelance pitch
 

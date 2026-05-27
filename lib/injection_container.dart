@@ -5,10 +5,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:delivery_app/core/architecture/datasources/auth_local_datasource.dart';
+import 'package:delivery_app/core/architecture/datasources/cache_metadata_local_datasource.dart';
 import 'package:delivery_app/core/architecture/datasources/notification_local_datasource.dart';
 import 'package:delivery_app/core/architecture/datasources/order_local_datasource.dart';
 import 'package:delivery_app/core/architecture/datasources/pending_sync_local_datasource.dart';
 import 'package:delivery_app/core/architecture/datasources/order_remote_datasource.dart';
+import 'package:delivery_app/core/architecture/datasources/route_cache_local_datasource.dart';
 import 'package:delivery_app/core/architecture/datasources/trip_local_datasource.dart';
 import 'package:delivery_app/core/architecture/datasources/trip_remote_datasource.dart';
 import 'package:delivery_app/core/architecture/entities/hive_adapters.dart';
@@ -22,6 +24,8 @@ import 'package:delivery_app/core/architecture/repositories/trip_repository.dart
 import 'package:delivery_app/core/architecture/repositories/trip_repository_impl.dart';
 import 'package:delivery_app/core/network/dio_client.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/core/network/network_status.dart';
+import 'package:delivery_app/core/network/offline_cubit.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/core/utils/map_tile_cache.dart';
 import 'package:delivery_app/core/sync/sync_service.dart';
@@ -54,16 +58,22 @@ Future<void> initDependencies() async {
   final userBox = await openUserBox();
   final notificationsBox = await openNotificationsBox();
   final pendingSyncBox = await openPendingSyncBox();
+  final cacheMetaBox = await openCacheMetaBox();
+  final routeCacheBox = await openRouteCacheBox();
 
   sl.registerLazySingleton(() => tripsBox);
   sl.registerLazySingleton(() => ordersBox);
   sl.registerLazySingleton(() => userBox);
   sl.registerLazySingleton(() => notificationsBox);
   sl.registerLazySingleton(() => pendingSyncBox);
+  sl.registerLazySingleton(() => cacheMetaBox);
+  sl.registerLazySingleton(() => routeCacheBox);
 
   sl.registerLazySingleton(() => Connectivity());
+  sl.registerLazySingleton(() => NetworkStatus(sl()));
+  sl.registerLazySingleton(() => OfflineCubit(sl()));
   sl.registerLazySingleton<Dio>(() => createDioClient(sl<Talker>()));
-  sl.registerLazySingleton(() => RouteService(sl(), sl()));
+  sl.registerLazySingleton(() => RouteService(sl(), sl(), sl()));
   await MapTileCache.init();
 
   sl.registerLazySingleton(() => TripLocalDataSource(sl()));
@@ -73,13 +83,16 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => AuthLocalDataSource(sl()));
   sl.registerLazySingleton(() => NotificationLocalDataSource(sl()));
   sl.registerLazySingleton(() => PendingSyncLocalDataSource(sl()));
+  sl.registerLazySingleton(() => CacheMetadataLocalDataSource(sl()));
+  sl.registerLazySingleton(() => RouteCacheLocalDataSource(sl()));
 
   sl.registerLazySingleton<TripRepository>(
     () => TripRepositoryImpl(
       local: sl(),
       remote: sl(),
       pendingSync: sl(),
-      connectivity: sl(),
+      cacheMetadata: sl(),
+      networkStatus: sl(),
       talker: sl(),
     ),
   );
@@ -87,12 +100,18 @@ Future<void> initDependencies() async {
     () => OrderRepositoryImpl(
       local: sl(),
       remote: sl(),
-      connectivity: sl(),
+      cacheMetadata: sl(),
+      networkStatus: sl(),
       talker: sl(),
     ),
   );
   sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(local: sl(), dio: sl(), connectivity: sl()),
+    () => AuthRepositoryImpl(
+      local: sl(),
+      dio: sl(),
+      cacheMetadata: sl(),
+      networkStatus: sl(),
+    ),
   );
   sl.registerLazySingleton<NotificationRepository>(
     () => NotificationRepositoryImpl(sl()),
@@ -102,7 +121,8 @@ Future<void> initDependencies() async {
     () => SyncService(
       tripRepository: sl(),
       orderRepository: sl(),
-      connectivity: sl(),
+      authRepository: sl(),
+      networkStatus: sl(),
       talker: sl(),
     ),
   );
@@ -113,7 +133,7 @@ Future<void> initDependencies() async {
 
   sl.registerFactory(() => AuthBloc(sl()));
   sl.registerFactory(
-    () => TripListBloc(repository: sl(), connectivity: sl()),
+    () => TripListBloc(repository: sl(), networkStatus: sl()),
   );
   sl.registerFactory(
     () => TripDetailBloc(
@@ -125,7 +145,7 @@ Future<void> initDependencies() async {
   sl.registerFactory(() => RequestRideBloc(repository: sl(), fcmService: sl()));
   sl.registerFactory(() => MapBloc());
   sl.registerFactory(() => TrackingBloc(sl()));
-  sl.registerFactory(() => OrderBloc(sl()));
+  sl.registerFactory(() => OrderBloc(sl(), sl()));
   sl.registerLazySingleton(() => NotificationBloc(sl()));
 
   sl.registerLazySingleton<AppRouter>(() => AppRouter());
@@ -163,5 +183,11 @@ void _registerHiveAdapters() {
   }
   if (!Hive.isAdapterRegistered(8)) {
     Hive.registerAdapter(PendingSyncEntityAdapter());
+  }
+  if (!Hive.isAdapterRegistered(9)) {
+    Hive.registerAdapter(CacheMetadataEntityAdapter());
+  }
+  if (!Hive.isAdapterRegistered(10)) {
+    Hive.registerAdapter(RouteCacheEntityAdapter());
   }
 }

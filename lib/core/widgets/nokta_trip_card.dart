@@ -10,10 +10,12 @@ class NoktaTripHeroCard extends StatelessWidget {
     super.key,
     required this.trip,
     this.highlighted = false,
+    this.pendingRetryCount = 0,
   });
 
   final TripEntity trip;
   final bool highlighted;
+  final int pendingRetryCount;
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +90,9 @@ class NoktaTripHeroCard extends StatelessWidget {
                   Icon(Icons.cloud_off, size: 14, color: scheme.error),
                   const SizedBox(width: 4),
                   Text(
-                    'offline_mode'.tr(),
+                    pendingRetryCount > 0
+                        ? '${'offline_mode'.tr()} ($pendingRetryCount)'
+                        : 'offline_mode'.tr(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: scheme.error,
                         ),
@@ -108,10 +112,12 @@ class NoktaTripCard extends StatelessWidget {
     super.key,
     required this.trip,
     this.onTap,
+    this.pendingRetryCount = 0,
   });
 
   final TripEntity trip;
   final VoidCallback? onTap;
+  final int pendingRetryCount;
 
   bool get _highlighted =>
       trip.status == TripStatus.inProgress ||
@@ -132,7 +138,11 @@ class NoktaTripCard extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              NoktaTripHeroCard(trip: trip, highlighted: _highlighted),
+              NoktaTripHeroCard(
+                trip: trip,
+                highlighted: _highlighted,
+                pendingRetryCount: pendingRetryCount,
+              ),
               if (_highlighted)
                 Positioned(
                   left: 0,

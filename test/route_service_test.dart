@@ -1,6 +1,10 @@
+import 'package:delivery_app/core/architecture/datasources/route_cache_local_datasource.dart';
+import 'package:delivery_app/core/architecture/entities/hive_adapters.dart';
+import 'package:delivery_app/core/architecture/entities/route_cache_entity.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -13,16 +17,31 @@ void main() {
   late _MockDio dio;
   late _MockTalker talker;
   late RouteService routeService;
+  late Box<RouteCacheEntity> routeBox;
 
-  setUp(() {
+  setUpAll(() {
+    Hive.init('test_route_cache');
+    if (!Hive.isAdapterRegistered(10)) {
+      Hive.registerAdapter(RouteCacheEntityAdapter());
+    }
+  });
+
+  setUp(() async {
     dio = _MockDio();
     talker = _MockTalker();
-    routeService = RouteService(dio, talker);
+    routeBox = await Hive.openBox<RouteCacheEntity>(
+      'route_cache_test_${DateTime.now().microsecondsSinceEpoch}',
+    );
+    routeService = RouteService(dio, talker, RouteCacheLocalDataSource(routeBox));
 
     when(() => talker.info(any())).thenReturn(null);
     when(
       () => talker.handle(any(), any(), any()),
     ).thenReturn(null);
+  });
+
+  tearDown(() async {
+    await routeBox.deleteFromDisk();
   });
 
   test('parses OSRM GeoJSON route response', () async {
@@ -115,6 +134,53 @@ void main() {
     await routeService.getRoute(pickup: pickup, dropoff: dropoff);
     await routeService.getRoute(pickup: pickup, dropoff: dropoff);
 
+    verify(
+      () => dio.get<Map<String, dynamic>>(
+        any(),
+        queryParameters: any(named: 'queryParameters'),
+        options: any(named: 'options'),
+      ),
+    ).called(1);
+  });
+
+  test('loads route from disk cache after service restart', () async {
+    when(() => dio.get<Map<String, dynamic>>(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        )).thenAnswer(
+      (_) async => Response(
+        requestOptions: RequestOptions(path: '/route'),
+        data: {
+          'routes': [
+            {
+              'distance': 2000.0,
+              'duration': 240.0,
+              'geometry': {
+                'coordinates': [
+                  [31.0, 30.0],
+                  [31.05, 30.05],
+                ],
+              },
+            },
+          ],
+        },
+      ),
+    );
+
+    final pickup = const LatLng(30.0, 31.0);
+    final dropoff = const LatLng(30.05, 31.05);
+
+    await routeService.getRoute(pickup: pickup, dropoff: dropoff);
+
+    final secondService =
+        RouteService(dio, talker, RouteCacheLocalDataSource(routeBox));
+    final cached = await secondService.getRoute(
+      pickup: pickup,
+      dropoff: dropoff,
+    );
+
+    expect(cached.fromCache, isTrue);
     verify(
       () => dio.get<Map<String, dynamic>>(
         any(),
