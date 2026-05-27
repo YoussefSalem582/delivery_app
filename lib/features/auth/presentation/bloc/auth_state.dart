@@ -31,3 +31,16 @@ class AuthError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+class AuthForgotPasswordLoading extends AuthState {
+  const AuthForgotPasswordLoading();
+}
+
+class AuthForgotPasswordSent extends AuthState {
+  const AuthForgotPasswordSent(this.email);
+
+  final String email;
+
+  @override
+  List<Object?> get props => [email];
+}

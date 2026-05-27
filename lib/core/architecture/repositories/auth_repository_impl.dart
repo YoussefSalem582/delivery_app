@@ -76,6 +76,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() => _local.clearUser();
 
   @override
+  Future<void> requestPasswordReset({required String email}) async {
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+  }
+
+  @override
   Future<UserEntity?> getCurrentUser() async => _local.getCurrentUser();
 
   @override

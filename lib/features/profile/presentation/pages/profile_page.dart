@@ -29,11 +29,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => sl<AuthBloc>()),
-        BlocProvider(create: (_) => sl<OrderBloc>()..add(const OrderLoadRequested())),
-      ],
+    return BlocProvider(
+      create: (_) => sl<OrderBloc>()..add(const OrderLoadRequested()),
       child: FutureBuilder(
         future: sl<AuthRepository>().getProfile(),
         initialData: sl<AuthRepository>().cachedUser,

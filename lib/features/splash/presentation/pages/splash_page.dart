@@ -3,7 +3,6 @@ import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/widgets/nokta_brand_icon.dart';
 import 'package:delivery_app/core/widgets/nokta_loading_ring.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +25,7 @@ class _SplashPageState extends State<SplashPage>
   @override
   void initState() {
     super.initState();
+    context.read<AuthBloc>().add(const AuthCheckRequested());
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -47,17 +47,15 @@ class _SplashPageState extends State<SplashPage>
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return BlocProvider(
-      create: (_) => sl<AuthBloc>()..add(const AuthCheckRequested()),
-      child: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is AuthAuthenticated) {
-            context.router.replaceAll([const MainShellRoute()]);
-          } else if (state is AuthUnauthenticated) {
-            context.router.replaceAll([const OnboardingRoute()]);
-          }
-        },
-        child: Scaffold(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          context.router.replaceAll([const MainShellRoute()]);
+        } else if (state is AuthUnauthenticated) {
+          context.router.replaceAll([const OnboardingRoute()]);
+        }
+      },
+      child: Scaffold(
           backgroundColor: Theme.of(context).colorScheme.surface,
           body: SafeArea(
             child: FadeTransition(
@@ -102,7 +100,6 @@ class _SplashPageState extends State<SplashPage>
             ),
           ),
         ),
-      ),
     );
   }
 }

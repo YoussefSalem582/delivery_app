@@ -131,7 +131,7 @@ Future<void> initDependencies() async {
     () => FcmService(notificationRepository: sl(), talker: sl()),
   );
 
-  sl.registerFactory(() => AuthBloc(sl()));
+  sl.registerLazySingleton(() => AuthBloc(sl()));
   sl.registerFactory(
     () => TripListBloc(repository: sl(), networkStatus: sl()),
   );

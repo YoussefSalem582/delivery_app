@@ -6,6 +6,7 @@ import 'package:delivery_app/core/theme/theme_cubit.dart';
 import 'package:delivery_app/core/utils/nokta_logo_cache.dart';
 import 'package:delivery_app/core/utils/talker_setup.dart';
 import 'package:delivery_app/core/widgets/nokta_offline_banner.dart';
+import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
@@ -57,8 +58,21 @@ Future<void> main() async {
   );
 }
 
-class DeliveryApp extends StatelessWidget {
+class DeliveryApp extends StatefulWidget {
   const DeliveryApp({super.key});
+
+  @override
+  State<DeliveryApp> createState() => _DeliveryAppState();
+}
+
+class _DeliveryAppState extends State<DeliveryApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      sl<NotificationBloc>().add(const NotificationLoadRequested());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +85,7 @@ class DeliveryApp extends StatelessWidget {
       providers: [
         BlocProvider.value(value: sl<ThemeCubit>()),
         BlocProvider.value(value: sl<LocaleCubit>()),
+        BlocProvider.value(value: sl<AuthBloc>()),
         BlocProvider.value(value: sl<NotificationBloc>()),
         BlocProvider.value(value: sl<OfflineCubit>()),
       ],

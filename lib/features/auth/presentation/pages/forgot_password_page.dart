@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/widgets/nokta_brand_icon.dart';
+import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/auth/presentation/forms/login_inputs.dart';
 import 'package:delivery_app/features/auth/presentation/utils/auth_navigation.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_scaffold.dart';
@@ -8,6 +9,7 @@ import 'package:delivery_app/features/auth/presentation/widgets/auth/forgot_pass
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 @RoutePage()
 class ForgotPasswordPage extends StatefulWidget {
@@ -20,8 +22,6 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _emailController = TextEditingController();
   EmailInput _email = const EmailInput.pure();
-  bool _emailSent = false;
-  bool _loading = false;
 
   @override
   void dispose() {
@@ -39,18 +39,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return null;
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     dismissAuthKeyboard();
     setState(() => _email = EmailInput.dirty(_emailController.text));
     if (_email.isNotValid) return;
 
-    setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-    setState(() {
-      _loading = false;
-      _emailSent = true;
-    });
+    context.read<AuthBloc>().add(
+          AuthForgotPasswordRequested(email: _email.value),
+        );
   }
 
   void _goToLogin() {
@@ -67,31 +63,38 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return AuthFormScaffold(
-      appBar: AppBar(
-        backgroundColor: scheme.surface.withValues(alpha: 0.92),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded),
-          onPressed: _goBack,
-        ),
-      ),
-      form: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: NoktaBrandIcon(size: 48, filled: false),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        final loading = state is AuthForgotPasswordLoading;
+        final emailSent = state is AuthForgotPasswordSent;
+
+        return AuthFormScaffold(
+          appBar: AppBar(
+            backgroundColor: scheme.surface.withValues(alpha: 0.92),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back_rounded),
+              onPressed: _goBack,
+            ),
           ),
-          const SizedBox(height: NoktaSpacing.md),
-          ForgotPasswordFormCard(
-            emailController: _emailController,
-            emailErrorText: _emailErrorText(),
-            loading: _loading,
-            emailSent: _emailSent,
-            onSubmit: _loading ? null : _submit,
-            onBackToLogin: _goToLogin,
+          form: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: NoktaBrandIcon(size: 48, filled: false),
+              ),
+              const SizedBox(height: NoktaSpacing.md),
+              ForgotPasswordFormCard(
+                emailController: _emailController,
+                emailErrorText: _emailErrorText(),
+                loading: loading,
+                emailSent: emailSent,
+                onSubmit: loading ? null : _submit,
+                onBackToLogin: _goToLogin,
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -201,13 +201,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final scheme = Theme.of(context).colorScheme;
     final loading = context.watch<AuthBloc>().state is AuthLoading;
 
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthError) {
-          AppToast.error(context, state.message);
-        }
-      },
-      child: AuthFormScaffold(
+    return AuthFormScaffold(
         background: AuthFormBackground.gradient,
         alignTop: true,
         appBar: AppBar(
@@ -253,7 +247,6 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

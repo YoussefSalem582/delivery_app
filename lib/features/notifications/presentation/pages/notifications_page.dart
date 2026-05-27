@@ -4,7 +4,6 @@ import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/notifications/presentation/bloc/notification_bloc.dart';
-import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -17,12 +16,9 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          sl<NotificationBloc>()..add(const NotificationLoadRequested()),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        appBar: AppBar(
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.surface,
           title: Text('notifications_title'.tr()),
           leading: IconButton(
@@ -108,7 +104,6 @@ class NotificationsPage extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
-      ),
     );
   }
 }
