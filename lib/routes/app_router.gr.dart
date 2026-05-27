@@ -43,6 +43,22 @@ class AuthCredentialShellRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ForgotPasswordPage]
+class ForgotPasswordRoute extends PageRouteInfo<void> {
+  const ForgotPasswordRoute({List<PageRouteInfo>? children})
+    : super(ForgotPasswordRoute.name, initialChildren: children);
+
+  static const String name = 'ForgotPasswordRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ForgotPasswordPage();
+    },
+  );
+}
+
+/// generated route for
 /// [HomeMapPage]
 class HomeMapRoute extends PageRouteInfo<void> {
   const HomeMapRoute({List<PageRouteInfo>? children})

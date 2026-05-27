@@ -4,6 +4,7 @@ import 'package:delivery_app/features/auth/presentation/pages/auth_choice_page.d
 import 'package:delivery_app/features/auth/presentation/pages/auth_credential_shell_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/login_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/onboarding_page.dart';
+import 'package:delivery_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:delivery_app/features/auth/presentation/pages/register_page.dart';
 import 'package:delivery_app/features/home/presentation/pages/home_map_page.dart';
 import 'package:delivery_app/features/notifications/presentation/pages/notifications_page.dart';
@@ -29,6 +30,7 @@ class AppRouter extends RootStackRouter {
           children: [
             AutoRoute(page: LoginRoute.page, initial: true),
             AutoRoute(page: RegisterRoute.page),
+            AutoRoute(page: ForgotPasswordRoute.page),
           ],
         ),
         AutoRoute(

@@ -61,6 +61,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<UserEntity> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final user = await login(email: email, password: password);
+    final registered = user.copyWith(name: name, email: email);
+    await _local.saveUser(registered);
+    return registered;
+  }
+
+  @override
   Future<void> logout() => _local.clearUser();
 
   @override

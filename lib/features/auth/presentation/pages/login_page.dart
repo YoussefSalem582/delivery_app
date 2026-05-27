@@ -4,8 +4,8 @@ import 'package:delivery_app/core/widgets/nokta_brand_icon.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/auth/presentation/forms/login_inputs.dart';
 import 'package:delivery_app/features/auth/presentation/utils/auth_navigation.dart';
-import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_card.dart';
 import 'package:delivery_app/features/auth/presentation/widgets/auth/auth_form_scaffold.dart';
+import 'package:delivery_app/features/auth/presentation/widgets/auth/login_form_card.dart';
 import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -95,6 +95,11 @@ class _LoginPageState extends State<LoginPage> {
     context.router.navigate(const RegisterRoute());
   }
 
+  void _goToForgotPassword(BuildContext context) {
+    dismissAuthKeyboard();
+    context.router.push(const ForgotPasswordRoute());
+  }
+
   void _goBack(BuildContext context) {
     dismissAuthKeyboard();
     context.router.maybePop();
@@ -130,27 +135,15 @@ class _LoginPageState extends State<LoginPage> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: NoktaSpacing.md),
-          AuthFormCard(
-            titleKey: 'login_title',
-            subtitleKey: 'login_subtitle',
-            hintKey: 'login_hint',
-            buttonKey: 'login',
+          LoginFormCard(
             emailController: _emailController,
             passwordController: _passwordController,
             emailErrorText: _emailErrorText(),
             passwordErrorText: _passwordErrorText(),
             loading: loading,
-            onSubmit: _isValid && !loading ? () => _submit(context) : null,
-            footer: TextButton(
-              onPressed: () => _goToRegister(context),
-              child: Text(
-                'login_create_account'.tr(),
-                style: textTheme.labelLarge?.copyWith(
-                  color: scheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            onSubmit: loading ? null : () => _submit(context),
+            onForgotPassword: () => _goToForgotPassword(context),
+            onCreateAccount: () => _goToRegister(context),
           ),
         ],
       ),
