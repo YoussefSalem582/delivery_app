@@ -8,6 +8,7 @@ class MapMarkerData {
     this.icon = Icons.place,
     this.size = 36,
     this.animate = false,
+    this.rotation,
   });
 
   final LatLng point;
@@ -15,6 +16,7 @@ class MapMarkerData {
   final IconData icon;
   final double size;
   final bool animate;
+  final double? rotation;
 }
 
 class MapConfig {

@@ -140,7 +140,8 @@ class _TrackingPageState extends State<TrackingPage> {
                   zoom: MapConfig.defaultZoom,
                   followCenter: true,
                   fitRouteBounds: true,
-                  polylines: active.route,
+                  traveledRoute: active.traveledRoute,
+                  remainingRoute: active.remainingRoute,
                   markers: [
                     MapMarkerData(
                       point: active.route.first,
@@ -153,6 +154,7 @@ class _TrackingPageState extends State<TrackingPage> {
                       icon: Icons.local_taxi,
                       size: 36,
                       animate: true,
+                      rotation: active.driverBearing,
                     ),
                     MapMarkerData(
                       point: active.route.last,

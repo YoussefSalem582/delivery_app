@@ -131,10 +131,10 @@ class TrackingStarted extends TrackingEvent {
 }
 
 class TrackingTick extends TrackingEvent {
-  const TrackingTick(this.index);
-  final int index;
+  const TrackingTick(this.now);
+  final DateTime now;
   @override
-  List<Object?> get props => [index];
+  List<Object?> get props => [now];
 }
 
 class TrackingStopped extends TrackingEvent {
@@ -165,6 +165,9 @@ class TrackingActive extends TrackingState {
     required this.trip,
     required this.route,
     required this.driverPosition,
+    required this.driverBearing,
+    required this.traveledRoute,
+    required this.remainingRoute,
     required this.progress,
     required this.etaMinutes,
   });
@@ -172,6 +175,9 @@ class TrackingActive extends TrackingState {
   final TripEntity trip;
   final List<LatLng> route;
   final LatLng driverPosition;
+  final double driverBearing;
+  final List<LatLng> traveledRoute;
+  final List<LatLng> remainingRoute;
   final double progress;
   final int etaMinutes;
 
@@ -179,6 +185,9 @@ class TrackingActive extends TrackingState {
     TripEntity? trip,
     List<LatLng>? route,
     LatLng? driverPosition,
+    double? driverBearing,
+    List<LatLng>? traveledRoute,
+    List<LatLng>? remainingRoute,
     double? progress,
     int? etaMinutes,
   }) {
@@ -186,12 +195,23 @@ class TrackingActive extends TrackingState {
       trip: trip ?? this.trip,
       route: route ?? this.route,
       driverPosition: driverPosition ?? this.driverPosition,
+      driverBearing: driverBearing ?? this.driverBearing,
+      traveledRoute: traveledRoute ?? this.traveledRoute,
+      remainingRoute: remainingRoute ?? this.remainingRoute,
       progress: progress ?? this.progress,
       etaMinutes: etaMinutes ?? this.etaMinutes,
     );
   }
 
   @override
-  List<Object?> get props =>
-      [trip, route, driverPosition, progress, etaMinutes];
+  List<Object?> get props => [
+        trip,
+        route,
+        driverPosition,
+        driverBearing,
+        traveledRoute,
+        remainingRoute,
+        progress,
+        etaMinutes,
+      ];
 }

@@ -6,11 +6,13 @@ class AnimatedMapMarker extends StatefulWidget {
     required this.icon,
     required this.color,
     this.size = 40,
+    this.rotation,
   });
 
   final IconData icon;
   final Color color;
   final double size;
+  final double? rotation;
 
   @override
   State<AnimatedMapMarker> createState() => _AnimatedMapMarkerState();
@@ -41,7 +43,7 @@ class _AnimatedMapMarkerState extends State<AnimatedMapMarker>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
+    final marker = ScaleTransition(
       scale: _scale,
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -53,6 +55,13 @@ class _AnimatedMapMarkerState extends State<AnimatedMapMarker>
           child: Icon(widget.icon, color: widget.color, size: widget.size),
         ),
       ),
+    );
+
+    if (widget.rotation == null) return marker;
+
+    return Transform.rotate(
+      angle: widget.rotation! * 3.141592653589793 / 180,
+      child: marker,
     );
   }
 }

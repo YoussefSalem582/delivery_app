@@ -5,6 +5,7 @@ import 'package:delivery_app/core/architecture/repositories/trip_repository.dart
 import 'package:delivery_app/core/network/fcm_service.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/core/utils/constants.dart';
+import 'package:delivery_app/core/utils/route_geometry.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -134,6 +135,8 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
   final RouteService _routeService;
   Timer? _timer;
   List<LatLng> _route = [];
+  DateTime? _startedAt;
+  double _durationSeconds = 600;
   int _initialEtaMinutes = 12;
 
   Future<void> _onStarted(
@@ -151,36 +154,56 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
 
     _route = routeResult.points;
     _initialEtaMinutes = routeResult.etaMinutes;
+    _durationSeconds = routeResult.durationSeconds;
+    _startedAt = DateTime.now();
+
+    final split = splitRouteAtProgress(_route, 0);
 
     emit(
       TrackingActive(
         trip: event.trip,
         route: _route,
         driverPosition: _route.first,
+        driverBearing: bearingAtProgress(_route, 0),
+        traveledRoute: split.traveled,
+        remainingRoute: split.remaining,
         progress: 0,
         etaMinutes: _initialEtaMinutes,
       ),
     );
 
     _timer?.cancel();
-    var index = 0;
-    _timer = Timer.periodic(const Duration(seconds: 2), (_) {
-      index = (index + 1).clamp(0, _route.length - 1);
-      add(TrackingTick(index));
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      add(TrackingTick(DateTime.now()));
     });
   }
 
   void _onTick(TrackingTick event, Emitter<TrackingState> emit) {
-    if (state is! TrackingActive) return;
+    if (state is! TrackingActive || _startedAt == null || _route.length < 2) {
+      return;
+    }
+
     final current = state as TrackingActive;
-    final progress = event.index / (_route.length - 1);
+    final elapsedSeconds =
+        event.now.difference(_startedAt!).inMilliseconds / 1000;
+    final progress =
+        (elapsedSeconds / _durationSeconds).clamp(0.0, 1.0).toDouble();
+    final split = splitRouteAtProgress(_route, progress);
+
     emit(
       current.copyWith(
-        driverPosition: _route[event.index],
+        driverPosition: interpolateAlongRoute(_route, progress),
+        driverBearing: bearingAtProgress(_route, progress),
+        traveledRoute: split.traveled,
+        remainingRoute: split.remaining,
         progress: progress,
         etaMinutes: ((1 - progress) * _initialEtaMinutes).ceil().clamp(1, 99),
       ),
     );
+
+    if (progress >= 1.0) {
+      _timer?.cancel();
+    }
   }
 
   Future<void> _onStopped(

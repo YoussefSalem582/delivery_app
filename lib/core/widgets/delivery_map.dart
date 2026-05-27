@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/map_tile_cache.dart';
 import 'package:delivery_app/core/widgets/animated_map_marker.dart';
@@ -12,6 +14,8 @@ class DeliveryMap extends StatefulWidget {
     required this.center,
     this.zoom = MapConfig.defaultZoom,
     this.polylines = const [],
+    this.traveledRoute = const [],
+    this.remainingRoute = const [],
     this.markers = const [],
     this.followCenter = false,
     this.showUserLocation = false,
@@ -21,6 +25,8 @@ class DeliveryMap extends StatefulWidget {
   final LatLng center;
   final double zoom;
   final List<LatLng> polylines;
+  final List<LatLng> traveledRoute;
+  final List<LatLng> remainingRoute;
   final List<MapMarkerData> markers;
   final bool followCenter;
   final bool showUserLocation;
@@ -55,19 +61,25 @@ class DeliveryMapState extends State<DeliveryMap> with TickerProviderStateMixin 
   }
 
   void _maybeFitBounds() {
-    if (!widget.fitRouteBounds ||
-        widget.polylines.length < 2 ||
-        _didFitBounds) {
+    final routePoints = _allRoutePoints();
+    if (!widget.fitRouteBounds || routePoints.length < 2 || _didFitBounds) {
       return;
     }
     _didFitBounds = true;
-    final bounds = LatLngBounds.fromPoints(widget.polylines);
+    final bounds = LatLngBounds.fromPoints(routePoints);
     _animatedController.animatedFitCamera(
       cameraFit: CameraFit.bounds(
         bounds: bounds,
         padding: const EdgeInsets.all(48),
       ),
     );
+  }
+
+  List<LatLng> _allRoutePoints() {
+    if (widget.traveledRoute.isNotEmpty || widget.remainingRoute.isNotEmpty) {
+      return [...widget.traveledRoute, ...widget.remainingRoute];
+    }
+    return widget.polylines;
   }
 
   @override
@@ -80,8 +92,10 @@ class DeliveryMapState extends State<DeliveryMap> with TickerProviderStateMixin 
       );
     }
     if (widget.fitRouteBounds &&
-        widget.polylines.length >= 2 &&
-        oldWidget.polylines != widget.polylines) {
+        _allRoutePoints().length >= 2 &&
+        (oldWidget.polylines != widget.polylines ||
+            oldWidget.traveledRoute != widget.traveledRoute ||
+            oldWidget.remainingRoute != widget.remainingRoute)) {
       _didFitBounds = false;
       _maybeFitBounds();
     }
@@ -127,7 +141,27 @@ class DeliveryMapState extends State<DeliveryMap> with TickerProviderStateMixin 
           userAgentPackageName: MapConfig.userAgentPackageName,
           tileProvider: tileProvider,
         ),
-        if (widget.polylines.length >= 2)
+        if (widget.traveledRoute.length >= 2)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: widget.traveledRoute,
+                color: scheme.outline.withValues(alpha: 0.55),
+                strokeWidth: 4,
+              ),
+            ],
+          ),
+        if (widget.remainingRoute.length >= 2)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: widget.remainingRoute,
+                color: scheme.primary,
+                strokeWidth: 4,
+              ),
+            ],
+          )
+        else if (widget.polylines.length >= 2)
           PolylineLayer(
             polylines: [
               Polyline(
@@ -149,13 +183,24 @@ class DeliveryMapState extends State<DeliveryMap> with TickerProviderStateMixin 
                           icon: m.icon,
                           color: m.color,
                           size: m.size,
+                          rotation: m.rotation,
                         )
-                      : Icon(m.icon, color: m.color, size: m.size),
+                      : _buildMarkerIcon(m),
                 ),
               )
               .toList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildMarkerIcon(MapMarkerData marker) {
+    final icon = Icon(marker.icon, color: marker.color, size: marker.size);
+    if (marker.rotation == null) return icon;
+
+    return Transform.rotate(
+      angle: marker.rotation! * math.pi / 180,
+      child: icon,
     );
   }
 }

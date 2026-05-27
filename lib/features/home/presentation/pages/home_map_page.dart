@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/app_toast.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
@@ -27,6 +30,7 @@ class HomeMapPage extends StatefulWidget {
 class _HomeMapPageState extends State<HomeMapPage> {
   final _mapKey = GlobalKey<DeliveryMapState>();
   RideRequestDraft? _previewDraft;
+  List<LatLng> _previewRoute = const [];
 
   Future<void> _startRideFlow(
     BuildContext context,
@@ -46,7 +50,11 @@ class _HomeMapPageState extends State<HomeMapPage> {
 
     if (draft == null || !context.mounted) return;
 
-    setState(() => _previewDraft = draft);
+    setState(() {
+      _previewDraft = draft;
+      _previewRoute = _fallbackRoutePoints(draft);
+    });
+    unawaited(_loadPreviewRoute(draft));
 
     final trip = await showModalBottomSheet(
       context: context,
@@ -59,7 +67,10 @@ class _HomeMapPageState extends State<HomeMapPage> {
     );
 
     if (context.mounted) {
-      setState(() => _previewDraft = null);
+      setState(() {
+        _previewDraft = null;
+        _previewRoute = const [];
+      });
     }
 
     if (trip != null && context.mounted) {
@@ -68,10 +79,23 @@ class _HomeMapPageState extends State<HomeMapPage> {
     }
   }
 
-  List<LatLng> _routePoints(RideRequestDraft draft) => [
+  List<LatLng> _fallbackRoutePoints(RideRequestDraft draft) => [
         LatLng(draft.pickupLat, draft.pickupLng),
         LatLng(draft.dropoffLat, draft.dropoffLng),
       ];
+
+  Future<void> _loadPreviewRoute(RideRequestDraft draft) async {
+    final result = await sl<RouteService>().getRoute(
+      pickup: LatLng(draft.pickupLat, draft.pickupLng),
+      dropoff: LatLng(draft.dropoffLat, draft.dropoffLng),
+    );
+
+    if (!mounted || _previewDraft != draft) return;
+
+    setState(() {
+      _previewRoute = result.points;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,9 +138,7 @@ class _HomeMapPageState extends State<HomeMapPage> {
                     zoom: MapConfig.defaultZoom,
                     followCenter: true,
                     showUserLocation: true,
-                    polylines: _previewDraft != null
-                        ? _routePoints(_previewDraft!)
-                        : const [],
+                    polylines: _previewDraft != null ? _previewRoute : const [],
                     markers: [
                       if (_previewDraft != null) ...[
                         MapMarkerData(

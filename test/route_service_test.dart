@@ -56,7 +56,7 @@ void main() {
       dropoff: const LatLng(30.0626, 31.2497),
     );
 
-    expect(result.points.length, 3);
+    expect(result.points.length, greaterThanOrEqualTo(3));
     expect(result.points.first.latitude, closeTo(30.0444, 0.0001));
     expect(result.points.first.longitude, closeTo(31.2357, 0.0001));
     expect(result.distanceMeters, 5000.0);
@@ -80,7 +80,7 @@ void main() {
       dropoff: const LatLng(30.0626, 31.2497),
     );
 
-    expect(result.points.length, 31);
+    expect(result.points.length, greaterThan(31));
     expect(result.etaMinutes, greaterThan(0));
   });
 

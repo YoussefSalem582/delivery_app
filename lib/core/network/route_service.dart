@@ -1,4 +1,5 @@
 import 'package:delivery_app/core/utils/demo_destinations.dart';
+import 'package:delivery_app/core/utils/route_geometry.dart';
 import 'package:dio/dio.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:talker_flutter/talker_flutter.dart';
@@ -75,7 +76,7 @@ class RouteService {
       final route = routes.first as Map<String, dynamic>;
       final geometry = route['geometry'] as Map<String, dynamic>;
       final coordinates = geometry['coordinates'] as List<dynamic>;
-      final points = coordinates
+      final rawPoints = coordinates
           .map(
             (c) => LatLng(
               (c[1] as num).toDouble(),
@@ -83,6 +84,7 @@ class RouteService {
             ),
           )
           .toList();
+      final points = densifyRoute(rawPoints);
 
       final result = RouteResult(
         points: points,
@@ -104,13 +106,14 @@ class RouteService {
     double? straightMeters,
   ]) {
     const steps = 30;
-    final points = List.generate(steps + 1, (i) {
+    final rawPoints = List.generate(steps + 1, (i) {
       final t = i / steps;
       return LatLng(
         pickup.latitude + (dropoff.latitude - pickup.latitude) * t,
         pickup.longitude + (dropoff.longitude - pickup.longitude) * t,
       );
     });
+    final points = densifyRoute(rawPoints);
     const distance = Distance();
     final meters = straightMeters ?? distance(pickup, dropoff);
     const avgSpeedMps = 8.33; // ~30 km/h
