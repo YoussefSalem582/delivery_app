@@ -11,6 +11,8 @@
     "driverName": "Ahmed Hassan",
     "driverPhone": "+201234567890",
     "driverAvatarUrl": "https://i.pravatar.cc/150?img=12",
+    "driverRating": 4.9,
+    "driverVehicle": "Toyota Corolla - White",
     "fare": 125.50,
     "createdAt": "2026-05-20T10:30:00.000Z",
     "updatedAt": "2026-05-20T11:15:00.000Z"
@@ -27,6 +29,8 @@
     "driverName": "Sara Mohamed",
     "driverPhone": "+201987654321",
     "driverAvatarUrl": "https://i.pravatar.cc/150?img=47",
+    "driverRating": 4.8,
+    "driverVehicle": "Hyundai Elantra - Silver",
     "fare": 85.00,
     "createdAt": "2026-05-25T14:00:00.000Z",
     "updatedAt": "2026-05-25T14:20:00.000Z"

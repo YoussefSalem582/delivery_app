@@ -57,7 +57,7 @@ class ErrorView extends StatelessWidget {
           children: [
             Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
             const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center),
+            Text(message.tr(), textAlign: TextAlign.center),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
               FilledButton(onPressed: onRetry, child: Text('retry'.tr())),

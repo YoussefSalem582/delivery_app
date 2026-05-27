@@ -22,6 +22,8 @@ class TripEntity extends HiveObject {
     this.driverName,
     this.driverPhone,
     this.driverAvatarUrl,
+    this.driverRating,
+    this.driverVehicle,
     required this.fare,
     required this.createdAt,
     required this.updatedAt,
@@ -39,6 +41,8 @@ class TripEntity extends HiveObject {
   final String? driverName;
   final String? driverPhone;
   final String? driverAvatarUrl;
+  final double? driverRating;
+  final String? driverVehicle;
   final double fare;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -56,6 +60,8 @@ class TripEntity extends HiveObject {
     String? driverName,
     String? driverPhone,
     String? driverAvatarUrl,
+    double? driverRating,
+    String? driverVehicle,
     double? fare,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -73,6 +79,8 @@ class TripEntity extends HiveObject {
       driverName: driverName ?? this.driverName,
       driverPhone: driverPhone ?? this.driverPhone,
       driverAvatarUrl: driverAvatarUrl ?? this.driverAvatarUrl,
+      driverRating: driverRating ?? this.driverRating,
+      driverVehicle: driverVehicle ?? this.driverVehicle,
       fare: fare ?? this.fare,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -92,6 +100,8 @@ class TripEntity extends HiveObject {
         'driverName': driverName,
         'driverPhone': driverPhone,
         'driverAvatarUrl': driverAvatarUrl,
+        'driverRating': driverRating,
+        'driverVehicle': driverVehicle,
         'fare': fare,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
@@ -113,6 +123,10 @@ class TripEntity extends HiveObject {
       driverName: json['driverName'] as String?,
       driverPhone: json['driverPhone'] as String?,
       driverAvatarUrl: json['driverAvatarUrl'] as String?,
+      driverRating: json['driverRating'] != null
+          ? (json['driverRating'] as num).toDouble()
+          : null,
+      driverVehicle: json['driverVehicle'] as String?,
       fare: (json['fare'] as num).toDouble(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),

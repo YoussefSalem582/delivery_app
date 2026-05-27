@@ -43,12 +43,17 @@ import 'features/profile/shared/domain/usecases/order_usecases.dart';
 import 'features/notifications/shared/domain/usecases/notification_usecases.dart';
 import 'features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
+import 'features/trips/shared/data/datasources/driver_remote_datasource.dart';
 import 'features/trips/shared/data/datasources/trip_local_datasource.dart';
 import 'features/trips/shared/data/datasources/trip_remote_datasource.dart';
+import 'features/trips/shared/data/repositories/driver_repository_impl.dart';
 import 'features/trips/shared/data/repositories/trip_repository_impl.dart';
+import 'features/trips/shared/domain/repositories/driver_repository.dart';
 import 'features/trips/shared/domain/repositories/trip_repository.dart';
+import 'features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
 import 'features/trips/trip_detail/presentation/bloc/trip_detail_bloc.dart';
 import 'features/trips/trip_list/presentation/bloc/trip_list_bloc.dart';
+import 'features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -106,6 +111,7 @@ Future<void> initDependencies() async {
   // ─── Data sources ────────────────────────────────────────────
   sl.registerLazySingleton(() => TripLocalDataSource(sl()));
   sl.registerLazySingleton(() => TripRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => DriverRemoteDataSource(sl()));
   sl.registerLazySingleton(() => OrderLocalDataSource(sl()));
   sl.registerLazySingleton(() => OrderRemoteDataSource(sl()));
   sl.registerLazySingleton(() => AuthLocalDataSource(sl()));
@@ -124,6 +130,9 @@ Future<void> initDependencies() async {
       networkStatus: sl(),
       talker: sl(),
     ),
+  );
+  sl.registerLazySingleton<DriverRepository>(
+    () => DriverRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<OrderRepository>(
     () => OrderRepositoryImpl(
@@ -159,6 +168,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetCachedTripsUseCase(sl()));
   sl.registerLazySingleton(() => GetTripDetailUseCase(sl()));
   sl.registerLazySingleton(() => GetCachedTripDetailUseCase(sl()));
+  sl.registerLazySingleton(() => GetDriverForTripUseCase(sl()));
   sl.registerLazySingleton(() => UpdateTripStatusUseCase(sl()));
   sl.registerLazySingleton(() => RequestTripUseCase(sl()));
   sl.registerLazySingleton(() => GetOrdersUseCase(sl()));
@@ -213,7 +223,13 @@ Future<void> initDependencies() async {
     () => RequestRideBloc(requestTrip: sl(), fcmService: sl()),
   );
   sl.registerFactory(() => MapBloc());
-  sl.registerFactory(() => TrackingBloc(sl()));
+  sl.registerFactory(
+    () => TrackingBloc(
+      routeService: sl(),
+      getTripDetail: sl(),
+      getDriverForTrip: sl(),
+    ),
+  );
   sl.registerFactory(
     () => OrderBloc(
       getCachedOrders: sl(),

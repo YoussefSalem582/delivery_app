@@ -55,7 +55,7 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
 
   @override
   TripEntity read(BinaryReader reader) {
-    return TripEntity(
+    final entity = TripEntity(
       id: reader.readString(),
       pickupAddress: reader.readString(),
       dropoffAddress: reader.readString(),
@@ -70,6 +70,25 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
       createdAt: DateTime.parse(reader.readString()),
       updatedAt: DateTime.parse(reader.readString()),
       isPendingSync: reader.readBool(),
+    );
+
+    String? driverAvatarUrl;
+    double? driverRating;
+    String? driverVehicle;
+    if (reader.availableBytes > 0) {
+      driverAvatarUrl = reader.readBool() ? reader.readString() : null;
+    }
+    if (reader.availableBytes > 0) {
+      driverRating = reader.readBool() ? reader.readDouble() : null;
+    }
+    if (reader.availableBytes > 0) {
+      driverVehicle = reader.readBool() ? reader.readString() : null;
+    }
+
+    return entity.copyWith(
+      driverAvatarUrl: driverAvatarUrl,
+      driverRating: driverRating,
+      driverVehicle: driverVehicle,
     );
   }
 
@@ -92,7 +111,15 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
       ..writeDouble(obj.fare)
       ..writeString(obj.createdAt.toIso8601String())
       ..writeString(obj.updatedAt.toIso8601String())
-      ..writeBool(obj.isPendingSync);
+      ..writeBool(obj.isPendingSync)
+      ..writeBool(obj.driverAvatarUrl != null);
+    if (obj.driverAvatarUrl != null) {
+      writer.writeString(obj.driverAvatarUrl!);
+    }
+    writer.writeBool(obj.driverRating != null);
+    if (obj.driverRating != null) writer.writeDouble(obj.driverRating!);
+    writer.writeBool(obj.driverVehicle != null);
+    if (obj.driverVehicle != null) writer.writeString(obj.driverVehicle!);
   }
 }
 
