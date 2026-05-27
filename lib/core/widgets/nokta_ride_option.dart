@@ -86,6 +86,7 @@ class NoktaRideOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final eta = DateTime.now().add(Duration(minutes: option.etaMinutes));
     final etaLabel = '${option.etaMinutes} ${'minutes'.tr()} • ${TimeOfDay.fromDateTime(eta).format(context)}';
 
@@ -99,8 +100,10 @@ class NoktaRideOptionCard extends StatelessWidget {
           padding: const EdgeInsets.all(NoktaSpacing.md),
           decoration: BoxDecoration(
             color: selected
-                ? scheme.primaryFixed.withValues(alpha: 0.35)
-                : scheme.surface,
+                ? (isDark
+                    ? scheme.primary.withValues(alpha: 0.2)
+                    : scheme.primaryFixed.withValues(alpha: 0.35))
+                : (isDark ? scheme.surfaceContainerHigh : scheme.surface),
             borderRadius: BorderRadius.circular(NoktaSpacing.radiusLg),
             border: Border.all(
               color: selected ? scheme.primary : scheme.outlineVariant,

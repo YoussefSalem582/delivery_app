@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -26,7 +27,12 @@ class FcmService {
 
   NotificationHandler? onNotification;
 
-  Future<void> init() async {
+  Future<void> init({bool firebaseReady = false}) async {
+    if (!firebaseReady || Firebase.apps.isEmpty) {
+      _talker.info('[FCM] Firebase not configured — using simulated notifications');
+      return;
+    }
+
     try {
       final messaging = FirebaseMessaging.instance;
       await messaging.requestPermission();

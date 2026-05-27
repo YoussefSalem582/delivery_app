@@ -12,6 +12,7 @@ class DeliveryMap extends StatefulWidget {
     this.polylines = const [],
     this.markers = const [],
     this.followCenter = false,
+    this.darkDim = false,
   });
 
   final LatLng center;
@@ -19,13 +20,18 @@ class DeliveryMap extends StatefulWidget {
   final List<LatLng> polylines;
   final List<MapMarkerData> markers;
   final bool followCenter;
+  final bool darkDim;
 
   @override
-  State<DeliveryMap> createState() => _DeliveryMapState();
+  State<DeliveryMap> createState() => DeliveryMapState();
 }
 
-class _DeliveryMapState extends State<DeliveryMap> {
+class DeliveryMapState extends State<DeliveryMap> {
   final _controller = MapController();
+
+  void recenter([LatLng? point]) {
+    _controller.move(point ?? widget.center, widget.zoom);
+  }
 
   @override
   void didUpdateWidget(covariant DeliveryMap oldWidget) {
@@ -37,7 +43,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
+    final map = FlutterMap(
       mapController: _controller,
       options: MapOptions(
         initialCenter: widget.center,
@@ -80,6 +86,18 @@ class _DeliveryMapState extends State<DeliveryMap> {
               .toList(),
         ),
       ],
+    );
+
+    if (!widget.darkDim) return map;
+
+    return ColorFiltered(
+      colorFilter: const ColorFilter.matrix([
+        0.4, 0, 0, 0, 0,
+        0, 0.4, 0, 0, 0,
+        0, 0, 0.4, 0, 0,
+        0, 0, 0, 1, 0,
+      ]),
+      child: map,
     );
   }
 }

@@ -2,10 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
-import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
-import 'package:delivery_app/core/widgets/nokta_ride_option.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
+import 'package:delivery_app/core/widgets/nokta_ride_option.dart';
 import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
+import 'package:delivery_app/features/home/presentation/widgets/home_destination_panel.dart';
 import 'package:delivery_app/features/home/presentation/widgets/request_ride_sheet.dart';
 import 'package:delivery_app/features/home/presentation/widgets/ride_selection_sheet.dart';
 import 'package:delivery_app/injection_container.dart';
@@ -13,24 +13,86 @@ import 'package:delivery_app/routes/app_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:latlong2/latlong.dart';
 
 @RoutePage()
-class HomeMapPage extends StatelessWidget {
+class HomeMapPage extends StatefulWidget {
   const HomeMapPage({super.key});
 
   @override
+  State<HomeMapPage> createState() => _HomeMapPageState();
+}
+
+class _HomeMapPageState extends State<HomeMapPage> {
+  final _mapKey = GlobalKey<DeliveryMapState>();
+  RideRequestDraft? _previewDraft;
+
+  Future<void> _startRideFlow(
+    BuildContext context,
+    MapReady mapState, {
+    String? dropoffLabel,
+  }) async {
+    final draft = await showModalBottomSheet<RideRequestDraft>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => RequestRideSheet(
+        pickupLat: mapState.userPosition.latitude,
+        pickupLng: mapState.userPosition.longitude,
+        initialDropoff: dropoffLabel,
+      ),
+    );
+
+    if (draft == null || !context.mounted) return;
+
+    setState(() => _previewDraft = draft);
+
+    final trip = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BlocProvider(
+        create: (_) => sl<RequestRideBloc>(),
+        child: RideSelectionSheet(draft: draft),
+      ),
+    );
+
+    if (context.mounted) {
+      setState(() => _previewDraft = null);
+    }
+
+    if (trip != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('trip_requested_success'.tr())),
+      );
+      context.router.push(TrackingRoute(tripId: trip.id));
+    }
+  }
+
+  List<LatLng> _routePoints(RideRequestDraft draft) => [
+        LatLng(draft.pickupLat, draft.pickupLng),
+        LatLng(draft.dropoffLat, draft.dropoffLng),
+      ];
+
+  @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return BlocProvider(
       create: (_) => sl<MapBloc>()..add(const MapStarted()),
       child: BlocBuilder<MapBloc, MapState>(
         builder: (context, state) {
-          final scheme = Theme.of(context).colorScheme;
-
           return Scaffold(
             extendBodyBehindAppBar: true,
             appBar: AppBar(
-              backgroundColor: scheme.surface,
-              title: Text('app_name'.tr()),
+              backgroundColor: scheme.surface.withValues(alpha: isDark ? 0.92 : 1),
+              title: Text(
+                'app_name'.tr(),
+                style: TextStyle(
+                  color: isDark ? scheme.inversePrimary : scheme.primary,
+                ),
+              ),
               leading: IconButton(
                 icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
                 onPressed: () {},
@@ -50,15 +112,38 @@ class HomeMapPage extends StatelessWidget {
               children: [
                 if (state is MapReady)
                   DeliveryMap(
+                    key: _mapKey,
                     center: state.userPosition,
                     zoom: MapConfig.defaultZoom,
                     followCenter: true,
+                    darkDim: isDark,
+                    polylines: _previewDraft != null
+                        ? _routePoints(_previewDraft!)
+                        : const [],
                     markers: [
                       MapMarkerData(
                         point: state.userPosition,
                         color: scheme.primaryContainer,
                         icon: Icons.my_location,
                       ),
+                      if (_previewDraft != null) ...[
+                        MapMarkerData(
+                          point: LatLng(
+                            _previewDraft!.pickupLat,
+                            _previewDraft!.pickupLng,
+                          ),
+                          color: scheme.secondary,
+                          icon: Icons.trip_origin,
+                        ),
+                        MapMarkerData(
+                          point: LatLng(
+                            _previewDraft!.dropoffLat,
+                            _previewDraft!.dropoffLng,
+                          ),
+                          color: scheme.error,
+                          icon: Icons.location_on,
+                        ),
+                      ],
                     ],
                   )
                 else
@@ -78,11 +163,7 @@ class HomeMapPage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.cloud_off,
-                              size: 18,
-                              color: scheme.onSurface,
-                            ),
+                            Icon(Icons.cloud_off, size: 18, color: scheme.onSurface),
                             const SizedBox(width: NoktaSpacing.sm),
                             Text(
                               'offline_banner'.tr(),
@@ -95,31 +176,27 @@ class HomeMapPage extends StatelessWidget {
                   ),
                 if (state is MapReady)
                   Positioned(
-                    left: NoktaSpacing.md,
                     right: NoktaSpacing.md,
-                    bottom: NoktaSpacing.md,
-                    child: AnimatedSlide(
-                      offset: Offset.zero,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeOutCubic,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(NoktaSpacing.radiusMd),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: NoktaColors.elevationShadow,
-                              blurRadius: 12,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: NoktaPrimaryButton(
-                          label: 'request_ride'.tr(),
-                          icon: Icons.directions_car,
-                          onPressed: () => _showRequestSheet(context, state),
-                        ),
-                      ),
+                    bottom: 220,
+                    child: FloatingActionButton(
+                      onPressed: () => _mapKey.currentState?.recenter(state.userPosition),
+                      backgroundColor: isDark
+                          ? scheme.inverseSurface
+                          : scheme.surfaceContainerLowest,
+                      foregroundColor:
+                          isDark ? scheme.inversePrimary : scheme.primary,
+                      child: const Icon(Icons.my_location),
+                    ),
+                  ),
+                if (state is MapReady)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: HomeDestinationPanel(
+                      onSearchTap: () => _startRideFlow(context, state),
+                      onQuickDestination: (label) =>
+                          _startRideFlow(context, state, dropoffLabel: label),
                     ),
                   ),
               ],
@@ -128,39 +205,5 @@ class HomeMapPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Future<void> _showRequestSheet(
-    BuildContext context,
-    MapReady mapState,
-  ) async {
-    final draft = await showModalBottomSheet<RideRequestDraft>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => RequestRideSheet(
-        pickupLat: mapState.userPosition.latitude,
-        pickupLng: mapState.userPosition.longitude,
-      ),
-    );
-
-    if (draft == null || !context.mounted) return;
-
-    final trip = await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider(
-        create: (_) => sl<RequestRideBloc>(),
-        child: RideSelectionSheet(draft: draft),
-      ),
-    );
-
-    if (trip != null && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('trip_requested_success'.tr())));
-      context.router.push(TrackingRoute(tripId: trip.id));
-    }
   }
 }

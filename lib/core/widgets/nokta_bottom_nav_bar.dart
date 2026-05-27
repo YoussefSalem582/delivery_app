@@ -19,7 +19,9 @@ class NoktaBottomNavBar extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerLowest,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? scheme.inverseSurface
+            : scheme.surfaceContainerLowest,
         boxShadow: const [
           BoxShadow(
             color: NoktaColors.elevationShadow,
@@ -36,8 +38,11 @@ class NoktaBottomNavBar extends StatelessWidget {
             children: List.generate(destinations.length, (index) {
               final dest = destinations[index];
               final selected = index == selectedIndex;
-              final color =
-                  selected ? scheme.primary : scheme.onSurfaceVariant;
+              final color = selected
+                  ? (Theme.of(context).brightness == Brightness.dark
+                      ? scheme.inversePrimary
+                      : scheme.primary)
+                  : scheme.onSurfaceVariant;
 
               return Expanded(
                 child: InkWell(
@@ -63,7 +68,9 @@ class NoktaBottomNavBar extends StatelessWidget {
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: scheme.primary,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? scheme.inversePrimary
+                                : scheme.primary,
                             shape: BoxShape.circle,
                           ),
                         ),

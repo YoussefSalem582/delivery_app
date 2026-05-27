@@ -51,7 +51,7 @@ class _NoktaTextFieldState extends State<NoktaTextField> {
         labelText: widget.labelText,
         hintText: widget.hintText,
         filled: true,
-        fillColor: NoktaColors.inputFill,
+        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         prefixIcon: widget.prefixIcon != null
             ? Icon(widget.prefixIcon, color: scheme.outline)

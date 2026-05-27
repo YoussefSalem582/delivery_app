@@ -39,7 +39,9 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: NoktaColors.inputFill,
+        fillColor: isDark
+            ? colorScheme.surfaceContainerHigh
+            : NoktaColors.inputFill,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),

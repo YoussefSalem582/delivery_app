@@ -11,19 +11,29 @@ class RequestRideSheet extends StatefulWidget {
     super.key,
     required this.pickupLat,
     required this.pickupLng,
+    this.initialDropoff,
   });
 
   final double pickupLat;
   final double pickupLng;
+  final String? initialDropoff;
 
   @override
   State<RequestRideSheet> createState() => _RequestRideSheetState();
 }
 
 class _RequestRideSheetState extends State<RequestRideSheet> {
-  final _pickupController =
-      TextEditingController(text: 'Current Location');
-  final _dropoffController = TextEditingController(text: 'City Mall');
+  late final TextEditingController _pickupController;
+  late final TextEditingController _dropoffController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pickupController = TextEditingController(text: 'Current Location');
+    _dropoffController = TextEditingController(
+      text: widget.initialDropoff ?? 'City Mall',
+    );
+  }
 
   @override
   void dispose() {

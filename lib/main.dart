@@ -17,11 +17,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
+  var firebaseReady = false;
   try {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    firebaseReady = true;
   } catch (_) {
-    // Firebase optional for demo without config files.
+    // Firebase optional for demo without google-services config.
   }
 
   await initDependencies();
@@ -29,7 +31,7 @@ Future<void> main() async {
   final talker = sl<Talker>();
   Bloc.observer = createTalkerBlocObserver(talker);
 
-  await sl<FcmService>().init();
+  await sl<FcmService>().init(firebaseReady: firebaseReady);
   await sl<SyncService>().init();
 
   runApp(
@@ -61,7 +63,8 @@ class DeliveryApp extends StatelessWidget {
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp.router(
-            title: 'app_name'.tr(),
+            // OS task switcher title — avoid .tr() here; delegates may not be loaded yet.
+            title: 'Nokta',
             debugShowCheckedModeBanner: false,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
