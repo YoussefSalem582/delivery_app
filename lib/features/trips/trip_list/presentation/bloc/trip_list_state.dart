@@ -25,6 +25,10 @@ class TripListLoaded extends TripListState {
   final bool isOffline;
   final bool isRefreshing;
 
+  TripEntity? get currentTrip => partitionTrips(trips).current;
+
+  List<TripEntity> get historyTrips => partitionTrips(trips).history;
+
   TripListLoaded copyWith({
     List<TripEntity>? trips,
     bool? isOffline,

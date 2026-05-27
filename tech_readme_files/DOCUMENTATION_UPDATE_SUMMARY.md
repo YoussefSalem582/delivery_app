@@ -4,6 +4,28 @@
 
 ---
 
+## 2026-05-27 — Trips list current trip card + history sections
+
+**What changed:** Restructured the trips tab into pinned **Current Trip** and **Trip History** sections.
+
+**UX:**
+
+- Active trip (`requested`, `accepted`, `driverArrived`, `inProgress`) shown in `CurrentTripCard` with live status chip, optional driver row, and **Track Trip** button
+- History list excludes the active trip; empty history hint when only a current trip exists
+- Section headers use `current_trip` / `trip_history` localization keys (EN + AR)
+
+**Domain / presentation:**
+
+- `trip_extensions.dart` — `isCurrentTrip`, `partitionTrips()`
+- `TripListLoaded.currentTrip` / `historyTrips` getters
+- `CurrentTripCard` widget in `trip_list/presentation/widgets/`
+
+**Tests:** `test/trip_partition_test.dart`
+
+**Files touched:** `trip_list_page.dart`, `trip_list_state.dart`, `trip_card.dart`, `trip_extensions.dart`, `current_trip_card.dart`, `en.json`, `ar.json`
+
+---
+
 ## 2026-05-27 — Driver profile screen
 
 **What changed:** Added trip-scoped driver profile page with merged trip/mock driver data, chat/call actions, and ratings & reviews section.

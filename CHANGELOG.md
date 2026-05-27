@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Trips list — current trip + history sections** — `TripListPage` splits active trips into a pinned `CurrentTripCard` (with Track CTA) and a `Trip History` list below; `partitionTrips` helper on `TripEntity`.
 - **Driver profile screen** — `DriverProfilePage` at `/trips/:tripId/driver` merges trip + mock driver data; ratings & reviews section with star breakdown and review cards from mock API.
 - Chat layer: `ChatMessageEntity`, `ChatLocalDataSource`, `ChatRepository`, `GetChatMessagesUseCase`, `SendChatMessageUseCase`, `DriverChatBloc`, `DriverCallBloc`.
 - **Functional UI controls** — Shell tab AppBars use Nokta logo instead of stub hamburger menus; `ProfileAvatarButton` navigates to profile tab; wallet top-up, profile edit, order details, ride payment/promo pickers wired with demo actions.

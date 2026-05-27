@@ -10,11 +10,13 @@ class TripHeroCard extends StatelessWidget {
     super.key,
     required this.trip,
     this.highlighted = false,
+    this.liveStatus = false,
     this.pendingRetryCount = 0,
   });
 
   final TripEntity trip;
   final bool highlighted;
+  final bool liveStatus;
   final int pendingRetryCount;
 
   @override
@@ -55,7 +57,11 @@ class TripHeroCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      TripStatusChip(status: trip.status, compact: true),
+                      TripStatusChip(
+                        status: trip.status,
+                        compact: true,
+                        live: liveStatus,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         formatTripDate(trip.createdAt),
