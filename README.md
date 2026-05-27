@@ -1,6 +1,20 @@
-# Nokta — Flutter Ride-Hailing / Delivery App
+<p align="center">
+  <img src="assets/logo.svg" alt="Nokta logo" width="120" />
+</p>
 
-> **Scalable Uber-like MVP template** — Clean Architecture + BLoC, offline-first Hive cache with reconnect + background sync, live OpenStreetMap tracking via flutter_map, FCM push alerts, bilingual EN/AR with RTL, dark/light themes, responsive tablet layouts, and Talker-observable demo flows. Production-oriented structure ready to swap mock API for a real backend.
+<h1 align="center">Nokta</h1>
+
+<p align="center"><strong>Flutter Ride-Hailing / Delivery App</strong></p>
+
+<p align="center">
+  <strong>Version:</strong> <code>1.0.0+1</code> — Scalable Uber-like MVP template
+</p>
+
+<p align="center">
+  Clean Architecture + BLoC · offline-first Hive cache · live map tracking · EN/AR · dark/light themes
+</p>
+
+---
 
 ## Features
 
@@ -115,7 +129,7 @@ lib/
 └── main.dart
 ```
 
-See [AGENTS.md](AGENTS.md) for conventions.
+See [AGENTS.md](AGENTS.md) for conventions. Extended docs: [tech_readme_files/INDEX.md](tech_readme_files/INDEX.md).
 
 ## Package highlights
 

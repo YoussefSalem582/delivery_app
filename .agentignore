@@ -1,0 +1,50 @@
+# ============================================================
+# .agentignore - Exclude from Generic AI agents (.agents/) context
+# AUTO-GENERATED from scripts/docs/ai_ignore_template.txt by scripts/sync_ai_ignores.ps1
+# DO NOT EDIT BY HAND. To change exclusions, edit the template and re-run the sync.
+# Paths are relative to this file's location (delivery_app/).
+# ============================================================
+
+# Flutter build artifacts
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+android/.gradle/
+android/app/build/
+ios/Pods/
+ios/.symlinks/
+
+# Generated files
+**/*.g.dart
+**/*.freezed.dart
+**/*.mocks.dart
+
+# Design assets (binary — low signal for code context)
+design/stitch/**/*.png
+**/*.ttf
+**/*.otf
+**/*.mp4
+**/*.pdf
+
+# Large mock JSON (reference via path only when needed)
+# assets/mock/ — keep mock data available; agents may read specific files
+
+# IDE & OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+**/*.log
+
+# Lock files (large, low signal)
+pubspec.lock
+scripts/node_modules/
