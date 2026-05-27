@@ -20,5 +20,7 @@ class MapMarkerData {
 class MapConfig {
   static const defaultZoom = 14.0;
   static const tileUrlTemplate = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  static const darkTileUrlTemplate =
+      'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png';
   static const userAgentPackageName = 'com.showcase.delivery.delivery_app';
 }

@@ -12,7 +12,6 @@ class DeliveryMap extends StatefulWidget {
     this.polylines = const [],
     this.markers = const [],
     this.followCenter = false,
-    this.darkDim = false,
   });
 
   final LatLng center;
@@ -20,7 +19,6 @@ class DeliveryMap extends StatefulWidget {
   final List<LatLng> polylines;
   final List<MapMarkerData> markers;
   final bool followCenter;
-  final bool darkDim;
 
   @override
   State<DeliveryMap> createState() => DeliveryMapState();
@@ -43,7 +41,9 @@ class DeliveryMapState extends State<DeliveryMap> {
 
   @override
   Widget build(BuildContext context) {
-    final map = FlutterMap(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return FlutterMap(
       mapController: _controller,
       options: MapOptions(
         initialCenter: widget.center,
@@ -54,7 +54,9 @@ class DeliveryMapState extends State<DeliveryMap> {
       ),
       children: [
         TileLayer(
-          urlTemplate: MapConfig.tileUrlTemplate,
+          urlTemplate: isDark
+              ? MapConfig.darkTileUrlTemplate
+              : MapConfig.tileUrlTemplate,
           userAgentPackageName: MapConfig.userAgentPackageName,
         ),
         if (widget.polylines.length >= 2)
@@ -86,18 +88,6 @@ class DeliveryMapState extends State<DeliveryMap> {
               .toList(),
         ),
       ],
-    );
-
-    if (!widget.darkDim) return map;
-
-    return ColorFiltered(
-      colorFilter: const ColorFilter.matrix([
-        0.4, 0, 0, 0, 0,
-        0, 0.4, 0, 0, 0,
-        0, 0, 0.4, 0, 0,
-        0, 0, 0, 1, 0,
-      ]),
-      child: map,
     );
   }
 }

@@ -4,7 +4,6 @@ import 'package:delivery_app/core/architecture/repositories/auth_repository.dart
 import 'package:delivery_app/core/theme/nokta_colors.dart';
 import 'package:delivery_app/core/theme/theme_cubit.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
-import 'package:delivery_app/core/widgets/nokta_primary_button.dart';
 import 'package:delivery_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/profile/presentation/bloc/order_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
@@ -37,9 +36,10 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (context, snapshot) {
           final user = snapshot.data;
           final scheme = Theme.of(context).colorScheme;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
 
           return Scaffold(
-            backgroundColor: scheme.surface,
+            backgroundColor: isDark ? scheme.surfaceContainerLow : scheme.surface,
             appBar: AppBar(
               backgroundColor: scheme.surface,
               title: Text('profile_title'.tr()),
@@ -94,17 +94,42 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       children: [
         Stack(
+          clipBehavior: Clip.none,
           children: [
-            CircleAvatar(
-              radius: 48,
-              backgroundColor: scheme.surfaceContainerHigh,
-              child: Text(
-                (user?.name ?? 'D')[0].toUpperCase(),
-                style: Theme.of(context).textTheme.headlineLarge,
+            Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isDark
+                      ? scheme.outlineVariant.withValues(alpha: 0.5)
+                      : scheme.surfaceContainerLowest,
+                  width: 3,
+                ),
+                boxShadow: isDark
+                    ? null
+                    : const [
+                        BoxShadow(
+                          color: Color(0x14000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+              ),
+              child: CircleAvatar(
+                radius: 45,
+                backgroundColor: scheme.surfaceContainerHigh,
+                child: Text(
+                  (user?.name ?? 'D')[0].toUpperCase(),
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        color: scheme.onSurface,
+                      ),
+                ),
               ),
             ),
             Positioned(
@@ -113,8 +138,15 @@ class _ProfileHeader extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: scheme.primary,
+                  color: isDark ? scheme.primaryContainer : scheme.primary,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Icon(Icons.edit, size: 16, color: scheme.onPrimary),
               ),
@@ -137,6 +169,7 @@ class _WalletCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(NoktaSpacing.md),
@@ -144,44 +177,73 @@ class _WalletCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [scheme.surface, scheme.surfaceContainerHigh],
+          colors: isDark
+              ? [scheme.surfaceContainerHigh, scheme.surfaceContainer]
+              : [scheme.surface, scheme.surfaceContainerHigh],
         ),
         borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
-        border: Border.all(color: scheme.outlineVariant),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 1),
+        ),
       ),
-      child: Row(
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.account_balance_wallet_outlined, size: 16, color: scheme.onSurfaceVariant),
-                    const SizedBox(width: 4),
-                    Text('balance'.tr(), style: Theme.of(context).textTheme.labelSmall),
-                  ],
-                ),
-                const SizedBox(height: NoktaSpacing.xs),
-                Text(
-                  '${balance.toStringAsFixed(2)} EGP',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-              ],
-            ),
-          ),
-          FilledButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.add, size: 18),
-            label: Text('top_up'.tr()),
-            style: FilledButton.styleFrom(
-              backgroundColor: scheme.primary,
-              foregroundColor: scheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+          Positioned(
+            right: -40,
+            top: -40,
+            child: Container(
+              width: 128,
+              height: 128,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: scheme.secondary.withValues(alpha: isDark ? 0.12 : 0.08),
               ),
             ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet_outlined,
+                          size: 16,
+                          color: scheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 4),
+                        Text('balance'.tr(), style: Theme.of(context).textTheme.labelSmall),
+                      ],
+                    ),
+                    const SizedBox(height: NoktaSpacing.xs),
+                    Text(
+                      '${balance.toStringAsFixed(2)} EGP',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: scheme.onSurface,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.add, size: 18),
+                label: Text('top_up'.tr()),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size(0, NoktaSpacing.buttonHeight),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  backgroundColor: isDark ? scheme.primaryContainer : scheme.primary,
+                  foregroundColor: scheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -228,6 +290,7 @@ class _TabButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return InkWell(
       onTap: onTap,
@@ -236,7 +299,9 @@ class _TabButton extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: selected ? scheme.primary : scheme.outlineVariant,
+              color: selected
+                  ? scheme.primary
+                  : scheme.outlineVariant.withValues(alpha: isDark ? 0.5 : 1),
               width: selected ? 2 : 1,
             ),
           ),
@@ -244,7 +309,8 @@ class _TabButton extends StatelessWidget {
         child: Text(
           label,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
                 color: selected ? scheme.primary : scheme.onSurfaceVariant,
               ),
         ),
@@ -268,7 +334,14 @@ class _OrdersTab extends StatelessWidget {
           if (state.orders.isEmpty) {
             return Padding(
               padding: const EdgeInsets.all(NoktaSpacing.lg),
-              child: Center(child: Text('no_orders'.tr())),
+              child: Center(
+                child: Text(
+                  'no_orders'.tr(),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
             );
           }
           return Column(
@@ -295,52 +368,94 @@ class _SettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
-        _SettingsTile(
-          icon: Icons.dark_mode_outlined,
-          title: 'dark_mode'.tr(),
-          trailing: Switch(
-            value: context.watch<ThemeCubit>().state == ThemeMode.dark,
-            onChanged: (v) => context.read<ThemeCubit>().toggleDark(v),
+        Material(
+          color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+            side: BorderSide(
+              color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
+            ),
           ),
-        ),
-        _SettingsTile(
-          icon: Icons.language,
-          title: 'language'.tr(),
-          trailing: DropdownButton<String>(
-            value: context.watch<LocaleCubit>().state,
-            underline: const SizedBox.shrink(),
-            items: const [
-              DropdownMenuItem(value: 'en', child: Text('English')),
-              DropdownMenuItem(value: 'ar', child: Text('العربية')),
-            ],
-            onChanged: (code) {
-              if (code == null) return;
-              context.read<LocaleCubit>().setLocale(code);
-              context.setLocale(Locale(code));
-            },
-          ),
-        ),
-        _SettingsTile(
-          icon: Icons.bug_report_outlined,
-          title: 'open_talker'.tr(),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => TalkerScreen(talker: sl()),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              _SettingsTile(
+                icon: Icons.dark_mode_outlined,
+                title: 'dark_mode'.tr(),
+                showDivider: true,
+                trailing: Switch.adaptive(
+                  value: context.watch<ThemeCubit>().state == ThemeMode.dark,
+                  activeTrackColor: scheme.primary.withValues(alpha: 0.5),
+                  activeThumbColor: scheme.primary,
+                  onChanged: (v) => context.read<ThemeCubit>().toggleDark(v),
+                ),
               ),
-            );
-          },
+              _SettingsTile(
+                icon: Icons.language,
+                title: 'language'.tr(),
+                showDivider: true,
+                trailing: DropdownButton<String>(
+                  value: context.watch<LocaleCubit>().state,
+                  underline: const SizedBox.shrink(),
+                  dropdownColor: isDark ? scheme.surfaceContainerHighest : null,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                  items: const [
+                    DropdownMenuItem(value: 'en', child: Text('English')),
+                    DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                  ],
+                  onChanged: (code) {
+                    if (code == null) return;
+                    context.read<LocaleCubit>().setLocale(code);
+                    context.setLocale(Locale(code));
+                  },
+                ),
+              ),
+              _SettingsTile(
+                icon: Icons.bug_report_outlined,
+                title: 'open_talker'.tr(),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => TalkerScreen(talker: sl()),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: NoktaSpacing.lg),
-        NoktaPrimaryButton(
-          label: 'logout'.tr(),
-          icon: Icons.logout,
-          onPressed: () {
-            context.read<AuthBloc>().add(const AuthLogoutRequested());
-            context.router.replaceAll([const LoginRoute()]);
-          },
+        SizedBox(
+          width: double.infinity,
+          height: NoktaSpacing.buttonHeight,
+          child: OutlinedButton.icon(
+            onPressed: () {
+              context.read<AuthBloc>().add(const AuthLogoutRequested());
+              context.router.replaceAll([const LoginRoute()]);
+            },
+            icon: Icon(Icons.logout, color: scheme.error),
+            label: Text(
+              'logout'.tr(),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: scheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: scheme.error,
+              side: BorderSide(color: scheme.error.withValues(alpha: 0.45)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -353,30 +468,44 @@ class _SettingsTile extends StatelessWidget {
     required this.title,
     this.trailing,
     this.onTap,
+    this.showDivider = false,
   });
 
   final IconData icon;
   final String title;
   final Widget? trailing;
   final VoidCallback? onTap;
+  final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: NoktaSpacing.sm),
-      decoration: BoxDecoration(
-        color: scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
-      ),
-      child: ListTile(
-        leading: Icon(icon, color: scheme.primary),
-        title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
-        trailing: trailing ?? const Icon(Icons.chevron_right),
-        onTap: onTap,
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: Icon(icon, color: scheme.onSurfaceVariant),
+          title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
+          trailing: trailing ??
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+          onTap: onTap,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
+          ),
+          hoverColor: isDark
+              ? scheme.surfaceContainerHighest.withValues(alpha: 0.5)
+              : scheme.surfaceContainerLow,
+        ),
+        if (showDivider)
+          Divider(
+            height: 1,
+            indent: NoktaSpacing.md,
+            endIndent: NoktaSpacing.md,
+            color: scheme.outlineVariant.withValues(alpha: isDark ? 0.35 : 0.5),
+          ),
+      ],
     );
   }
 }
@@ -394,33 +523,85 @@ class _OrderTile extends StatelessWidget {
     };
   }
 
+  Color _statusColor(OrderStatus status, ColorScheme scheme) {
+    return switch (status) {
+      OrderStatus.delivered => scheme.secondary,
+      OrderStatus.inTransit => scheme.secondaryContainer,
+      OrderStatus.pending => scheme.onSurfaceVariant,
+    };
+  }
+
+  Color _statusBg(OrderStatus status, ColorScheme scheme, bool isDark) {
+    return switch (status) {
+      OrderStatus.delivered => scheme.secondary.withValues(alpha: isDark ? 0.15 : 0.1),
+      OrderStatus.inTransit => scheme.secondaryContainer.withValues(alpha: isDark ? 0.2 : 0.35),
+      OrderStatus.pending => scheme.surfaceContainerHighest.withValues(alpha: isDark ? 0.6 : 1),
+    };
+  }
+
+  IconData _statusIcon(OrderStatus status) {
+    return switch (status) {
+      OrderStatus.delivered => Icons.check_circle_outline,
+      OrderStatus.inTransit => Icons.local_shipping_outlined,
+      OrderStatus.pending => Icons.schedule,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(NoktaSpacing.md),
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerLowest,
+        color: isDark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(NoktaSpacing.radiusMd),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 0.5),
+        ),
       ),
       child: Row(
         children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: _statusBg(order.status, scheme, isDark),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _statusIcon(order.status),
+              size: 20,
+              color: _statusColor(order.status, scheme),
+            ),
+          ),
+          const SizedBox(width: NoktaSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(order.title, style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: scheme.onSurface,
-                    )),
-                Text(_statusLabel(order.status), style: Theme.of(context).textTheme.bodyMedium),
+                Text(
+                  order.title,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _statusLabel(order.status),
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
               ],
             ),
           ),
           Text(
             '${order.amount.toStringAsFixed(2)} EGP',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w700,
+                ),
           ),
         ],
       ),

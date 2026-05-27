@@ -65,7 +65,7 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(NoktaSpacing.buttonHeight),
+          minimumSize: const Size(64, NoktaSpacing.buttonHeight),
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
           shape: RoundedRectangleBorder(

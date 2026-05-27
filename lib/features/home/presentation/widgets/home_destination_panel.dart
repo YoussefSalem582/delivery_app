@@ -20,7 +20,7 @@ class HomeDestinationPanel extends StatelessWidget {
 
     return Material(
       elevation: 0,
-      color: isDark ? scheme.inverseSurface : scheme.surfaceContainerLowest,
+      color: scheme.surfaceContainerLowest,
       borderRadius: const BorderRadius.vertical(
         top: Radius.circular(NoktaSpacing.radiusLg),
       ),
@@ -29,13 +29,18 @@ class HomeDestinationPanel extends StatelessWidget {
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(NoktaSpacing.radiusLg),
           ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x1F000000),
-              blurRadius: 24,
-              offset: Offset(0, -4),
-            ),
-          ],
+          border: isDark
+              ? Border(top: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.4)))
+              : null,
+          boxShadow: isDark
+              ? null
+              : const [
+                  BoxShadow(
+                    color: Color(0x1F000000),
+                    blurRadius: 24,
+                    offset: Offset(0, -4),
+                  ),
+                ],
         ),
         padding: const EdgeInsets.fromLTRB(
           NoktaSpacing.md,
@@ -50,9 +55,7 @@ class HomeDestinationPanel extends StatelessWidget {
             const NoktaSheetHandle(),
             Text(
               'request_ride_title'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: isDark ? scheme.onInverseSurface : scheme.onSurface,
-                  ),
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: NoktaSpacing.md),
             Material(
@@ -127,11 +130,12 @@ class _QuickChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Material(
-      color: scheme.surface,
+      color: isDark ? scheme.surfaceContainerHigh : scheme.surface,
       shape: StadiumBorder(
-        side: BorderSide(color: scheme.outlineVariant),
+        side: BorderSide(color: scheme.outlineVariant.withValues(alpha: isDark ? 0.6 : 1)),
       ),
       child: InkWell(
         onTap: onTap,

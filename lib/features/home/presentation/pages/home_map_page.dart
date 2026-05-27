@@ -89,9 +89,7 @@ class _HomeMapPageState extends State<HomeMapPage> {
               backgroundColor: scheme.surface.withValues(alpha: isDark ? 0.92 : 1),
               title: Text(
                 'app_name'.tr(),
-                style: TextStyle(
-                  color: isDark ? scheme.inversePrimary : scheme.primary,
-                ),
+                style: TextStyle(color: scheme.primary),
               ),
               leading: IconButton(
                 icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
@@ -116,7 +114,6 @@ class _HomeMapPageState extends State<HomeMapPage> {
                     center: state.userPosition,
                     zoom: MapConfig.defaultZoom,
                     followCenter: true,
-                    darkDim: isDark,
                     polylines: _previewDraft != null
                         ? _routePoints(_previewDraft!)
                         : const [],
@@ -181,10 +178,10 @@ class _HomeMapPageState extends State<HomeMapPage> {
                     child: FloatingActionButton(
                       onPressed: () => _mapKey.currentState?.recenter(state.userPosition),
                       backgroundColor: isDark
-                          ? scheme.inverseSurface
+                          ? scheme.surfaceContainerHigh
                           : scheme.surfaceContainerLowest,
-                      foregroundColor:
-                          isDark ? scheme.inversePrimary : scheme.primary,
+                      foregroundColor: scheme.primary,
+                      elevation: isDark ? 2 : 4,
                       child: const Icon(Icons.my_location),
                     ),
                   ),
