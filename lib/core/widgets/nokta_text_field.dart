@@ -12,6 +12,8 @@ class NoktaTextField extends StatefulWidget {
     this.obscureText = false,
     this.validator,
     this.textInputAction,
+    this.errorText,
+    this.onChanged,
   });
 
   final TextEditingController controller;
@@ -22,6 +24,8 @@ class NoktaTextField extends StatefulWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final TextInputAction? textInputAction;
+  final String? errorText;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<NoktaTextField> createState() => _NoktaTextFieldState();
@@ -45,11 +49,13 @@ class _NoktaTextFieldState extends State<NoktaTextField> {
       keyboardType: widget.keyboardType,
       obscureText: _obscured,
       validator: widget.validator,
+      onChanged: widget.onChanged,
       textInputAction: widget.textInputAction,
       style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(
         labelText: widget.labelText,
         hintText: widget.hintText,
+        errorText: widget.errorText,
         filled: true,
         fillColor: Theme.of(context).inputDecorationTheme.fillColor,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
