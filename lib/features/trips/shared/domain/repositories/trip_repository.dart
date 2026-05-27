@@ -10,6 +10,11 @@ abstract class TripRepository {
     required double pickupLng,
     required double dropoffLat,
     required double dropoffLng,
+    required double fare,
+    double? distanceKm,
+    int? etaMinutes,
+    String? paymentMethodKey,
+    String? rideTierKey,
   });
   Future<TripEntity> updateTripStatus(String id, TripStatus status);
   Future<void> syncPendingChanges();

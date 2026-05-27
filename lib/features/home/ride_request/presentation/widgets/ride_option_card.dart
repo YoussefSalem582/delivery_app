@@ -77,19 +77,27 @@ class RideOptionCard extends StatelessWidget {
     required this.option,
     required this.selected,
     required this.onTap,
+    this.etaMinutes,
+    this.distanceKm,
   });
 
   final RideOption option;
   final bool selected;
   final VoidCallback onTap;
+  final int? etaMinutes;
+  final double? distanceKm;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final eta = DateTime.now().add(Duration(minutes: option.etaMinutes));
+    final effectiveEta = etaMinutes ?? option.etaMinutes;
+    final eta = DateTime.now().add(Duration(minutes: effectiveEta));
+    final distanceLabel = distanceKm != null && distanceKm! > 0
+        ? '${distanceKm!.toStringAsFixed(1)} km • '
+        : '';
     final etaLabel =
-        '${option.etaMinutes} ${'minutes'.tr()} • ${TimeOfDay.fromDateTime(eta).format(context)}';
+        '$distanceLabel$effectiveEta ${'minutes'.tr()} • ${TimeOfDay.fromDateTime(eta).format(context)}';
 
     return Material(
       color: Colors.transparent,

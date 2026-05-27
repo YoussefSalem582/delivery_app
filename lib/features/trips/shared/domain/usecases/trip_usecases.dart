@@ -131,6 +131,11 @@ class RequestTripParams {
     required this.pickupLng,
     required this.dropoffLat,
     required this.dropoffLng,
+    required this.fare,
+    this.distanceKm,
+    this.etaMinutes,
+    this.paymentMethodKey,
+    this.rideTierKey,
   });
 
   final String pickupAddress;
@@ -139,6 +144,11 @@ class RequestTripParams {
   final double pickupLng;
   final double dropoffLat;
   final double dropoffLng;
+  final double fare;
+  final double? distanceKm;
+  final int? etaMinutes;
+  final String? paymentMethodKey;
+  final String? rideTierKey;
 }
 
 class RequestTripUseCase extends UseCase<TripEntity, RequestTripParams> {
@@ -156,6 +166,11 @@ class RequestTripUseCase extends UseCase<TripEntity, RequestTripParams> {
         pickupLng: params.pickupLng,
         dropoffLat: params.dropoffLat,
         dropoffLng: params.dropoffLng,
+        fare: params.fare,
+        distanceKm: params.distanceKm,
+        etaMinutes: params.etaMinutes,
+        paymentMethodKey: params.paymentMethodKey,
+        rideTierKey: params.rideTierKey,
       );
       return Right(trip);
     } catch (e) {

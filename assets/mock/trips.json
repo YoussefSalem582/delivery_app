@@ -14,6 +14,10 @@
     "driverRating": 4.9,
     "driverVehicle": "Toyota Corolla - White",
     "fare": 125.50,
+    "distanceKm": 18.4,
+    "etaMinutes": 24,
+    "paymentMethodKey": "payment_card",
+    "rideTierKey": "ride_premium",
     "createdAt": "2026-05-20T10:30:00.000Z",
     "updatedAt": "2026-05-20T11:15:00.000Z"
   },
@@ -32,6 +36,10 @@
     "driverRating": 4.8,
     "driverVehicle": "Hyundai Elantra - Silver",
     "fare": 85.00,
+    "distanceKm": 7.2,
+    "etaMinutes": 12,
+    "paymentMethodKey": "payment_cash",
+    "rideTierKey": "ride_economy",
     "createdAt": "2026-05-25T14:00:00.000Z",
     "updatedAt": "2026-05-25T14:20:00.000Z"
   }

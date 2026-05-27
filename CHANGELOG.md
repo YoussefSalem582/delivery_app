@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Trips list — current trip + history sections** — `TripListPage` splits active trips into a pinned `CurrentTripCard` (with Track CTA) and a `Trip History` list below; `partitionTrips` helper on `TripEntity`.
 - **Connected trip data flow** — shell-scoped `TripListBloc` syncs from Hive after ride request, tracking completion, trip detail status changes, FCM notifications, and reconnect sync; tracking persists `inProgress`/`completed` to repository.
+- **Unified trip quote data** — fare, distance, ETA, payment method, and ride tier flow from ride selection into `TripEntity` and display consistently on list, tracking, and detail screens; mock API assigns catalog drivers with full profile fields.
+- **Tracking performance + sync** — cap densified route points to prevent map jank on long fallback routes; debounce trip-list cache sync; skip redundant list rebuilds when Hive snapshot unchanged; tracking uses same pickup→dropoff route/ETA as booking.
 - **Driver profile screen** — `DriverProfilePage` at `/trips/:tripId/driver` merges trip + mock driver data; ratings & reviews section with star breakdown and review cards from mock API.
 - Chat layer: `ChatMessageEntity`, `ChatLocalDataSource`, `ChatRepository`, `GetChatMessagesUseCase`, `SendChatMessageUseCase`, `DriverChatBloc`, `DriverCallBloc`.
 - **Functional UI controls** — Shell tab AppBars use Nokta logo instead of stub hamburger menus; `ProfileAvatarButton` navigates to profile tab; wallet top-up, profile edit, order details, ride payment/promo pickers wired with demo actions.

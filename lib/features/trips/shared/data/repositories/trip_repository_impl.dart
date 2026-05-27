@@ -104,6 +104,11 @@ class TripRepositoryImpl implements TripRepository {
     required double pickupLng,
     required double dropoffLat,
     required double dropoffLng,
+    required double fare,
+    double? distanceKm,
+    int? etaMinutes,
+    String? paymentMethodKey,
+    String? rideTierKey,
   }) async {
     final now = DateTime.now();
     final optimisticId = _uuid.v4();
@@ -116,7 +121,11 @@ class TripRepositoryImpl implements TripRepository {
       dropoffLat: dropoffLat,
       dropoffLng: dropoffLng,
       status: TripStatus.requested,
-      fare: 75,
+      fare: fare,
+      distanceKm: distanceKm,
+      etaMinutes: etaMinutes,
+      paymentMethodKey: paymentMethodKey,
+      rideTierKey: rideTierKey,
       createdAt: now,
       updatedAt: now,
       isPendingSync: true,

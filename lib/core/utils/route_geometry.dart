@@ -114,12 +114,21 @@ double bearingAtProgress(List<LatLng> route, double progress) {
 }
 
 /// Inserts intermediate points so consecutive vertices are at most [maxSegmentMeters] apart.
-List<LatLng> densifyRoute(List<LatLng> route, {double maxSegmentMeters = 20}) {
+List<LatLng> densifyRoute(
+  List<LatLng> route, {
+  double maxSegmentMeters = 20,
+  int maxPoints = 512,
+}) {
   if (route.length < 2) return List<LatLng>.from(route);
 
   final densified = <LatLng>[route.first];
 
   for (var i = 1; i < route.length; i++) {
+    if (densified.length >= maxPoints) {
+      if (densified.last != route.last) densified.add(route.last);
+      break;
+    }
+
     final start = route[i - 1];
     final end = route[i];
     final segmentLength = _distance(start, end);
@@ -131,9 +140,14 @@ List<LatLng> densifyRoute(List<LatLng> route, {double maxSegmentMeters = 20}) {
 
     final steps = (segmentLength / maxSegmentMeters).ceil();
     for (var step = 1; step <= steps; step++) {
+      if (densified.length >= maxPoints) break;
       final t = step / steps;
       densified.add(_lerpLatLng(start, end, t));
     }
+  }
+
+  if (densified.isEmpty || densified.last != route.last) {
+    densified.add(route.last);
   }
 
   return densified;

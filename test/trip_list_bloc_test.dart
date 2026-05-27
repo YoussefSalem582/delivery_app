@@ -35,6 +35,7 @@ void main() {
         pickupLng: 0,
         dropoffLat: 0,
         dropoffLng: 0,
+        fare: 0,
       ),
     );
     registerFallbackValue(const LatLng(0, 0));
@@ -121,6 +122,18 @@ void main() {
         TripListLoaded(trips: syncedTrips, isOffline: false),
       ],
     );
+
+    blocTest<TripListBloc, TripListState>(
+      'cache sync skips emit when snapshot unchanged',
+      build: () {
+        when(() => getCachedTrips(any())).thenAnswer((_) async => Right(trips));
+        when(() => networkStatus.isOnline).thenAnswer((_) async => true);
+        return buildBloc();
+      },
+      seed: () => TripListLoaded(trips: trips, isOffline: false),
+      act: (bloc) => bloc.add(const TripListCacheSyncRequested()),
+      expect: () => [],
+    );
   });
 
   group('RequestRideBloc', () {
@@ -169,6 +182,11 @@ void main() {
           pickupLng: 1,
           dropoffLat: 2,
           dropoffLng: 2,
+          fare: 12.5,
+          distanceKm: 5.2,
+          etaMinutes: 10,
+          paymentMethodKey: 'payment_card',
+          rideTierKey: 'ride_economy',
         ),
       ),
       expect: () => [

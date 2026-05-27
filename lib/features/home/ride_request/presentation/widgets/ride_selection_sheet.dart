@@ -1,14 +1,19 @@
+import 'dart:async';
+
+import 'package:delivery_app/core/network/route_service.dart';
+import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_option_card.dart';
+import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
+import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/shared/widgets/banners/app_toast.dart';
 import 'package:delivery_app/shared/widgets/inputs/app_text_field.dart';
 import 'package:delivery_app/shared/widgets/navigation/app_bottom_nav_bar.dart';
 import 'package:delivery_app/shared/widgets/buttons/app_button.dart';
-import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_option_card.dart';
-import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:latlong2/latlong.dart';
 
 class RideSelectionSheet extends StatefulWidget {
   const RideSelectionSheet({super.key, required this.draft});
@@ -24,9 +29,38 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
   RideTier _selected = RideTier.economy;
   String _paymentMethodKey = 'payment_card';
   String? _appliedPromo;
+  int? _routeEtaMinutes;
+  double? _routeDistanceKm;
+  bool _loadingRoute = true;
 
   RideOption get _selectedOption =>
       _options.firstWhere((o) => o.tier == _selected);
+
+  String get _selectedTierKey => _selectedOption.nameKey;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadRouteQuote());
+  }
+
+  Future<void> _loadRouteQuote() async {
+    try {
+      final result = await sl<RouteService>().getRoute(
+        pickup: LatLng(widget.draft.pickupLat, widget.draft.pickupLng),
+        dropoff: LatLng(widget.draft.dropoffLat, widget.draft.dropoffLng),
+      );
+      if (!mounted) return;
+      setState(() {
+        _routeEtaMinutes = result.etaMinutes;
+        _routeDistanceKm = result.distanceMeters / 1000;
+        _loadingRoute = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loadingRoute = false);
+    }
+  }
 
   Future<void> _showPaymentMethodSheet() async {
     final scheme = Theme.of(context).colorScheme;
@@ -153,12 +187,22 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const AppSheetHandle(),
+                    if (_loadingRoute)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: LinearProgressIndicator(
+                          color: scheme.primary,
+                          backgroundColor: scheme.surfaceContainerHighest,
+                        ),
+                      ),
                     ..._options.map(
                       (option) => Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                         child: RideOptionCard(
                           option: option,
                           selected: _selected == option.tier,
+                          etaMinutes: _routeEtaMinutes,
+                          distanceKm: _routeDistanceKm,
                           onTap: () => setState(() => _selected = option.tier),
                         ),
                       ),
@@ -169,7 +213,9 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                         Expanded(
                           child: _PaymentChip(
                             label: _paymentMethodKey.tr(),
-                            icon: Icons.credit_card,
+                            icon: _paymentMethodKey == 'payment_cash'
+                                ? Icons.payments_outlined
+                                : Icons.credit_card,
                             onTap: _showPaymentMethodSheet,
                           ),
                         ),
@@ -188,18 +234,26 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                         args: [_selectedOption.nameKey.tr()],
                       ),
                       loading: loading,
-                      onPressed: () {
-                        context.read<RequestRideBloc>().add(
-                              RequestRideSubmitted(
-                                pickupAddress: widget.draft.pickupAddress,
-                                dropoffAddress: widget.draft.dropoffAddress,
-                                pickupLat: widget.draft.pickupLat,
-                                pickupLng: widget.draft.pickupLng,
-                                dropoffLat: widget.draft.dropoffLat,
-                                dropoffLng: widget.draft.dropoffLng,
-                              ),
-                            );
-                      },
+                      onPressed: loading || _loadingRoute
+                          ? null
+                          : () {
+                              context.read<RequestRideBloc>().add(
+                                    RequestRideSubmitted(
+                                      pickupAddress: widget.draft.pickupAddress,
+                                      dropoffAddress:
+                                          widget.draft.dropoffAddress,
+                                      pickupLat: widget.draft.pickupLat,
+                                      pickupLng: widget.draft.pickupLng,
+                                      dropoffLat: widget.draft.dropoffLat,
+                                      dropoffLng: widget.draft.dropoffLng,
+                                      fare: _selectedOption.price,
+                                      distanceKm: _routeDistanceKm,
+                                      etaMinutes: _routeEtaMinutes,
+                                      paymentMethodKey: _paymentMethodKey,
+                                      rideTierKey: _selectedTierKey,
+                                    ),
+                                  );
+                            },
                     )
                         .animate()
                         .fadeIn(duration: 300.ms)

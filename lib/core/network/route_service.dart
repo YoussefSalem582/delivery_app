@@ -139,9 +139,12 @@ class RouteService {
         pickup.longitude + (dropoff.longitude - pickup.longitude) * t,
       );
     });
-    final points = densifyRoute(rawPoints);
     const distance = Distance();
     final meters = straightMeters ?? distance(pickup, dropoff);
+    final points = densifyRoute(
+      rawPoints,
+      maxSegmentMeters: (meters / 60).clamp(20, 5000),
+    );
     const avgSpeedMps = 8.33; // ~30 km/h
     return RouteResult(
       points: points,

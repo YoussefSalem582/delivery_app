@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-05-27 — Unified trip quote data (fare, km, driver, payment)
+
+**What changed:** Ride selection quote fields now persist on `TripEntity` and display consistently across home, tracking, list, and detail.
+
+**Fields added to TripEntity:** `distanceKm`, `etaMinutes`, `paymentMethodKey`, `rideTierKey`
+
+**Flow:** `RideSelectionSheet` loads `RouteService` quote → passes selected tier price + route ETA/distance + payment into `RequestRideSubmitted` → Hive + mock API → `TripMetaRow` on cards/tracking/detail
+
+**Other fixes:** Mock POST assigns drivers from `drivers.json`; wallet debits only for card payment; trip detail uses real driver rating/vehicle instead of hardcoded text.
+
+**Files touched:** `trip_entity.dart`, `hive_adapters.dart`, `ride_selection_sheet.dart`, `trip_card.dart`, `tracking_bottom_sheet.dart`, `trip_detail_page.dart`, `mock_api_interceptor.dart`, `trips.json`, translations
+
+---
+
 ## 2026-05-27 — Connected trip data flow (home, tracking, history)
 
 **What changed:** Home ride request, live tracking, and trips list now share a single shell-scoped `TripListBloc` backed by Hive.

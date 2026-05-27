@@ -6,6 +6,7 @@ import 'package:delivery_app/core/error/failures.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_payment.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 
 part 'trip_detail_event.dart';
@@ -109,7 +110,9 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
     await result.fold(
       (Failure failure) async => emit(TripDetailError(failure.message)),
       (trip) async {
-        await _authRepository.updateWalletBalance(-current!.fare);
+        if (tripUsesWallet(trip.paymentMethodKey)) {
+          await _authRepository.updateWalletBalance(-current!.fare);
+        }
         await _fcmService.simulateTripNotification(
           title: 'notification_trip_update',
           body: 'status_completed',

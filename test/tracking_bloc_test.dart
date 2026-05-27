@@ -160,7 +160,7 @@ void main() {
       expect(active.driverPhone, '+201987654321');
       verify(
         () => routeService.getRoute(
-          pickup: const LatLng(30.055, 31.245),
+          pickup: const LatLng(30, 31),
           dropoff: const LatLng(30.1, 31.1),
         ),
       ).called(1);

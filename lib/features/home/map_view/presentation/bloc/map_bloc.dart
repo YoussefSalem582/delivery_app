@@ -41,6 +41,11 @@ class RequestRideBloc extends Bloc<RequestRideEvent, RequestRideState> {
         pickupLng: event.pickupLng,
         dropoffLat: event.dropoffLat,
         dropoffLng: event.dropoffLng,
+        fare: event.fare,
+        distanceKm: event.distanceKm,
+        etaMinutes: event.etaMinutes,
+        paymentMethodKey: event.paymentMethodKey,
+        rideTierKey: event.rideTierKey,
       ),
     );
     await result.fold(

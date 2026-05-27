@@ -6,6 +6,7 @@ import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/usecase/usecase.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_extensions.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_snapshot.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 
 part 'trip_list_event.dart';
@@ -86,6 +87,10 @@ class TripListBloc extends Bloc<TripListEvent, TripListState> {
       },
       (cached) async {
         if (current is TripListLoaded) {
+          if (tripsSnapshotEquals(current.trips, cached) &&
+              current.isOffline == isOffline) {
+            return;
+          }
           emit(current.copyWith(trips: cached, isOffline: isOffline));
           return;
         }

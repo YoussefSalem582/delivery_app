@@ -25,6 +25,10 @@ class TripEntity extends HiveObject {
     this.driverRating,
     this.driverVehicle,
     required this.fare,
+    this.distanceKm,
+    this.etaMinutes,
+    this.paymentMethodKey,
+    this.rideTierKey,
     required this.createdAt,
     required this.updatedAt,
     this.isPendingSync = false,
@@ -44,6 +48,10 @@ class TripEntity extends HiveObject {
   final double? driverRating;
   final String? driverVehicle;
   final double fare;
+  final double? distanceKm;
+  final int? etaMinutes;
+  final String? paymentMethodKey;
+  final String? rideTierKey;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isPendingSync;
@@ -63,6 +71,10 @@ class TripEntity extends HiveObject {
     double? driverRating,
     String? driverVehicle,
     double? fare,
+    double? distanceKm,
+    int? etaMinutes,
+    String? paymentMethodKey,
+    String? rideTierKey,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isPendingSync,
@@ -82,6 +94,10 @@ class TripEntity extends HiveObject {
       driverRating: driverRating ?? this.driverRating,
       driverVehicle: driverVehicle ?? this.driverVehicle,
       fare: fare ?? this.fare,
+      distanceKm: distanceKm ?? this.distanceKm,
+      etaMinutes: etaMinutes ?? this.etaMinutes,
+      paymentMethodKey: paymentMethodKey ?? this.paymentMethodKey,
+      rideTierKey: rideTierKey ?? this.rideTierKey,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isPendingSync: isPendingSync ?? this.isPendingSync,
@@ -103,6 +119,10 @@ class TripEntity extends HiveObject {
         'driverRating': driverRating,
         'driverVehicle': driverVehicle,
         'fare': fare,
+        if (distanceKm != null) 'distanceKm': distanceKm,
+        if (etaMinutes != null) 'etaMinutes': etaMinutes,
+        if (paymentMethodKey != null) 'paymentMethodKey': paymentMethodKey,
+        if (rideTierKey != null) 'rideTierKey': rideTierKey,
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
       };
@@ -128,6 +148,14 @@ class TripEntity extends HiveObject {
           : null,
       driverVehicle: json['driverVehicle'] as String?,
       fare: (json['fare'] as num).toDouble(),
+      distanceKm: json['distanceKm'] != null
+          ? (json['distanceKm'] as num).toDouble()
+          : null,
+      etaMinutes: json['etaMinutes'] != null
+          ? (json['etaMinutes'] as num).toInt()
+          : null,
+      paymentMethodKey: json['paymentMethodKey'] as String?,
+      rideTierKey: json['rideTierKey'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

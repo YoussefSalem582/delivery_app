@@ -75,6 +75,7 @@
   "trips_title": "My Trips",
   "current_trip": "Current Trip",
   "trip_history": "Trip History",
+  "trip_distance_km": "{distance} km",
   "no_trip_history": "No past trips yet",
   "no_trips": "No trips yet",
   "pull_refresh": "Pull to refresh",

@@ -1,4 +1,5 @@
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_meta_row.dart';
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -89,6 +90,7 @@ class TripHeroCard extends StatelessWidget {
                 dimmed: !highlighted,
               ),
             ),
+            TripMetaRow(trip: trip, compact: true),
             if (trip.isPendingSync) ...[
               const SizedBox(height: AppSpacing.sm),
               Row(

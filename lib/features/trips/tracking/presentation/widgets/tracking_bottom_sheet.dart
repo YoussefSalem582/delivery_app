@@ -1,6 +1,7 @@
 import 'package:delivery_app/config/routes/route_names.dart';
 import 'package:delivery_app/config/theme/app_colors.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_meta_row.dart';
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/widgets/tracking_driver_row.dart';
@@ -84,6 +85,12 @@ class _ActiveSheet extends StatelessWidget {
                             height: 1,
                           ),
                     ),
+                    Text(
+                      '${active.trip.fare.toStringAsFixed(2)} EGP',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                    ),
                   ],
                 ),
               ),
@@ -102,10 +109,11 @@ class _ActiveSheet extends StatelessWidget {
             tripId: tripId,
             driverName: driverName,
             avatarUrl: active.trip.driverAvatarUrl,
-            rating: active.driverRating,
-            vehicle: active.driverVehicle,
-            phone: active.driverPhone,
+            rating: active.driverRating ?? active.trip.driverRating,
+            vehicle: active.driverVehicle ?? active.trip.driverVehicle,
+            phone: active.driverPhone ?? active.trip.driverPhone,
           ),
+          TripMetaRow(trip: active.trip, compact: true),
         ],
       ),
     )
@@ -183,10 +191,11 @@ class _CompletedSheet extends StatelessWidget {
             tripId: tripId,
             driverName: driverName,
             avatarUrl: completed.trip.driverAvatarUrl,
-            rating: completed.driverRating,
-            vehicle: completed.driverVehicle,
-            phone: completed.driverPhone,
+            rating: completed.driverRating ?? completed.trip.driverRating,
+            vehicle: completed.driverVehicle ?? completed.trip.driverVehicle,
+            phone: completed.driverPhone ?? completed.trip.driverPhone,
           ),
+          TripMetaRow(trip: completed.trip, compact: true),
           const SizedBox(height: AppSpacing.md),
           AppButton(
             label: 'view_trip_details'.tr(),

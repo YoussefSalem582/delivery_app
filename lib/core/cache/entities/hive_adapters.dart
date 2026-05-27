@@ -85,10 +85,31 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
       driverVehicle = reader.readBool() ? reader.readString() : null;
     }
 
+    double? distanceKm;
+    int? etaMinutes;
+    String? paymentMethodKey;
+    String? rideTierKey;
+    if (reader.availableBytes > 0) {
+      distanceKm = reader.readBool() ? reader.readDouble() : null;
+    }
+    if (reader.availableBytes > 0) {
+      etaMinutes = reader.readBool() ? reader.readInt() : null;
+    }
+    if (reader.availableBytes > 0) {
+      paymentMethodKey = reader.readBool() ? reader.readString() : null;
+    }
+    if (reader.availableBytes > 0) {
+      rideTierKey = reader.readBool() ? reader.readString() : null;
+    }
+
     return entity.copyWith(
       driverAvatarUrl: driverAvatarUrl,
       driverRating: driverRating,
       driverVehicle: driverVehicle,
+      distanceKm: distanceKm,
+      etaMinutes: etaMinutes,
+      paymentMethodKey: paymentMethodKey,
+      rideTierKey: rideTierKey,
     );
   }
 
@@ -120,6 +141,16 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
     if (obj.driverRating != null) writer.writeDouble(obj.driverRating!);
     writer.writeBool(obj.driverVehicle != null);
     if (obj.driverVehicle != null) writer.writeString(obj.driverVehicle!);
+    writer.writeBool(obj.distanceKm != null);
+    if (obj.distanceKm != null) writer.writeDouble(obj.distanceKm!);
+    writer.writeBool(obj.etaMinutes != null);
+    if (obj.etaMinutes != null) writer.writeInt(obj.etaMinutes!);
+    writer.writeBool(obj.paymentMethodKey != null);
+    if (obj.paymentMethodKey != null) {
+      writer.writeString(obj.paymentMethodKey!);
+    }
+    writer.writeBool(obj.rideTierKey != null);
+    if (obj.rideTierKey != null) writer.writeString(obj.rideTierKey!);
   }
 }
 

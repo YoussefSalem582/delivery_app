@@ -119,6 +119,10 @@ class MockApiInterceptor extends Interceptor {
     if (method == 'POST' && path == ApiEndpoints.requestTrip) {
       final body = options.data as Map<String, dynamic>? ?? {};
       final now = DateTime.now().toUtc().toIso8601String();
+      final drivers = await _loadJsonList('assets/mock/drivers.json');
+      final driver = drivers.isNotEmpty
+          ? drivers[_random.nextInt(drivers.length)] as Map<String, dynamic>
+          : null;
       return _ok(options, {
         'id': 'trip-${DateTime.now().millisecondsSinceEpoch}',
         'pickupAddress': body['pickupAddress'] ?? 'Current Location',
@@ -128,10 +132,18 @@ class MockApiInterceptor extends Interceptor {
         'dropoffLat': body['dropoffLat'] ?? 30.0626,
         'dropoffLng': body['dropoffLng'] ?? 31.2497,
         'status': 'accepted',
-        'driverName': 'Demo Driver',
-        'driverPhone': '+201555555555',
-        'driverAvatarUrl': 'https://i.pravatar.cc/150?img=33',
-        'fare': 75.0,
+        'driverName': driver?['name'] ?? body['driverName'],
+        'driverPhone': driver?['phone'] ?? body['driverPhone'],
+        'driverAvatarUrl':
+            'https://i.pravatar.cc/150?img=${driver?['id'] == 'driver-002' ? 47 : 12}',
+        'driverRating': driver?['rating'],
+        'driverVehicle': driver?['vehicle'],
+        'fare': body['fare'] ?? 75.0,
+        if (body['distanceKm'] != null) 'distanceKm': body['distanceKm'],
+        if (body['etaMinutes'] != null) 'etaMinutes': body['etaMinutes'],
+        if (body['paymentMethodKey'] != null)
+          'paymentMethodKey': body['paymentMethodKey'],
+        if (body['rideTierKey'] != null) 'rideTierKey': body['rideTierKey'],
         'createdAt': now,
         'updatedAt': now,
       });

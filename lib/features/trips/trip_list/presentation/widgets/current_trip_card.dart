@@ -82,6 +82,13 @@ class CurrentTripCard extends StatelessWidget {
                           .titleSmall
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
+                    if (trip.driverRating != null)
+                      Text(
+                        trip.driverRating!.toStringAsFixed(1),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: scheme.outline,
+                            ),
+                      ),
                     if (trip.driverVehicle != null &&
                         trip.driverVehicle!.isNotEmpty)
                       Text(

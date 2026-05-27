@@ -6,6 +6,7 @@ import 'package:delivery_app/core/utils/route_geometry.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/driver_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_payment.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'package:equatable/equatable.dart';
@@ -81,27 +82,33 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       return;
     }
 
-    final activeTrip = await _ensureInProgress(trip);
+    final activeTrip = await _ensureInProgress(trip, notify: false);
 
     DriverEntity? driver;
     final driverResult = await _getDriverForTrip(
-      GetDriverForTripParams(driverName: trip.driverName),
+      GetDriverForTripParams(driverName: activeTrip.driverName),
     );
     driverResult.fold((_) {}, (value) => driver = value);
 
-    final routeOrigin = _routeOrigin(activeTrip, driver);
+    final pickup = LatLng(activeTrip.pickupLat, activeTrip.pickupLng);
     final dropoff = LatLng(activeTrip.dropoffLat, activeTrip.dropoffLng);
 
     try {
       final routeResult = await _routeService.getRoute(
-        pickup: routeOrigin,
+        pickup: pickup,
         dropoff: dropoff,
       );
 
       _route = routeResult.points;
-      _initialEtaMinutes = routeResult.etaMinutes;
-      _durationSeconds = routeResult.durationSeconds;
+      _initialEtaMinutes = activeTrip.etaMinutes ?? routeResult.etaMinutes;
+      _durationSeconds = activeTrip.etaMinutes != null
+          ? activeTrip.etaMinutes! * 60
+          : routeResult.durationSeconds;
       _startedAt = DateTime.now();
+
+      final driverPosition = driver != null
+          ? LatLng(driver!.lat, driver!.lng)
+          : pickup;
 
       final split = splitRouteAtProgress(_route, 0);
       final driverRating = driver?.rating ?? activeTrip.driverRating;
@@ -112,7 +119,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
         TrackingActive(
           trip: activeTrip,
           route: _route,
-          driverPosition: _route.first,
+          driverPosition: driverPosition,
           driverBearing: bearingAtProgress(_route, 0),
           traveledRoute: split.traveled,
           remainingRoute: split.remaining,
@@ -125,19 +132,10 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       );
 
       _startTimers();
+      _onTripsChanged?.call();
     } catch (_) {
       emit(const TrackingError('error_generic'));
     }
-  }
-
-  LatLng _routeOrigin(TripEntity trip, DriverEntity? driver) {
-    if (trip.status == TripStatus.requested) {
-      return LatLng(trip.pickupLat, trip.pickupLng);
-    }
-    if (driver != null) {
-      return LatLng(driver.lat, driver.lng);
-    }
-    return LatLng(trip.pickupLat, trip.pickupLng);
   }
 
   void _startTimers() {
@@ -248,7 +246,10 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     _cancelTimers();
   }
 
-  Future<TripEntity> _ensureInProgress(TripEntity trip) async {
+  Future<TripEntity> _ensureInProgress(
+    TripEntity trip, {
+    bool notify = true,
+  }) async {
     if (trip.status == TripStatus.inProgress ||
         trip.status == TripStatus.completed ||
         trip.status == TripStatus.cancelled) {
@@ -261,7 +262,9 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     return result.fold(
       (_) => trip,
       (updated) {
-        _onTripsChanged?.call();
+        if (notify) {
+          _onTripsChanged?.call();
+        }
         return updated;
       },
     );
@@ -282,7 +285,9 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     await result.fold(
       (_) async {},
       (completed) async {
-        await _authRepository.updateWalletBalance(-trip.fare);
+        if (tripUsesWallet(completed.paymentMethodKey)) {
+          await _authRepository.updateWalletBalance(-trip.fare);
+        }
         await _fcmService.simulateTripNotification(
           title: 'notification_trip_update',
           body: 'status_completed',

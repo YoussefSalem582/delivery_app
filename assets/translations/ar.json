@@ -75,6 +75,7 @@
   "trips_title": "رحلاتي",
   "current_trip": "الرحلة الحالية",
   "trip_history": "سجل الرحلات",
+  "trip_distance_km": "{distance} كم",
   "no_trip_history": "لا توجد رحلات سابقة بعد",
   "no_trips": "لا توجد رحلات بعد",
   "pull_refresh": "اسحب للتحديث",

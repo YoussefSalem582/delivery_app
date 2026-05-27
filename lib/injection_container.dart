@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -66,8 +68,13 @@ import 'features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 
 final sl = GetIt.instance;
 
+Timer? _tripsCacheSyncDebounce;
+
 void notifyTripsCacheChanged() {
-  sl<TripListBloc>().add(const TripListCacheSyncRequested());
+  _tripsCacheSyncDebounce?.cancel();
+  _tripsCacheSyncDebounce = Timer(const Duration(milliseconds: 250), () {
+    sl<TripListBloc>().add(const TripListCacheSyncRequested());
+  });
 }
 
 Future<void> initDependencies() async {

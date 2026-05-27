@@ -7,6 +7,7 @@ import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/shared/widgets/buttons/app_button.dart';
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_card.dart';
+import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_meta_row.dart';
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/trip_detail/presentation/bloc/trip_detail_bloc.dart';
@@ -93,8 +94,11 @@ class _TripDetailBody extends StatelessWidget {
             name: trip.driverName ?? 'driver'.tr(),
             phone: trip.driverPhone,
             avatarUrl: trip.driverAvatarUrl,
+            rating: trip.driverRating,
+            vehicle: trip.driverVehicle,
           ),
           const SizedBox(height: AppSpacing.md),
+          _TripQuoteCard(trip: trip),
           _StatusTimeline(status: trip.status),
           const SizedBox(height: AppSpacing.lg),
           AppButton(
@@ -158,18 +162,62 @@ class _TripDetailBody extends StatelessWidget {
   }
 }
 
+class _TripQuoteCard extends StatelessWidget {
+  const _TripQuoteCard({required this.trip});
+
+  final TripEntity trip;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: scheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'fare'.tr(),
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+              Text(
+                '${trip.fare.toStringAsFixed(2)} EGP',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ],
+          ),
+          TripMetaRow(trip: trip),
+        ],
+      ),
+    );
+  }
+}
+
 class _DriverCard extends StatelessWidget {
   const _DriverCard({
     required this.tripId,
     required this.name,
     this.phone,
     this.avatarUrl,
+    this.rating,
+    this.vehicle,
   });
 
   final String tripId;
   final String name;
   final String? phone;
   final String? avatarUrl;
+  final double? rating;
+  final String? vehicle;
 
   @override
   Widget build(BuildContext context) {
@@ -215,20 +263,29 @@ class _DriverCard extends StatelessWidget {
                                   .labelLarge
                                   ?.copyWith(color: scheme.onSurface),
                             ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  size: 16,
-                                  color: AppColors.tertiaryFixedDim,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '4.9 • 124 rides',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            ),
+                            if (rating != null)
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: AppColors.tertiaryFixedDim,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    rating!.toStringAsFixed(1),
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            if (vehicle != null && vehicle!.isNotEmpty)
+                              Text(
+                                vehicle!,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             if (phone != null && phone!.isNotEmpty)
                               Text(
                                 phone!,

@@ -14,6 +14,11 @@ class RequestRideSubmitted extends RequestRideEvent {
     required this.pickupLng,
     required this.dropoffLat,
     required this.dropoffLng,
+    required this.fare,
+    this.distanceKm,
+    this.etaMinutes,
+    this.paymentMethodKey,
+    this.rideTierKey,
   });
 
   final String pickupAddress;
@@ -22,6 +27,11 @@ class RequestRideSubmitted extends RequestRideEvent {
   final double pickupLng;
   final double dropoffLat;
   final double dropoffLng;
+  final double fare;
+  final double? distanceKm;
+  final int? etaMinutes;
+  final String? paymentMethodKey;
+  final String? rideTierKey;
 
   @override
   List<Object?> get props => [
@@ -31,6 +41,11 @@ class RequestRideSubmitted extends RequestRideEvent {
         pickupLng,
         dropoffLat,
         dropoffLng,
+        fare,
+        distanceKm,
+        etaMinutes,
+        paymentMethodKey,
+        rideTierKey,
       ];
 }
 
