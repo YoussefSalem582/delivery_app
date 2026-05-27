@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:uuid/uuid.dart';
-import 'package:delivery_app/core/architecture/datasources/cache_metadata_local_datasource.dart';
-import 'package:delivery_app/core/architecture/datasources/pending_sync_local_datasource.dart';
-import 'package:delivery_app/core/architecture/datasources/trip_local_datasource.dart';
-import 'package:delivery_app/core/architecture/datasources/trip_remote_datasource.dart';
-import 'package:delivery_app/core/architecture/entities/pending_sync_entity.dart';
-import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
-import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
+import 'package:delivery_app/core/cache/datasources/cache_metadata_local_datasource.dart';
+import 'package:delivery_app/core/cache/datasources/pending_sync_local_datasource.dart';
+import 'package:delivery_app/features/trips/shared/data/datasources/trip_local_datasource.dart';
+import 'package:delivery_app/features/trips/shared/data/datasources/trip_remote_datasource.dart';
+import 'package:delivery_app/core/cache/entities/pending_sync_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/repositories/trip_repository.dart';
 import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/utils/cache_freshness.dart';
 

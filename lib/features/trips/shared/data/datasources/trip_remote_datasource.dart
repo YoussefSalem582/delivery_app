@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/core/network/api_endpoints.dart';
 
 class TripRemoteDataSource {

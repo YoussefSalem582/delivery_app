@@ -1,24 +1,24 @@
-import 'package:auto_route/auto_route.dart';
-import 'package:delivery_app/core/architecture/entities/trip_entity.dart';
-import 'package:delivery_app/core/architecture/repositories/trip_repository.dart';
-import 'package:delivery_app/core/theme/nokta_colors.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/repositories/trip_repository.dart';
+import 'package:delivery_app/config/theme/app_colors.dart';
+import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/map_launcher.dart';
 import 'package:delivery_app/core/widgets/avatar_image.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
-import 'package:delivery_app/core/widgets/nokta_trip_widgets.dart';
+import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
-import 'package:delivery_app/features/home/presentation/bloc/map_bloc.dart';
+import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-@RoutePage()
 class TrackingPage extends StatefulWidget {
-  const TrackingPage({super.key, @PathParam('tripId') required this.tripId});
+  const TrackingPage({super.key, required this.tripId});
 
   final String tripId;
 
@@ -62,7 +62,7 @@ class _TrackingPageState extends State<TrackingPage> {
         body: Skeletonizer(
           enabled: true,
           child: ListView(
-            padding: const EdgeInsets.all(NoktaSpacing.md),
+            padding: const EdgeInsets.all(AppSpacing.md),
             children: const [SkeletonTripCard(), SkeletonTripCard()],
           ),
         ),
@@ -77,14 +77,14 @@ class _TrackingPageState extends State<TrackingPage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: Padding(
-            padding: const EdgeInsets.only(left: NoktaSpacing.sm),
+            padding: const EdgeInsets.only(left: AppSpacing.sm),
             child: Material(
               color: Theme.of(context).colorScheme.surfaceContainerLowest,
               shape: const CircleBorder(),
               elevation: 2,
               child: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () => context.router.maybePop(),
+                onPressed: () => context.pop(),
               ),
             ),
           ),
@@ -112,7 +112,7 @@ class _TrackingPageState extends State<TrackingPage> {
               return Skeletonizer(
                 enabled: true,
                 child: ListView(
-                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   children: const [SkeletonTripCard()],
                 ),
               );
@@ -122,7 +122,7 @@ class _TrackingPageState extends State<TrackingPage> {
               return Skeletonizer(
                 enabled: true,
                 child: ListView(
-                  padding: const EdgeInsets.all(NoktaSpacing.md),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   children: const [SkeletonTripCard()],
                 ),
               );
@@ -164,7 +164,7 @@ class _TrackingPageState extends State<TrackingPage> {
                   ],
                 ),
                 Positioned(
-                  right: NoktaSpacing.md,
+                  right: AppSpacing.md,
                   bottom: 260,
                   child: FloatingActionButton(
                     onPressed: () =>
@@ -173,18 +173,18 @@ class _TrackingPageState extends State<TrackingPage> {
                   ),
                 ),
                 Positioned(
-                  left: NoktaSpacing.md,
-                  right: NoktaSpacing.md,
-                  bottom: NoktaSpacing.md,
+                  left: AppSpacing.md,
+                  right: AppSpacing.md,
+                  bottom: AppSpacing.md,
                   child: Container(
-                    padding: const EdgeInsets.all(NoktaSpacing.md),
+                    padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: scheme.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(NoktaSpacing.radiusLg),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       border: Border.all(color: scheme.outlineVariant),
                       boxShadow: const [
                         BoxShadow(
-                          color: NoktaColors.elevationShadow,
+                          color: AppColors.elevationShadow,
                           blurRadius: 12,
                           offset: Offset(0, 4),
                         ),
@@ -224,7 +224,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                 ],
                               ),
                             ),
-                            NoktaStatusChip(
+                            TripStatusChip(
                               status: active.trip.status,
                               compact: true,
                             ),
@@ -232,7 +232,7 @@ class _TrackingPageState extends State<TrackingPage> {
                         ),
                         Divider(
                           color: scheme.outlineVariant.withValues(alpha: 0.3),
-                          height: NoktaSpacing.lg,
+                          height: AppSpacing.lg,
                         ),
                         Row(
                           children: [
@@ -241,7 +241,7 @@ class _TrackingPageState extends State<TrackingPage> {
                               fallback: driverName,
                               radius: 24,
                             ),
-                            const SizedBox(width: NoktaSpacing.md),
+                            const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +260,7 @@ class _TrackingPageState extends State<TrackingPage> {
                                       Icon(
                                         Icons.star,
                                         size: 16,
-                                        color: NoktaColors.tertiaryFixedDim,
+                                        color: AppColors.tertiaryFixedDim,
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
@@ -276,7 +276,7 @@ class _TrackingPageState extends State<TrackingPage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: NoktaSpacing.md),
+                        const SizedBox(height: AppSpacing.md),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
@@ -286,7 +286,7 @@ class _TrackingPageState extends State<TrackingPage> {
                             color: scheme.primary,
                           ),
                         ),
-                        const SizedBox(height: NoktaSpacing.md),
+                        const SizedBox(height: AppSpacing.md),
                         OutlinedButton.icon(
                           onPressed: () => openExternalMaps(
                             lat: active.trip.dropoffLat,
