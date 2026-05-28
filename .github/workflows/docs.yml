@@ -50,8 +50,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verify pubspec version in README / CHANGELOG / CURRENT_STATUS
-        run: bash scripts/check_docs_freshness.sh
+        run: bash scripts/docs/check_docs_freshness.sh
       - name: Verify AI ignore files match template
         run: bash scripts/docs/sync_ai_ignores.sh --check
       - name: Verify official skills match skills-lock.json
-        run: bash scripts/check_skills_drift.sh
+        run: bash scripts/docs/check_skills_drift.sh
