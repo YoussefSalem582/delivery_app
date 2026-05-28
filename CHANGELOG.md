@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **README** — refreshed with current feature set (Nominatim, per-km fares, two-phase tracking, native branding); hero logo switched to `assets/logo.png` at 560px width.
+
 ### Added
 
 - **Native branding assets** — `flutter_launcher_icons` + `flutter_native_splash` generate Android/iOS app icons from `assets/app_icon.png` and native splash screens from `assets/logo.png` (surface `#F7F9FC` background); fixed Android adaptive icon XML (`mipmap-anydpi-v26`).

@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Native app icon + splash screen from Nokta logo assets.
+> **Last Updated:** May 27, 2026 — README refreshed; native app icon + splash from Nokta logo assets.
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)

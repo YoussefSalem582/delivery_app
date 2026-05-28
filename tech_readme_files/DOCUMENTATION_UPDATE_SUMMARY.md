@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-27 — README refresh
+
+**What changed:** Updated root `README.md` with latest features (Nominatim geocoding, per-km pricing, two-phase tracking, native branding, production roadmap). Hero image now uses `assets/logo.png` at 560px width.
+
+**Files touched:** `README.md`
+
+---
+
 ## 2026-05-27 — App icon + native splash from Nokta logo
 
 **What changed:** Wired `flutter_launcher_icons` and `flutter_native_splash` in `pubspec.yaml`. App icons (Android adaptive + iOS) generated from `assets/app_icon.png`; native splash on Android (incl. Android 12) and iOS uses `assets/logo.png` on `#F7F9FC` background. Removed misnamed `mipmap-anydpi-v26 copy` folder; proper adaptive icon XML now in `mipmap-anydpi-v26/`.
