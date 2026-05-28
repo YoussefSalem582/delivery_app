@@ -15,4 +15,9 @@ abstract final class RouteNames {
   static const driverChat = 'driverChat';
   static const driverCall = 'driverCall';
   static const driverProfile = 'driverProfile';
+  static const driverOnboarding = 'driverOnboarding';
+  static const driverHome = 'driverHome';
+  static const driverJobs = 'driverJobs';
+  static const driverShellProfile = 'driverShellProfile';
+  static const driverActiveTrip = 'driverActiveTrip';
 }

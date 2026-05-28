@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:delivery_app/config/routes/route_names.dart';
 import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
+import 'package:delivery_app/features/driver/shared/domain/entities/app_mode.dart';
+import 'package:delivery_app/features/driver/shared/presentation/cubit/app_mode_cubit.dart';
+import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/features/auth/splash/presentation/splash_config.dart';
 import 'package:delivery_app/features/auth/splash/presentation/widgets/splash_background.dart';
 import 'package:delivery_app/features/auth/splash/presentation/widgets/splash_content.dart';
@@ -50,7 +53,12 @@ class _SplashPageState extends State<SplashPage>
 
     final authState = results[1] as AuthState;
     if (authState is AuthAuthenticated) {
-      context.goNamed(RouteNames.home);
+      final appMode = sl<AppModeCubit>().state.mode;
+      if (appMode.isDriver && authState.user.isDriverRegistered) {
+        context.goNamed(RouteNames.driverHome);
+      } else {
+        context.goNamed(RouteNames.home);
+      }
     } else {
       context.replaceNamed(RouteNames.onboarding);
     }

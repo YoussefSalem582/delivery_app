@@ -8,6 +8,8 @@
     "dropoffLat": 30.1219,
     "dropoffLng": 31.4056,
     "status": "completed",
+    "riderId": "user-001",
+    "driverId": "driver-001",
     "driverName": "Ahmed Hassan",
     "driverPhone": "+201234567890",
     "driverAvatarUrl": "https://i.pravatar.cc/150?img=12",
@@ -30,6 +32,8 @@
     "dropoffLat": 30.0131,
     "dropoffLng": 31.2089,
     "status": "inProgress",
+    "riderId": "user-001",
+    "driverId": "driver-002",
     "driverName": "Sara Mohamed",
     "driverPhone": "+201987654321",
     "driverAvatarUrl": "https://i.pravatar.cc/150?img=47",
@@ -42,5 +46,23 @@
     "rideTierKey": "ride_economy",
     "createdAt": "2026-05-25T14:00:00.000Z",
     "updatedAt": "2026-05-25T14:20:00.000Z"
+  },
+  {
+    "id": "trip-demo-offer",
+    "pickupAddress": "Nasr City",
+    "dropoffAddress": "Zamalek",
+    "pickupLat": 30.0561,
+    "pickupLng": 31.3302,
+    "dropoffLat": 30.0626,
+    "dropoffLng": 31.2189,
+    "status": "requested",
+    "riderId": "user-rider-demo",
+    "fare": 95.0,
+    "distanceKm": 9.5,
+    "etaMinutes": 18,
+    "paymentMethodKey": "payment_card",
+    "rideTierKey": "ride_economy",
+    "createdAt": "2026-05-28T12:00:00.000Z",
+    "updatedAt": "2026-05-28T12:00:00.000Z"
   }
 ]

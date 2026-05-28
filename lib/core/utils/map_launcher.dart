@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> openExternalMaps({
@@ -8,9 +7,9 @@ Future<void> openExternalMaps({
   String? label,
 }) async {
   final encodedLabel = Uri.encodeComponent(label ?? 'Destination');
-  Uri uri;
+  final Uri uri;
 
-  if (Platform.isIOS) {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
     uri = Uri.parse(
       'https://maps.apple.com/?ll=$lat,$lng&q=$encodedLabel',
     );

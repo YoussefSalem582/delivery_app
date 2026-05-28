@@ -1,0 +1,16 @@
+[
+  {
+    "id": "user-001",
+    "name": "Demo User",
+    "phone": "+201000000000",
+    "rating": 4.7,
+    "avatarUrl": "https://i.pravatar.cc/150?img=68"
+  },
+  {
+    "id": "user-rider-demo",
+    "name": "Sara Ali",
+    "phone": "+201112223344",
+    "rating": 4.9,
+    "avatarUrl": "https://i.pravatar.cc/150?img=32"
+  }
+]

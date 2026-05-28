@@ -45,3 +45,12 @@ class AuthForgotPasswordRequested extends AuthEvent {
   @override
   List<Object?> get props => [email];
 }
+
+class AuthUserRefreshed extends AuthEvent {
+  const AuthUserRefreshed(this.user);
+
+  final UserEntity user;
+
+  @override
+  List<Object?> get props => [user];
+}

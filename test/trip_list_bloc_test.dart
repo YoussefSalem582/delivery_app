@@ -3,6 +3,9 @@ import 'package:dartz/dartz.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
 import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/usecase/usecase.dart';
+import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
+import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
@@ -13,17 +16,20 @@ import 'package:mocktail/mocktail.dart';
 
 class MockGetCachedTripsUseCase extends Mock implements GetCachedTripsUseCase {}
 
-class MockGetTripsUseCase extends Mock implements GetTripsUseCase {}
+class MockGetRiderTripsUseCase extends Mock implements GetRiderTripsUseCase {}
 
 class MockRefreshTripsUseCase extends Mock implements RefreshTripsUseCase {}
 
 class MockNetworkStatus extends Mock implements NetworkStatus {}
 
+class MockAuthRepository extends Mock implements AuthRepository {}
+
 void main() {
   late MockGetCachedTripsUseCase getCachedTrips;
-  late MockGetTripsUseCase getTrips;
+  late MockGetRiderTripsUseCase getRiderTrips;
   late MockRefreshTripsUseCase refreshTrips;
   late MockNetworkStatus networkStatus;
+  late MockAuthRepository authRepository;
 
   setUpAll(() {
     registerFallbackValue(const NoParams());
@@ -39,21 +45,33 @@ void main() {
       ),
     );
     registerFallbackValue(const LatLng(0, 0));
+    registerFallbackValue(NotificationType.tripAccepted);
   });
 
   setUp(() {
     getCachedTrips = MockGetCachedTripsUseCase();
-    getTrips = MockGetTripsUseCase();
+    getRiderTrips = MockGetRiderTripsUseCase();
     refreshTrips = MockRefreshTripsUseCase();
     networkStatus = MockNetworkStatus();
+    authRepository = MockAuthRepository();
     when(() => networkStatus.isOnline).thenAnswer((_) async => true);
+    when(() => authRepository.cachedUser).thenReturn(
+      UserEntity(
+        id: 'user-001',
+        name: 'Test',
+        email: 't@test.com',
+        phone: '+201000000000',
+        walletBalance: 100,
+      ),
+    );
   });
 
   TripListBloc buildBloc() => TripListBloc(
         getCachedTrips: getCachedTrips,
-        getTrips: getTrips,
+        getRiderTrips: getRiderTrips,
         refreshTrips: refreshTrips,
         networkStatus: networkStatus,
+        authRepository: authRepository,
       );
 
   group('TripListBloc', () {
@@ -67,6 +85,7 @@ void main() {
         dropoffLat: 2,
         dropoffLng: 2,
         status: TripStatus.requested,
+        riderId: 'user-001',
         fare: 10,
         createdAt: DateTime(2026),
         updatedAt: DateTime(2026),
@@ -77,7 +96,7 @@ void main() {
       'emits loaded trips when repository returns data',
       build: () {
         when(() => getCachedTrips(any())).thenAnswer((_) async => Right(trips));
-        when(() => getTrips(any())).thenAnswer((_) async => Right(trips));
+        when(() => getRiderTrips(any())).thenAnswer((_) async => Right(trips));
         return buildBloc();
       },
       act: (bloc) => bloc.add(const TripListLoadRequested()),
@@ -95,7 +114,8 @@ void main() {
       build: () {
         when(() => getCachedTrips(any()))
             .thenAnswer((_) async => Right(cachedTrips));
-        when(() => getTrips(any())).thenAnswer((_) async => Right(freshTrips));
+        when(() => getRiderTrips(any()))
+            .thenAnswer((_) async => Right(freshTrips));
         return buildBloc();
       },
       act: (bloc) => bloc.add(const TripListLoadRequested()),
@@ -148,6 +168,7 @@ void main() {
           title: any(named: 'title'),
           body: any(named: 'body'),
           tripId: any(named: 'tripId'),
+          type: any(named: 'type'),
         ),
       ).thenAnswer((_) async {});
     });
@@ -163,7 +184,8 @@ void main() {
           pickupLng: 1,
           dropoffLat: 2,
           dropoffLng: 2,
-          status: TripStatus.accepted,
+          status: TripStatus.requested,
+          riderId: 'user-001',
           fare: 75,
           createdAt: DateTime(2026),
           updatedAt: DateTime(2026),

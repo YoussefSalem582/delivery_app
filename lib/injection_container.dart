@@ -17,12 +17,27 @@ import 'core/network/connectivity_service.dart';
 import 'core/network/fcm_service.dart';
 import 'core/network/network_status.dart';
 import 'core/network/route_service.dart';
+import 'core/sync/app_data_coordinator.dart';
+import 'core/sync/driver_pending_sync_handler.dart';
 import 'core/sync/sync_service.dart';
+import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
+import 'package:delivery_app/features/driver/jobs/presentation/bloc/driver_jobs_bloc.dart';
+import 'package:delivery_app/features/driver/offers/presentation/bloc/driver_offers_bloc.dart';
+import 'package:delivery_app/features/driver/onboarding/presentation/cubit/driver_onboarding_cubit.dart';
+import 'package:delivery_app/features/driver/shared/data/datasources/driver_profile_remote_datasource.dart';
+import 'package:delivery_app/features/driver/shared/data/datasources/driver_trip_remote_datasource.dart';
+import 'package:delivery_app/features/driver/shared/data/repositories/driver_profile_repository_impl.dart';
+import 'package:delivery_app/features/driver/shared/data/repositories/driver_trip_repository_impl.dart';
+import 'package:delivery_app/features/driver/shared/domain/repositories/driver_profile_repository.dart';
+import 'package:delivery_app/features/driver/shared/domain/repositories/driver_trip_repository.dart';
+import 'package:delivery_app/features/driver/shared/domain/usecases/driver_profile_usecases.dart';
+import 'package:delivery_app/features/driver/shared/domain/usecases/switch_app_mode_usecase.dart';
+import 'package:delivery_app/features/driver/shared/presentation/cubit/app_mode_cubit.dart';
+import 'package:delivery_app/features/driver/shared/presentation/cubit/driver_availability_cubit.dart';
 import 'core/utils/map_tile_cache.dart';
 import 'core/utils/talker_setup.dart';
 import 'features/auth/shared/data/datasources/auth_local_datasource.dart';
 import 'features/auth/shared/data/repositories/auth_repository_impl.dart';
-import 'features/auth/shared/domain/repositories/auth_repository.dart';
 import 'features/auth/shared/domain/usecases/forgot_password_usecase.dart';
 import 'features/auth/shared/domain/usecases/get_cached_user_usecase.dart';
 import 'features/auth/shared/domain/usecases/login_usecase.dart';
@@ -31,7 +46,8 @@ import 'features/auth/shared/domain/usecases/register_usecase.dart';
 import 'features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'features/home/map_view/presentation/bloc/map_bloc.dart';
 import 'features/home/ride_request/presentation/cubit/location_search_cubit.dart';
-import 'features/home/shared/data/datasources/nominatim_remote_datasource.dart';
+import 'package:delivery_app/features/home/shared/data/datasources/nominatim_remote_datasource.dart';
+import 'package:delivery_app/features/home/shared/data/datasources/photon_remote_datasource.dart';
 import 'features/home/shared/data/datasources/saved_places_local_datasource.dart';
 import 'features/home/shared/data/repositories/geocoding_repository_impl.dart';
 import 'features/home/shared/domain/repositories/geocoding_repository.dart';
@@ -56,17 +72,21 @@ import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/trips/shared/data/datasources/chat_local_datasource.dart';
 import 'features/trips/shared/data/datasources/driver_remote_datasource.dart';
 import 'features/trips/shared/data/datasources/driver_review_remote_datasource.dart';
+import 'features/trips/shared/data/datasources/rider_remote_datasource.dart';
 import 'features/trips/shared/data/datasources/trip_local_datasource.dart';
 import 'features/trips/shared/data/datasources/trip_remote_datasource.dart';
 import 'features/trips/shared/data/repositories/chat_repository_impl.dart';
 import 'features/trips/shared/data/repositories/driver_repository_impl.dart';
+import 'features/trips/shared/data/repositories/rider_repository_impl.dart';
 import 'features/trips/shared/data/repositories/trip_repository_impl.dart';
 import 'features/trips/shared/domain/repositories/chat_repository.dart';
 import 'features/trips/shared/domain/repositories/driver_repository.dart';
+import 'features/trips/shared/domain/repositories/rider_repository.dart';
 import 'features/trips/shared/domain/repositories/trip_repository.dart';
 import 'features/trips/shared/domain/usecases/chat_usecases.dart';
 import 'features/trips/shared/domain/usecases/get_driver_reviews_usecase.dart';
 import 'features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
+import 'features/trips/shared/domain/usecases/get_rider_for_trip_usecase.dart';
 import 'features/trips/driver_chat/presentation/bloc/driver_chat_bloc.dart';
 import 'features/trips/driver_call/presentation/bloc/driver_call_bloc.dart';
 import 'features/trips/driver_profile/presentation/bloc/driver_profile_bloc.dart';
@@ -76,16 +96,34 @@ import 'features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 
 final sl = GetIt.instance;
 
-Timer? _tripsCacheSyncDebounce;
-
 void notifyTripsCacheChanged() {
-  _tripsCacheSyncDebounce?.cancel();
-  _tripsCacheSyncDebounce = Timer(const Duration(milliseconds: 250), () {
+  if (sl.isRegistered<AppDataCoordinator>()) {
+    sl<AppDataCoordinator>().notifyTripDataChanged();
+  }
+}
+
+void _wireAppDataCoordinator() {
+  final coordinator = sl<AppDataCoordinator>();
+  coordinator.onTripDataChanged = () {
     sl<TripListBloc>().add(const TripListCacheSyncRequested());
+    if (sl.isRegistered<DriverJobsBloc>()) {
+      final authState = sl<AuthBloc>().state;
+      if (authState is AuthAuthenticated) {
+        sl<DriverJobsBloc>().add(
+          DriverJobsCacheSyncRequested(driverId: authState.user.id),
+        );
+      }
+    }
+    if (sl.isRegistered<DriverOffersBloc>()) {
+      sl<DriverOffersBloc>().add(const DriverOffersRefreshRequested());
+    }
     if (sl.isRegistered<NotificationBloc>()) {
       sl<NotificationBloc>().add(const NotificationReceived());
     }
-  });
+  };
+  coordinator.onUserDataChanged = (user) {
+    sl<AuthBloc>().add(AuthUserRefreshed(user));
+  };
 }
 
 Future<void> initDependencies() async {
@@ -102,6 +140,19 @@ Future<void> initDependencies() async {
 
   // ─── Settings ────────────────────────────────────────────────
   sl.registerLazySingleton(() => SettingsCubit(sharedPreferences: sl()));
+  sl.registerLazySingleton(() => SwitchAppModeUseCase(sharedPreferences: sl()));
+  sl.registerLazySingleton(
+    () => AppModeCubit(sharedPreferences: sl(), switchAppMode: sl()),
+  );
+  sl.registerLazySingleton(() => AppDataCoordinator());
+  sl.registerLazySingleton(
+    () => DriverAvailabilityCubit(
+      sharedPreferences: sl(),
+      remote: sl(),
+      networkStatus: sl(),
+      pendingSync: sl(),
+    ),
+  );
 
   // ─── Hive ────────────────────────────────────────────────────
   await Hive.initFlutter();
@@ -145,20 +196,24 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => TripLocalDataSource(sl()));
   sl.registerLazySingleton(() => TripRemoteDataSource(sl()));
   sl.registerLazySingleton(() => DriverRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => RiderRemoteDataSource(sl()));
   sl.registerLazySingleton(() => DriverReviewRemoteDataSource(sl()));
   sl.registerLazySingleton(() => ChatLocalDataSource(sl()));
   sl.registerLazySingleton(() => OrderLocalDataSource(sl()));
   sl.registerLazySingleton(() => OrderRemoteDataSource(sl()));
   sl.registerLazySingleton(() => AuthLocalDataSource(sl()));
+  sl.registerLazySingleton(() => DriverProfileRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => DriverTripRemoteDataSource(sl()));
   sl.registerLazySingleton(() => NotificationLocalDataSource(sl()));
   sl.registerLazySingleton(() => PendingSyncLocalDataSource(sl()));
   sl.registerLazySingleton(() => CacheMetadataLocalDataSource(sl()));
   sl.registerLazySingleton(() => RouteCacheLocalDataSource(sl()));
 
   sl.registerLazySingleton(() => NominatimRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => PhotonRemoteDataSource(sl()));
   sl.registerLazySingleton(() => SavedPlacesLocalDataSource(sl()));
   sl.registerLazySingleton<GeocodingRepository>(
-    () => GeocodingRepositoryImpl(remote: sl()),
+    () => GeocodingRepositoryImpl(nominatim: sl(), photon: sl()),
   );
 
   // ─── Repositories ────────────────────────────────────────────
@@ -170,10 +225,33 @@ Future<void> initDependencies() async {
       cacheMetadata: sl(),
       networkStatus: sl(),
       talker: sl(),
+      coordinator: sl(),
+    ),
+  );
+  sl.registerLazySingleton<DriverProfileRepository>(
+    () => DriverProfileRepositoryImpl(
+      remote: sl(),
+      authLocal: sl(),
+      networkStatus: sl(),
+      coordinator: sl(),
+      pendingSync: sl(),
+    ),
+  );
+  sl.registerLazySingleton<DriverTripRepository>(
+    () => DriverTripRepositoryImpl(
+      remote: sl(),
+      local: sl(),
+      authLocal: sl(),
+      networkStatus: sl(),
+      coordinator: sl(),
+      pendingSync: sl(),
     ),
   );
   sl.registerLazySingleton<DriverRepository>(
     () => DriverRepositoryImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<RiderRepository>(
+    () => RiderRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(local: sl()),
@@ -213,9 +291,11 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetTripDetailUseCase(sl()));
   sl.registerLazySingleton(() => GetCachedTripDetailUseCase(sl()));
   sl.registerLazySingleton(() => GetDriverForTripUseCase(sl()));
+  sl.registerLazySingleton(() => GetRiderForTripUseCase(sl()));
   sl.registerLazySingleton(() => GetDriverReviewsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateTripStatusUseCase(sl()));
-  sl.registerLazySingleton(() => RequestTripUseCase(sl()));
+  sl.registerLazySingleton(() => RequestTripUseCase(sl(), sl()));
+  sl.registerLazySingleton(() => GetRiderTripsUseCase(sl(), sl()));
   sl.registerLazySingleton(() => EstimateFareUseCase());
   sl.registerLazySingleton(() => GetChatMessagesUseCase(sl()));
   sl.registerLazySingleton(() => SendChatMessageUseCase(sl()));
@@ -229,9 +309,21 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => AddNotificationUseCase(sl()));
   sl.registerLazySingleton(() => GetUnreadNotificationCountUseCase(sl()));
   sl.registerLazySingleton(() => SearchPlacesUseCase(sl()));
-  sl.registerLazySingleton(() => ReverseGeocodeUseCase(sl()));
+  sl.registerLazySingleton(() => RegisterDriverUseCase(sl()));
+  sl.registerLazySingleton(() => GetDriverProfileUseCase(sl()));
 
   // ─── Services ────────────────────────────────────────────────
+  sl.registerLazySingleton(
+    () => DriverPendingSyncHandler(
+      pendingSync: sl(),
+      driverProfileRemote: sl(),
+      driverTripRemote: sl(),
+      authLocal: sl(),
+      tripLocal: sl(),
+      coordinator: sl(),
+      talker: sl(),
+    ),
+  );
   sl.registerLazySingleton(
     () => SyncService(
       tripRepository: sl(),
@@ -239,6 +331,7 @@ Future<void> initDependencies() async {
       authRepository: sl(),
       networkStatus: sl(),
       talker: sl(),
+      driverPendingSyncHandler: sl(),
     ),
   );
   sl.registerLazySingleton(
@@ -258,9 +351,23 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(
     () => TripListBloc(
       getCachedTrips: sl(),
-      getTrips: sl(),
+      getRiderTrips: sl(),
       refreshTrips: sl(),
       networkStatus: sl(),
+      authRepository: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => DriverJobsBloc(
+      driverTripRepository: sl(),
+      tripRepository: sl(),
+      networkStatus: sl(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => DriverOffersBloc(
+      driverTripRepository: sl(),
+      fcmService: sl(),
     ),
   );
   sl.registerFactory(
@@ -293,7 +400,9 @@ Future<void> initDependencies() async {
       routeService: sl(),
       getTripDetail: sl(),
       getDriverForTrip: sl(),
+      getRiderForTrip: sl(),
       updateTripStatus: sl(),
+      driverTripRepository: sl(),
       authRepository: sl(),
       fcmService: sl(),
       onTripsChanged: notifyTripsCacheChanged,
@@ -329,6 +438,9 @@ Future<void> initDependencies() async {
     ),
   );
   sl.registerFactory(
+    () => DriverOnboardingCubit(registerDriver: sl()),
+  );
+  sl.registerFactory(
     () => ProfileBloc(
       getProfile: sl(),
       refreshProfile: sl(),
@@ -355,6 +467,7 @@ Future<void> initDependencies() async {
   };
 
   sl<SyncService>().onTripsChanged = notifyTripsCacheChanged;
+  _wireAppDataCoordinator();
 }
 
 void _registerHiveAdapters() {

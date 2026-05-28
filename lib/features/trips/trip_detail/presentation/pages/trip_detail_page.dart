@@ -89,15 +89,48 @@ class _TripDetailBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          _DriverCard(
-            tripId: trip.id,
-            name: trip.driverName ?? 'driver'.tr(),
-            phone: trip.driverPhone,
-            avatarUrl: trip.driverAvatarUrl,
-            rating: trip.driverRating,
-            vehicle: trip.driverVehicle,
-          ),
-          const SizedBox(height: AppSpacing.md),
+          if (trip.status == TripStatus.requested) ...[
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      'waiting_for_driver'.tr(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ] else ...[
+            _DriverCard(
+              tripId: trip.id,
+              name: trip.driverName ?? 'driver'.tr(),
+              phone: trip.driverPhone,
+              avatarUrl: trip.driverAvatarUrl,
+              rating: trip.driverRating,
+              vehicle: trip.driverVehicle,
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
           _TripQuoteCard(trip: trip),
           _StatusTimeline(status: trip.status),
           const SizedBox(height: AppSpacing.lg),

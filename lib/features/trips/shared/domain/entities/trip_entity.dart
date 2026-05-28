@@ -19,11 +19,15 @@ class TripEntity extends HiveObject {
     required this.dropoffLat,
     required this.dropoffLng,
     required this.status,
+    this.riderId = 'user-001',
+    this.driverId,
     this.driverName,
     this.driverPhone,
     this.driverAvatarUrl,
     this.driverRating,
     this.driverVehicle,
+    this.driverLat,
+    this.driverLng,
     required this.fare,
     this.distanceKm,
     this.etaMinutes,
@@ -42,11 +46,15 @@ class TripEntity extends HiveObject {
   final double dropoffLat;
   final double dropoffLng;
   final TripStatus status;
+  final String riderId;
+  final String? driverId;
   final String? driverName;
   final String? driverPhone;
   final String? driverAvatarUrl;
   final double? driverRating;
   final String? driverVehicle;
+  final double? driverLat;
+  final double? driverLng;
   final double fare;
   final double? distanceKm;
   final int? etaMinutes;
@@ -65,11 +73,15 @@ class TripEntity extends HiveObject {
     double? dropoffLat,
     double? dropoffLng,
     TripStatus? status,
+    String? riderId,
+    String? driverId,
     String? driverName,
     String? driverPhone,
     String? driverAvatarUrl,
     double? driverRating,
     String? driverVehicle,
+    double? driverLat,
+    double? driverLng,
     double? fare,
     double? distanceKm,
     int? etaMinutes,
@@ -78,6 +90,9 @@ class TripEntity extends HiveObject {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isPendingSync,
+    bool clearDriverId = false,
+    bool clearDriverLat = false,
+    bool clearDriverLng = false,
   }) {
     return TripEntity(
       id: id ?? this.id,
@@ -88,11 +103,15 @@ class TripEntity extends HiveObject {
       dropoffLat: dropoffLat ?? this.dropoffLat,
       dropoffLng: dropoffLng ?? this.dropoffLng,
       status: status ?? this.status,
+      riderId: riderId ?? this.riderId,
+      driverId: clearDriverId ? null : (driverId ?? this.driverId),
       driverName: driverName ?? this.driverName,
       driverPhone: driverPhone ?? this.driverPhone,
       driverAvatarUrl: driverAvatarUrl ?? this.driverAvatarUrl,
       driverRating: driverRating ?? this.driverRating,
       driverVehicle: driverVehicle ?? this.driverVehicle,
+      driverLat: clearDriverLat ? null : (driverLat ?? this.driverLat),
+      driverLng: clearDriverLng ? null : (driverLng ?? this.driverLng),
       fare: fare ?? this.fare,
       distanceKm: distanceKm ?? this.distanceKm,
       etaMinutes: etaMinutes ?? this.etaMinutes,
@@ -113,11 +132,15 @@ class TripEntity extends HiveObject {
         'dropoffLat': dropoffLat,
         'dropoffLng': dropoffLng,
         'status': status.name,
+        'riderId': riderId,
+        if (driverId != null) 'driverId': driverId,
         'driverName': driverName,
         'driverPhone': driverPhone,
         'driverAvatarUrl': driverAvatarUrl,
         'driverRating': driverRating,
         'driverVehicle': driverVehicle,
+        if (driverLat != null) 'driverLat': driverLat,
+        if (driverLng != null) 'driverLng': driverLng,
         'fare': fare,
         if (distanceKm != null) 'distanceKm': distanceKm,
         if (etaMinutes != null) 'etaMinutes': etaMinutes,
@@ -140,6 +163,8 @@ class TripEntity extends HiveObject {
         (e) => e.name == json['status'],
         orElse: () => TripStatus.requested,
       ),
+      riderId: json['riderId'] as String? ?? 'user-001',
+      driverId: json['driverId'] as String?,
       driverName: json['driverName'] as String?,
       driverPhone: json['driverPhone'] as String?,
       driverAvatarUrl: json['driverAvatarUrl'] as String?,
@@ -147,6 +172,10 @@ class TripEntity extends HiveObject {
           ? (json['driverRating'] as num).toDouble()
           : null,
       driverVehicle: json['driverVehicle'] as String?,
+      driverLat:
+          json['driverLat'] != null ? (json['driverLat'] as num).toDouble() : null,
+      driverLng:
+          json['driverLng'] != null ? (json['driverLng'] as num).toDouble() : null,
       fare: (json['fare'] as num).toDouble(),
       distanceKm: json['distanceKm'] != null
           ? (json['distanceKm'] as num).toDouble()

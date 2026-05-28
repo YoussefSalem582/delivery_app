@@ -26,6 +26,7 @@
     "ios/Pods/**",
     "android/.gradle/**",
     "node_modules/**",
+    "scripts/node_modules/**",
     ".agents/skills/dart-*/**",
     ".agents/skills/flutter-*/**"
   ]

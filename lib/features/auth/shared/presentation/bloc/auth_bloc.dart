@@ -31,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthRegisterRequested>(_onRegister);
     on<AuthLogoutRequested>(_onLogout);
     on<AuthForgotPasswordRequested>(_onForgotPassword);
+    on<AuthUserRefreshed>(_onUserRefreshed);
   }
 
   final GetCachedUserUseCase _getCachedUser;
@@ -109,5 +110,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (failure) => emit(AuthError(mapAuthFailureMessage(failure))),
       (_) => emit(AuthForgotPasswordSent(event.email)),
     );
+  }
+
+  void _onUserRefreshed(
+    AuthUserRefreshed event,
+    Emitter<AuthState> emit,
+  ) {
+    emit(AuthAuthenticated(event.user));
   }
 }

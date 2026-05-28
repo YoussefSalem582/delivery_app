@@ -3,7 +3,9 @@ import 'package:dartz/dartz.dart';
 import 'package:delivery_app/core/error/exceptions.dart';
 import 'package:delivery_app/core/error/failures.dart';
 import 'package:delivery_app/core/usecase/usecase.dart';
+import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import '../entities/trip_entity.dart';
+import '../entities/trip_extensions.dart';
 import '../repositories/trip_repository.dart';
 
 class GetTripsUseCase extends UseCase<List<TripEntity>, NoParams> {
@@ -152,13 +154,17 @@ class RequestTripParams {
 }
 
 class RequestTripUseCase extends UseCase<TripEntity, RequestTripParams> {
-  RequestTripUseCase(this._repository);
+  RequestTripUseCase(this._repository, this._authRepository);
 
   final TripRepository _repository;
+  final AuthRepository _authRepository;
 
   @override
   Future<Either<Failure, TripEntity>> call(RequestTripParams params) async {
     try {
+      final user = _authRepository.cachedUser ??
+          await _authRepository.getCurrentUser();
+      final riderId = user?.id ?? 'user-001';
       final trip = await _repository.requestTrip(
         pickupAddress: params.pickupAddress,
         dropoffAddress: params.dropoffAddress,
@@ -167,12 +173,33 @@ class RequestTripUseCase extends UseCase<TripEntity, RequestTripParams> {
         dropoffLat: params.dropoffLat,
         dropoffLng: params.dropoffLng,
         fare: params.fare,
+        riderId: riderId,
         distanceKm: params.distanceKm,
         etaMinutes: params.etaMinutes,
         paymentMethodKey: params.paymentMethodKey,
         rideTierKey: params.rideTierKey,
       );
       return Right(trip);
+    } catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+}
+
+class GetRiderTripsUseCase extends UseCase<List<TripEntity>, NoParams> {
+  GetRiderTripsUseCase(this._repository, this._authRepository);
+
+  final TripRepository _repository;
+  final AuthRepository _authRepository;
+
+  @override
+  Future<Either<Failure, List<TripEntity>>> call(NoParams params) async {
+    try {
+      final trips = await _repository.getTrips();
+      final user = _authRepository.cachedUser ??
+          await _authRepository.getCurrentUser();
+      final riderId = user?.id ?? 'user-001';
+      return Right(TripQuery.forRider(trips, riderId));
     } catch (e) {
       return Left(mapExceptionToFailure(e));
     }

@@ -8,12 +8,16 @@ abstract class TrackingEvent extends Equatable {
 }
 
 class TrackingLoadRequested extends TrackingEvent {
-  const TrackingLoadRequested(this.tripId);
+  const TrackingLoadRequested(
+    this.tripId, {
+    this.role = TrackingRole.rider,
+  });
 
   final String tripId;
+  final TrackingRole role;
 
   @override
-  List<Object?> get props => [tripId];
+  List<Object?> get props => [tripId, role];
 }
 
 class TrackingTick extends TrackingEvent {
@@ -31,4 +35,17 @@ class TrackingStatusPollRequested extends TrackingEvent {
 
 class TrackingStopped extends TrackingEvent {
   const TrackingStopped();
+}
+
+class TrackingDriverStatusRequested extends TrackingEvent {
+  const TrackingDriverStatusRequested({
+    required this.tripId,
+    required this.status,
+  });
+
+  final String tripId;
+  final TripStatus status;
+
+  @override
+  List<Object?> get props => [tripId, status];
 }

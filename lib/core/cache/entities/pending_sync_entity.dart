@@ -3,6 +3,10 @@ import 'package:hive/hive.dart';
 enum SyncAction {
   createTrip,
   updateTripStatus,
+  registerDriver,
+  acceptTripOffer,
+  updateDriverAvailability,
+  updateDriverLocation,
 }
 
 class PendingSyncEntity extends HiveObject {

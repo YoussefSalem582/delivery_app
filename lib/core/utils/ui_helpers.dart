@@ -87,17 +87,3 @@ class ErrorView extends StatelessWidget {
     );
   }
 }
-
-class OfflineBanner extends StatelessWidget {
-  const OfflineBanner({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialBanner(
-      content: Text('offline_mode'.tr()),
-      leading: const Icon(Icons.cloud_off),
-      backgroundColor: Theme.of(context).colorScheme.errorContainer,
-      actions: const [SizedBox.shrink()],
-    );
-  }
-}

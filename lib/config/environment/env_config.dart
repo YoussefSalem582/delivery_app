@@ -5,6 +5,12 @@ abstract final class EnvConfig {
     defaultValue: 'https://api.example.com',
   );
 
+  /// When true (default), driver endpoints are served by [MockApiInterceptor].
+  static const bool useMockDriverApi = bool.fromEnvironment(
+    'USE_MOCK_DRIVER_API',
+    defaultValue: true,
+  );
+
   static const bool enableLogging = bool.fromEnvironment(
     'ENABLE_LOGGING',
     defaultValue: true,

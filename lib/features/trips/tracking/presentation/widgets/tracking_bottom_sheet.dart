@@ -5,11 +5,13 @@ import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_met
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/widgets/tracking_driver_row.dart';
+import 'package:delivery_app/features/trips/tracking/presentation/widgets/tracking_rider_row.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/shared/widgets/buttons/app_button.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class TrackingBottomSheet extends StatelessWidget {
@@ -17,18 +19,25 @@ class TrackingBottomSheet extends StatelessWidget {
     super.key,
     required this.state,
     required this.tripId,
+    this.role = TrackingRole.rider,
   });
 
   final TrackingState state;
   final String tripId;
+  final TrackingRole role;
 
   @override
   Widget build(BuildContext context) {
     return switch (state) {
-      TrackingActive active => _ActiveSheet(active: active, tripId: tripId),
+      TrackingActive active => _ActiveSheet(
+          active: active,
+          tripId: tripId,
+          role: role,
+        ),
       TrackingCompleted completed => _CompletedSheet(
           completed: completed,
           tripId: tripId,
+          role: role,
         ),
       _ => const SizedBox.shrink(),
     };
@@ -36,15 +45,21 @@ class TrackingBottomSheet extends StatelessWidget {
 }
 
 class _ActiveSheet extends StatelessWidget {
-  const _ActiveSheet({required this.active, required this.tripId});
+  const _ActiveSheet({
+    required this.active,
+    required this.tripId,
+    required this.role,
+  });
 
   final TrackingActive active;
   final String tripId;
+  final TrackingRole role;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final driverName = active.trip.driverName ?? 'driver'.tr();
+    final isDriver = role == TrackingRole.driver;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -122,15 +137,68 @@ class _ActiveSheet extends StatelessWidget {
             color: scheme.outlineVariant.withValues(alpha: 0.3),
             height: AppSpacing.lg,
           ),
-          TrackingDriverRow(
-            tripId: tripId,
-            driverName: driverName,
-            avatarUrl: active.trip.driverAvatarUrl,
-            rating: active.driverRating ?? active.trip.driverRating,
-            vehicle: active.driverVehicle ?? active.trip.driverVehicle,
-            phone: active.driverPhone ?? active.trip.driverPhone,
-          ),
+          if (!isDriver) ...[
+            TrackingDriverRow(
+              tripId: tripId,
+              driverName: driverName,
+              avatarUrl: active.trip.driverAvatarUrl,
+              rating: active.driverRating ?? active.trip.driverRating,
+              vehicle: active.driverVehicle ?? active.trip.driverVehicle,
+              phone: active.driverPhone ?? active.trip.driverPhone,
+            ),
+          ],
+          if (isDriver) ...[
+            TrackingRiderRow(
+              tripId: tripId,
+              riderName: active.riderName ?? 'passenger'.tr(),
+              avatarUrl: active.riderAvatarUrl,
+              rating: active.riderRating,
+              phone: active.riderPhone,
+            ),
+          ],
           TripMetaRow(trip: active.trip, compact: true),
+          if (isDriver) ...[
+            const SizedBox(height: AppSpacing.md),
+            if (active.canDriverMarkArrived)
+              AppButton(
+                label: 'driver_mark_arrived'.tr(),
+                loading: active.isUpdating,
+                onPressed: active.isUpdating
+                    ? null
+                    : () => context.read<TrackingBloc>().add(
+                          TrackingDriverStatusRequested(
+                            tripId: tripId,
+                            status: TripStatus.driverArrived,
+                          ),
+                        ),
+              ),
+            if (active.canDriverStartTrip)
+              AppButton(
+                label: 'driver_start_trip'.tr(),
+                loading: active.isUpdating,
+                onPressed: active.isUpdating
+                    ? null
+                    : () => context.read<TrackingBloc>().add(
+                          TrackingDriverStatusRequested(
+                            tripId: tripId,
+                            status: TripStatus.inProgress,
+                          ),
+                        ),
+              ),
+            if (active.canDriverCompleteTrip)
+              AppButton(
+                label: 'driver_complete_trip'.tr(),
+                loading: active.isUpdating,
+                onPressed: active.isUpdating
+                    ? null
+                    : () => context.read<TrackingBloc>().add(
+                          TrackingDriverStatusRequested(
+                            tripId: tripId,
+                            status: TripStatus.completed,
+                          ),
+                        ),
+              ),
+          ],
         ],
       ),
     )
@@ -144,13 +212,19 @@ class _CompletedSheet extends StatelessWidget {
   const _CompletedSheet({
     required this.completed,
     required this.tripId,
+    required this.role,
   });
 
   final TrackingCompleted completed;
   final String tripId;
+  final TrackingRole role;
 
   @override
   Widget build(BuildContext context) {
+    if (role == TrackingRole.driver) {
+      return const SizedBox.shrink();
+    }
+
     final scheme = Theme.of(context).colorScheme;
     final driverName = completed.trip.driverName ?? 'driver'.tr();
 

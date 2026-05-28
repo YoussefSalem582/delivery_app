@@ -6,9 +6,10 @@ import 'package:delivery_app/features/trips/shared/domain/entities/driver_entity
 import 'package:delivery_app/features/trips/shared/domain/repositories/driver_repository.dart';
 
 class GetDriverForTripParams {
-  const GetDriverForTripParams({this.driverName});
+  const GetDriverForTripParams({this.driverName, this.driverId});
 
   final String? driverName;
+  final String? driverId;
 }
 
 class GetDriverForTripUseCase extends UseCase<DriverEntity?, GetDriverForTripParams> {
@@ -20,11 +21,15 @@ class GetDriverForTripUseCase extends UseCase<DriverEntity?, GetDriverForTripPar
   Future<Either<Failure, DriverEntity?>> call(
     GetDriverForTripParams params,
   ) async {
-    final name = params.driverName;
-    if (name == null || name.isEmpty) {
-      return const Right(null);
-    }
     try {
+      if (params.driverId != null && params.driverId!.isNotEmpty) {
+        final byId = await _repository.findById(params.driverId!);
+        if (byId != null) return Right(byId);
+      }
+      final name = params.driverName;
+      if (name == null || name.isEmpty) {
+        return const Right(null);
+      }
       final driver = await _repository.findByName(name);
       return Right(driver);
     } catch (e) {

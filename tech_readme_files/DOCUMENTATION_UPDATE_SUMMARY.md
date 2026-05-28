@@ -4,6 +4,114 @@
 
 ---
 
+## 2026-05-28 — Web PWA icons aligned with mobile
+
+**What changed:** `flutter_launcher_icons` `web:` config generates favicon + 192/512/maskable icons from `assets/app_icon.png`; `web/manifest.json` branded as Nokta with primary theme color.
+
+**Files touched:** `pubspec.yaml`, `web/icons/**`, `web/favicon.png`, `web/manifest.json`
+
+---
+
+## 2026-05-28 — Web client demo (Device Preview + GitHub Pages)
+
+**What changed:** Flutter Web platform; `device_preview` shell on `kIsWeb`; Photon geocoding for browser CORS; web guards for Workmanager and map tile disk cache; `map_launcher` without `dart:io`; GitHub Actions deploy to Pages on `feature/web-client-demo` push.
+
+**Demo URL (after merge + Pages setup):** https://youssefsalem582.github.io/delivery_app/
+
+**One-time setup:** Repo Settings → Pages → Source: **GitHub Actions**
+
+**Files touched:** `web/**`, `pubspec.yaml`, `lib/main.dart`, `lib/app.dart`, `lib/core/utils/map_launcher.dart`, `lib/core/sync/sync_service.dart`, `lib/core/utils/map_tile_cache.dart`, `lib/features/home/shared/data/datasources/photon_remote_datasource.dart`, `lib/features/home/shared/data/repositories/geocoding_repository_impl.dart`, `lib/injection_container.dart`, `.github/workflows/deploy-web-demo.yml`, `README.md`
+
+---
+
+## 2026-05-28 — Driver offer preview + passenger sheet
+
+**What changed:** Offer cards open `DriverOfferPreviewPage` (OSRM route map, passenger info, accept/decline); `TrackingRiderRow` on driver active-trip sheet; `RiderEntity` + `GetRiderForTripUseCase` + `assets/mock/riders.json`.
+
+**Files touched:** `lib/features/driver/offers/**`, `lib/features/trips/shared/**`, `lib/features/trips/tracking/**`, `lib/features/driver/home/**`, `assets/mock/riders.json`, `assets/translations/*`, tests
+
+---
+
+## 2026-05-28 — Driver active trip unified with live tracking
+
+**What changed:** Driver active trip uses shared `LiveTrackingPage` + `TrackingBloc` driver mode (OSRM route, animated marker, bottom sheet ETA/phase, driver status buttons, location publish); `DriverActiveTripPage` is a thin wrapper; `DriverActiveTripBloc` removed from DI.
+
+**Files touched:** `lib/features/trips/tracking/**`, `lib/features/driver/active_trip/presentation/pages/driver_active_trip_page.dart`, `lib/features/driver/home/presentation/pages/driver_home_page.dart`, `lib/injection_container.dart`, `test/tracking_bloc_test.dart`
+
+---
+
+## 2026-05-28 — Driver home on-trip state fix
+
+**What changed:** Driver home no longer shows "Go online" while `onTrip`; stale on-trip lock clears when jobs have no active assignment; completing a trip returns driver to online.
+
+**Files touched:** `driver_home_page.dart`, `driver_availability_cubit.dart`
+
+---
+
+## 2026-05-28 — Driver/passenger widget deduplication (phase 2)
+
+**What changed:** `ProfileUserCard` hero variant; passenger wallet on `StatSummaryCard`; `performAppLogout`, `AppModeSwitchTile`, `NotificationShellScaffold`, `MapTripScaffold`; profile/orders/trip-history empty states on `EmptyStateView`; notifications on `ShellTabScaffold` (66 tests passing).
+
+**Files touched:** `lib/shared/widgets/profile/**`, `lib/shared/widgets/navigation/notification_shell_scaffold.dart`, `lib/core/widgets/map_trip_scaffold.dart`, `lib/features/auth/shared/presentation/utils/app_logout.dart`, `lib/features/profile/**`, `lib/features/driver/**`, `lib/features/home/main_shell/**`, `lib/features/notifications/**`, `lib/features/trips/tracking/**`
+
+---
+
+## 2026-05-28 — Shared driver/passenger widgets
+
+**What changed:** Consolidated duplicated UI into shared widgets (`ShellTabAppBar`, `ShellTabScaffold`, `EmptyStateView`, `SectionHeader`, `TripAccentCard`, `ActiveTripSection`, `ProfileUserCard`, `StatSummaryCard`, `LogoutButton`); refactored driver home/jobs/profile and passenger trips/notifications/profile to use them.
+
+**Files touched:** `lib/shared/widgets/**`, `lib/features/trips/shared/presentation/widgets/**`, `lib/features/driver/**`, `lib/features/trips/trip_list/**`, `lib/features/profile/**`, `lib/features/notifications/**`
+
+---
+
+## 2026-05-28 — Driver demo offer seed
+
+**What changed:** Added `trip-demo-offer` to mock trips (requested, rider `user-rider-demo`) so single-account driver mode shows an offer; driver empty-state hint; removed redundant auth refresh after onboarding.
+
+**Files touched:** `assets/mock/trips.json`, `assets/translations/*`, `driver_home_page.dart`, `driver_onboarding_page.dart`
+
+---
+
+## 2026-05-28 — Plan exit-criteria polish (round 2)
+
+**What changed:** Added `SwitchAppModeUseCase`; vehicle-type dropdown (Economy/Premium/Delivery); registered-driver read-only onboarding summary; notification badge on driver shell home tab; full driver onboarding EN/AR strings; `SwitchAppModeUseCase` test (66 tests passing).
+
+**Files touched:** `lib/features/driver/onboarding/**`, `lib/features/driver/main_shell/**`, `lib/features/driver/shared/domain/usecases/switch_app_mode_usecase.dart`, `assets/translations/*`, `test/switch_app_mode_usecase_test.dart`
+
+---
+
+## 2026-05-28 — Plan exit-criteria gaps
+
+**What changed:** Wired `EnvConfig.useMockDriverApi` to `ApiEndpoints` (`/v1/driver/*` when false); mock interceptor normalizes v1 paths; driver availability offline queue; go-online connectivity guard; trip detail waiting-for-driver banner; `AppModeCubit` unit test (65 tests passing).
+
+**Files touched:** `lib/core/network/api_endpoints.dart`, `mock_api_interceptor.dart`, `driver_availability_cubit.dart`, `driver_home_page.dart`, `trip_detail_page.dart`, `assets/translations/*`, `test/app_mode_cubit_test.dart`
+
+---
+
+## 2026-05-28 — Driver active trip mock location publish
+
+**What changed:** `DriverActiveTripPage` publishes mock GPS every 5s via `updateDriverLocation` so rider `TrackingBloc` poll reads `driverLat`/`driverLng` from the shared trip record.
+
+**Files touched:** `lib/features/driver/active_trip/presentation/pages/driver_active_trip_page.dart`
+
+---
+
+## 2026-05-28 — Dual-mode driver flow polish + sync
+
+**What changed:** Completed remaining plan gaps: `DriverPendingSyncHandler` drains offline driver actions; rider `CurrentTripCard` waiting state; request-ride notification copy; FCM for driver offers/accept/complete; mock rider wallet debit on driver complete; entity Hive + onboarding cubit tests (63 tests passing).
+
+**Files touched:** `lib/core/sync/driver_pending_sync_handler.dart`, `lib/features/driver/**`, `lib/features/trips/trip_list/**`, `lib/features/home/map_view/**`, `lib/core/network/mock_api_interceptor.dart`, `test/entity_hive_test.dart`, `test/driver_onboarding_cubit_test.dart`, `CHANGELOG.md`, `CURRENT_STATUS.md`
+
+---
+
+## 2026-05-28 — Dual-mode driver flow
+
+**What changed:** Implemented full dual-mode driver flow on branch `feature/dual-mode-driver-flow`: extended `UserEntity`/`TripEntity`, `AppModeCubit`, driver onboarding, driver shell, mock dispatch, `AppDataCoordinator`, rider trip filters, subscriber tracking, EN/AR strings, ADR + API docs.
+
+**Files touched:** `lib/features/driver/**`, `lib/core/sync/app_data_coordinator.dart`, `lib/core/network/mock_api_store.dart`, `lib/config/routes/app_router.dart`, `lib/features/profile/**`, `lib/features/trips/**`, `assets/translations/*`, `assets/mock/trips.json`, `test/trip_query_test.dart`, `CHANGELOG.md`, `CURRENT_STATUS.md`, `09_api_endpoints.md`, `decisions/001-dual-mode-driver-flow.md`
+
+---
+
 ## 2026-05-27 — Notifications real trip data + category filters
 
 **What changed:** Replaced All/Unread-only filters with All/Trip/Messages/Calls chips plus Unread toggle; `NotificationBloc` joins trips for live status chips and routes; added `message`/`call` notification types; aligned mock seed; chat/call flows emit notifications via `FcmService`.

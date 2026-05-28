@@ -5,15 +5,20 @@ import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:delivery_app/core/utils/date_time_format.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
-import 'package:delivery_app/core/widgets/avatar_image.dart';
+import 'package:delivery_app/features/auth/shared/presentation/utils/app_logout.dart';
+import 'package:delivery_app/shared/widgets/feedback/empty_state_view.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_tab_scaffold.dart';
+import 'package:delivery_app/shared/widgets/profile/app_mode_switch_tile.dart';
+import 'package:delivery_app/shared/widgets/profile/profile_user_card.dart';
+import 'package:delivery_app/shared/widgets/profile/stat_summary_card.dart';
 import 'package:delivery_app/shared/widgets/banners/app_toast.dart';
 import 'package:delivery_app/shared/widgets/banners/offline_banner.dart';
 import 'package:delivery_app/shared/widgets/inputs/app_text_field.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
-import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/profile/orders/presentation/bloc/order_bloc.dart';
 import 'package:delivery_app/features/profile/profile_view/presentation/bloc/profile_bloc.dart';
-import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_tab_app_bar.dart';
+import 'package:delivery_app/shared/widgets/profile/logout_button.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -46,9 +51,8 @@ class _ProfilePageState extends State<ProfilePage> {
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading || state is ProfileInitial) {
-            return Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              appBar: AppBar(title: Text('profile_title'.tr())),
+            return ShellTabScaffold(
+              appBar: ShellTabAppBar(title: Text('profile_title'.tr())),
               body: Skeletonizer(
                 enabled: true,
                 child: ListView(
@@ -64,9 +68,8 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           }
           if (state is ProfileError) {
-            return Scaffold(
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              appBar: AppBar(title: Text('profile_title'.tr())),
+            return ShellTabScaffold(
+              appBar: ShellTabAppBar(title: Text('profile_title'.tr())),
               body: ErrorView(
                 message: state.message,
                 onRetry: () => context.read<ProfileBloc>().add(
@@ -110,197 +113,53 @@ class _ProfileContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: isDark ? scheme.surfaceContainerLow : scheme.surface,
-      appBar: AppBar(
-        backgroundColor: scheme.surface,
-        toolbarHeight: ShellAppBarLogo.tabToolbarHeight,
-        leadingWidth: ShellAppBarLogo.leadingWidth,
-        automaticallyImplyLeading: false,
-        leading: const ShellAppBarLogo(),
-        title: Text('profile_title'.tr()),
-      ),
+      appBar: ShellTabAppBar(title: Text('profile_title'.tr())),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
           if (isOffline) const OfflineSectionBanner(),
-          _ProfileHeader(user: user),
+          ProfileUserCard(
+            user: user,
+            variant: ProfileUserCardVariant.hero,
+            onEdit: () => _showEditProfileSheet(context, user),
+          ),
           const SizedBox(height: AppSpacing.lg),
-          _WalletCard(balance: user.walletBalance),
+          StatSummaryCard(
+            icon: Icons.account_balance_wallet_outlined,
+            label: 'balance'.tr(),
+            amountText: '${user.walletBalance.toStringAsFixed(2)} EGP',
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: isDark
+                  ? [scheme.surfaceContainerHigh, scheme.surfaceContainer]
+                  : [scheme.surface, scheme.surfaceContainerHigh],
+            ),
+            iconColor: scheme.onSurfaceVariant,
+            trailing: FilledButton.icon(
+              onPressed: () => _showTopUpSheet(context),
+              icon: const Icon(Icons.add, size: 18),
+              label: Text('top_up'.tr()),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, AppSpacing.buttonHeight),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor:
+                    isDark ? scheme.primaryContainer : scheme.primary,
+                foregroundColor: scheme.onPrimary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
           _TabBar(selectedIndex: tabIndex, onChanged: onTabChanged),
           const SizedBox(height: AppSpacing.md),
           if (tabIndex == 0) _OrdersTab() else _SettingsTab(user: user),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.user});
-
-  final UserEntity user;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Column(
-      children: [
-        Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isDark
-                      ? scheme.outlineVariant.withValues(alpha: 0.5)
-                      : scheme.surfaceContainerLowest,
-                  width: 3,
-                ),
-                boxShadow: isDark
-                    ? null
-                    : const [
-                        BoxShadow(
-                          color: Color(0x14000000),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-              ),
-              child: AvatarImage(
-                imageUrl: user.avatarUrl,
-                fallback: user.name,
-                radius: 42,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: GestureDetector(
-                onTap: () => _showEditProfileSheet(context, user),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: isDark ? scheme.primaryContainer : scheme.primary,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(
-                          alpha: isDark ? 0.4 : 0.15,
-                        ),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(Icons.edit, size: 16, color: scheme.onPrimary),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(user.name, style: Theme.of(context).textTheme.titleLarge),
-        Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
-      ],
-    );
-  }
-}
-
-class _WalletCard extends StatelessWidget {
-  const _WalletCard({required this.balance});
-
-  final double balance;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [scheme.surfaceContainerHigh, scheme.surfaceContainer]
-              : [scheme.surface, scheme.surfaceContainerHigh],
-        ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: isDark ? 0.45 : 1),
-        ),
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            right: -40,
-            top: -40,
-            child: Container(
-              width: 128,
-              height: 128,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: scheme.secondary.withValues(alpha: isDark ? 0.12 : 0.08),
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet_outlined,
-                          size: 16,
-                          color: scheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'balance'.tr(),
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '${balance.toStringAsFixed(2)} EGP',
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(color: scheme.onSurface),
-                    ),
-                  ],
-                ),
-              ),
-              FilledButton.icon(
-                onPressed: () => _showTopUpSheet(context),
-                icon: const Icon(Icons.add, size: 18),
-                label: Text('top_up'.tr()),
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size(0, AppSpacing.buttonHeight),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  backgroundColor: isDark
-                      ? scheme.primaryContainer
-                      : scheme.primary,
-                  foregroundColor: scheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 10,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -393,16 +252,9 @@ class _OrdersTab extends StatelessWidget {
         }
         if (state is OrderLoaded) {
           if (state.orders.isEmpty) {
-            return Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Center(
-                child: Text(
-                  'no_orders'.tr(),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
+            return EmptyStateView(
+              icon: Icons.receipt_long_outlined,
+              title: 'no_orders'.tr(),
             );
           }
           return Column(
@@ -450,6 +302,24 @@ class _SettingsTab extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
+              if (!user.isDriverRegistered)
+                _SettingsTile(
+                  icon: Icons.local_taxi_outlined,
+                  title: 'become_driver'.tr(),
+                  showDivider: true,
+                  trailing: Icon(
+                    Icons.chevron_right,
+                    color: scheme.onSurfaceVariant,
+                  ),
+                  onTap: () => context.pushNamed(RouteNames.driverOnboarding),
+                )
+              else
+                _SettingsTile(
+                  icon: Icons.swap_horiz,
+                  title: 'driver_mode'.tr(),
+                  showDivider: true,
+                  trailing: const AppModeSwitchTile.passenger(),
+                ),
               _SettingsTile(
                 icon: Icons.dark_mode_outlined,
                 title: 'dark_mode'.tr(),
@@ -504,31 +374,7 @@ class _SettingsTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        SizedBox(
-          width: double.infinity,
-          height: AppSpacing.buttonHeight,
-          child: OutlinedButton.icon(
-            onPressed: () {
-              context.read<AuthBloc>().add(const AuthLogoutRequested());
-              context.goNamed(RouteNames.splash);
-            },
-            icon: Icon(Icons.logout, color: scheme.error),
-            label: Text(
-              'logout'.tr(),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: scheme.error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: scheme.error,
-              side: BorderSide(color: scheme.error.withValues(alpha: 0.45)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-            ),
-          ),
-        ),
+        LogoutButton(onPressed: () => performAppLogout(context)),
       ],
     );
   }

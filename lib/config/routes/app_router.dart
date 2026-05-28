@@ -11,6 +11,11 @@ import '../../features/auth/register/presentation/pages/register_page.dart';
 import '../../features/auth/shared/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/shared/presentation/widgets/auth/auth_form_bloc_listener.dart';
 import '../../features/auth/splash/presentation/pages/splash_page.dart';
+import '../../features/driver/active_trip/presentation/pages/driver_active_trip_page.dart';
+import '../../features/driver/main_shell/presentation/pages/driver_main_shell_page.dart';
+import '../../features/driver/onboarding/presentation/pages/driver_onboarding_page.dart';
+import '../../features/driver/shared/domain/entities/app_mode.dart';
+import '../../features/driver/shared/presentation/cubit/app_mode_cubit.dart';
 import '../../features/home/main_shell/presentation/pages/main_shell_page.dart';
 import '../../features/trips/tracking/presentation/pages/tracking_page.dart';
 import '../../features/trips/trip_detail/presentation/pages/trip_detail_page.dart';
@@ -33,11 +38,18 @@ class AppRouter {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: EnvConfig.enableLogging,
-    refreshListenable: _GoRouterAuthRefresh(sl<AuthBloc>().stream),
+    refreshListenable: _GoRouterAppRefresh(
+      authStream: sl<AuthBloc>().stream,
+      modeStream: sl<AppModeCubit>().stream,
+    ),
     redirect: (context, state) {
       final authState = sl<AuthBloc>().state;
+      final appMode = sl<AppModeCubit>().state.mode;
       final isAuthenticated = authState is AuthAuthenticated;
       final isTransient = authState is AuthLoading || authState is AuthInitial;
+      final isDriverRegistered = authState is AuthAuthenticated
+          ? authState.user.isDriverRegistered
+          : false;
 
       const publicPaths = {
         '/',
@@ -47,13 +59,39 @@ class AppRouter {
         '/register',
         '/forgot-password',
       };
-      final isPublicRoute = publicPaths.contains(state.matchedLocation);
+      final location = state.matchedLocation;
+      final isPublicRoute = publicPaths.contains(location);
+      final isDriverRoute = location.startsWith('/driver');
 
       if (isTransient) return null;
 
       if (!isAuthenticated && !isPublicRoute) return '/';
 
-      if (isAuthenticated && isPublicRoute) return '/home';
+      if (isAuthenticated && isPublicRoute) {
+        return appMode.isDriver && isDriverRegistered
+            ? '/driver/home'
+            : '/home';
+      }
+
+      if (isAuthenticated && isDriverRoute && !isDriverRegistered) {
+        return '/driver/onboarding';
+      }
+
+      if (isAuthenticated &&
+          isDriverRoute &&
+          location == '/driver/onboarding' &&
+          isDriverRegistered) {
+        return '/driver/home';
+      }
+
+      if (isAuthenticated &&
+          !isDriverRoute &&
+          !isPublicRoute &&
+          appMode.isDriver &&
+          isDriverRegistered &&
+          !location.startsWith('/trips/')) {
+        return '/driver/home';
+      }
 
       return null;
     },
@@ -101,6 +139,25 @@ class AppRouter {
           ),
         ],
       ),
+      GoRoute(
+        path: '/driver/onboarding',
+        name: RouteNames.driverOnboarding,
+        pageBuilder: (context, state) => _fadePage(
+          state: state,
+          child: const DriverOnboardingPage(),
+        ),
+      ),
+      GoRoute(
+        path: '/driver/trips/:tripId/active',
+        name: RouteNames.driverActiveTrip,
+        pageBuilder: (context, state) {
+          final tripId = state.pathParameters['tripId']!;
+          return _fadePage(
+            state: state,
+            child: DriverActiveTripPage(tripId: tripId),
+          );
+        },
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainShellPage(navigationShell: navigationShell),
@@ -130,8 +187,10 @@ class AppRouter {
               GoRoute(
                 path: '/notifications',
                 name: RouteNames.notifications,
-                pageBuilder: (context, state) =>
-                    _fadePage(state: state, child: const NotificationsTabPage()),
+                pageBuilder: (context, state) => _fadePage(
+                  state: state,
+                  child: const NotificationsTabPage(),
+                ),
               ),
             ],
           ),
@@ -142,6 +201,44 @@ class AppRouter {
                 name: RouteNames.profile,
                 pageBuilder: (context, state) =>
                     _fadePage(state: state, child: const ProfileTabPage()),
+              ),
+            ],
+          ),
+        ],
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            DriverMainShellPage(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/driver/home',
+                name: RouteNames.driverHome,
+                pageBuilder: (context, state) =>
+                    _fadePage(state: state, child: const DriverHomeTabPage()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/driver/jobs',
+                name: RouteNames.driverJobs,
+                pageBuilder: (context, state) =>
+                    _fadePage(state: state, child: const DriverJobsTabPage()),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/driver/profile',
+                name: RouteNames.driverShellProfile,
+                pageBuilder: (context, state) => _fadePage(
+                  state: state,
+                  child: const DriverProfileTabShellPage(),
+                ),
               ),
             ],
           ),
@@ -219,7 +316,6 @@ class AppRouter {
     );
   }
 
-  /// Platform [MaterialPage] transition — required for [Hero] flights (splash → onboarding).
   static Page<void> _heroPage({
     required GoRouterState state,
     required Widget child,
@@ -231,16 +327,22 @@ class AppRouter {
   }
 }
 
-class _GoRouterAuthRefresh extends ChangeNotifier {
-  _GoRouterAuthRefresh(Stream<AuthState> stream) {
-    _subscription = stream.listen((_) => notifyListeners());
+class _GoRouterAppRefresh extends ChangeNotifier {
+  _GoRouterAppRefresh({
+    required Stream<AuthState> authStream,
+    required Stream<AppModeState> modeStream,
+  }) {
+    _authSub = authStream.listen((_) => notifyListeners());
+    _modeSub = modeStream.listen((_) => notifyListeners());
   }
 
-  late final StreamSubscription<AuthState> _subscription;
+  late final StreamSubscription<AuthState> _authSub;
+  late final StreamSubscription<AppModeState> _modeSub;
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _authSub.cancel();
+    _modeSub.cancel();
     super.dispose();
   }
 }

@@ -5,9 +5,13 @@ import 'package:delivery_app/core/network/fcm_service.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
+import 'package:delivery_app/features/driver/shared/domain/repositories/driver_trip_repository.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/driver_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/rider_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
+import 'package:delivery_app/features/trips/shared/domain/usecases/get_rider_for_trip_usecase.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -22,12 +26,17 @@ class MockGetTripDetailUseCase extends Mock implements GetTripDetailUseCase {}
 class MockGetDriverForTripUseCase extends Mock
     implements GetDriverForTripUseCase {}
 
+class MockGetRiderForTripUseCase extends Mock
+    implements GetRiderForTripUseCase {}
+
 class MockUpdateTripStatusUseCase extends Mock
     implements UpdateTripStatusUseCase {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockFcmService extends Mock implements FcmService {}
+
+class MockDriverTripRepository extends Mock implements DriverTripRepository {}
 
 TripEntity _sampleTrip({TripStatus status = TripStatus.inProgress}) {
   return TripEntity(
@@ -54,6 +63,13 @@ const _driver = DriverEntity(
   vehicle: 'Hyundai Elantra - Silver',
   lat: 30.055,
   lng: 31.245,
+);
+
+const _rider = RiderEntity(
+  id: 'user-rider-demo',
+  name: 'Sara Ali',
+  phone: '+201112223344',
+  rating: 4.9,
 );
 
 TripRoutePlan _sampleRoutePlan({
@@ -98,32 +114,57 @@ void main() {
   late MockRouteService routeService;
   late MockGetTripDetailUseCase getTripDetail;
   late MockGetDriverForTripUseCase getDriverForTrip;
+  late MockGetRiderForTripUseCase getRiderForTrip;
   late MockUpdateTripStatusUseCase updateTripStatus;
   late MockAuthRepository authRepository;
   late MockFcmService fcmService;
+  late MockDriverTripRepository driverTripRepository;
 
   setUpAll(() {
     registerFallbackValue(const LatLng(0, 0));
     registerFallbackValue(const GetTripDetailParams(''));
-    registerFallbackValue(const GetDriverForTripParams());
+    registerFallbackValue(NotificationType.tripAccepted);
+    registerFallbackValue(const GetDriverForTripParams(driverName: 'x'));
+    registerFallbackValue(const GetRiderForTripParams(riderId: 'x'));
     registerFallbackValue(
       const UpdateTripStatusParams(
         tripId: '',
         status: TripStatus.inProgress,
       ),
     );
+    registerFallbackValue(TripStatus.accepted);
   });
 
   setUp(() {
     routeService = MockRouteService();
     getTripDetail = MockGetTripDetailUseCase();
     getDriverForTrip = MockGetDriverForTripUseCase();
+    getRiderForTrip = MockGetRiderForTripUseCase();
     updateTripStatus = MockUpdateTripStatusUseCase();
     authRepository = MockAuthRepository();
     fcmService = MockFcmService();
+    driverTripRepository = MockDriverTripRepository();
+
+    when(() => driverTripRepository.updateDriverLocation(
+          any(),
+          lat: any(named: 'lat'),
+          lng: any(named: 'lng'),
+        )).thenAnswer(
+      (_) async => _sampleTrip(status: TripStatus.accepted),
+    );
+    when(() => driverTripRepository.updateDriverTripStatus(any(), any()))
+        .thenAnswer(
+      (invocation) async {
+        final status = invocation.positionalArguments[1] as TripStatus;
+        return _sampleTrip(status: status);
+      },
+    );
 
     when(() => getDriverForTrip(any())).thenAnswer(
       (_) async => const Right(_driver),
+    );
+    when(() => getRiderForTrip(any())).thenAnswer(
+      (_) async => const Right(_rider),
     );
     when(() => updateTripStatus(any())).thenAnswer(
       (invocation) async {
@@ -146,6 +187,7 @@ void main() {
         title: any(named: 'title'),
         body: any(named: 'body'),
         tripId: any(named: 'tripId'),
+        type: any(named: 'type'),
       ),
     ).thenAnswer((_) async {});
     when(
@@ -162,7 +204,9 @@ void main() {
       routeService: routeService,
       getTripDetail: getTripDetail,
       getDriverForTrip: getDriverForTrip,
+      getRiderForTrip: getRiderForTrip,
       updateTripStatus: updateTripStatus,
+      driverTripRepository: driverTripRepository,
       authRepository: authRepository,
       fcmService: fcmService,
       onTripsChanged: onTripsChanged,
@@ -339,5 +383,86 @@ void main() {
       isA<TrackingLoading>(),
       isA<TrackingError>(),
     ],
+  );
+
+  blocTest<TrackingBloc, TrackingState>(
+    'driver mode load includes rider profile fields',
+    build: () {
+      when(() => getTripDetail(any())).thenAnswer(
+        (_) async => Right(
+          _sampleTrip(status: TripStatus.accepted).copyWith(
+            riderId: 'user-rider-demo',
+            driverId: 'driver-002',
+          ),
+        ),
+      );
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(
+      const TrackingLoadRequested(
+        '1',
+        role: TrackingRole.driver,
+      ),
+    ),
+    expect: () => [
+      isA<TrackingLoading>(),
+      isA<TrackingActive>(),
+    ],
+    verify: (bloc) {
+      final active = bloc.state as TrackingActive;
+      expect(active.riderName, 'Sara Ali');
+      expect(active.riderPhone, '+201112223344');
+      expect(active.riderRating, 4.9);
+    },
+  );
+
+  blocTest<TrackingBloc, TrackingState>(
+    'driver mode advances progress and publishes location',
+    build: () {
+      when(() => getTripDetail(any())).thenAnswer(
+        (_) async => Right(
+          _sampleTrip(status: TripStatus.accepted).copyWith(
+            driverId: 'driver-002',
+          ),
+        ),
+      );
+      when(
+        () => routeService.getTripRoutePlan(
+          pickup: any(named: 'pickup'),
+          dropoff: any(named: 'dropoff'),
+          placementSeed: any(named: 'placementSeed'),
+        ),
+      ).thenAnswer(
+        (_) async => _sampleRoutePlan(
+          approachMeters: 1000,
+          tripMeters: 1000,
+          approachSeconds: 10,
+          tripSeconds: 10,
+        ),
+      );
+      return buildBloc();
+    },
+    act: (bloc) async {
+      bloc.add(
+        const TrackingLoadRequested(
+          '1',
+          role: TrackingRole.driver,
+        ),
+      );
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(TrackingTick(DateTime.now().add(const Duration(seconds: 5))));
+    },
+    verify: (bloc) {
+      final active = bloc.state as TrackingActive;
+      expect(active.role, TrackingRole.driver);
+      expect(active.progress, greaterThan(0));
+      verify(
+        () => driverTripRepository.updateDriverLocation(
+          '1',
+          lat: any(named: 'lat'),
+          lng: any(named: 'lng'),
+        ),
+      ).called(greaterThan(0));
+    },
   );
 }

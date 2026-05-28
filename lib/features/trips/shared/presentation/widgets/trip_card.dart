@@ -115,6 +115,67 @@ class TripHeroCard extends StatelessWidget {
   }
 }
 
+/// Trip card with optional left accent stripe for active/highlighted trips.
+class TripAccentCard extends StatelessWidget {
+  const TripAccentCard({
+    super.key,
+    required this.trip,
+    this.highlighted = false,
+    this.liveStatus = false,
+    this.pendingRetryCount = 0,
+    this.onTap,
+  });
+
+  final TripEntity trip;
+  final bool highlighted;
+  final bool liveStatus;
+  final int pendingRetryCount;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    final card = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        TripHeroCard(
+          trip: trip,
+          highlighted: highlighted,
+          liveStatus: liveStatus,
+          pendingRetryCount: pendingRetryCount,
+        ),
+        if (highlighted)
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(AppSpacing.radiusMd),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+
+    if (onTap == null) return card;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        onTap: onTap,
+        child: card,
+      ),
+    );
+  }
+}
+
 class TripCard extends StatelessWidget {
   const TripCard({
     super.key,
@@ -134,41 +195,13 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return Hero(
       tag: 'trip_${trip.id}',
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          onTap: onTap,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              TripHeroCard(
-                trip: trip,
-                highlighted: _highlighted,
-                pendingRetryCount: pendingRetryCount,
-              ),
-              if (_highlighted)
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 4,
-                    decoration: BoxDecoration(
-                      color: scheme.primaryContainer,
-                      borderRadius: const BorderRadius.horizontal(
-                        left: Radius.circular(AppSpacing.radiusMd),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
+      child: TripAccentCard(
+        trip: trip,
+        highlighted: _highlighted,
+        pendingRetryCount: pendingRetryCount,
+        onTap: onTap,
       ),
     );
   }

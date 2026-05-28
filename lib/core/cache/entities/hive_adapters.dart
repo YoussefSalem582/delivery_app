@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:delivery_app/core/cache/entities/cache_metadata_entity.dart';
 import 'package:delivery_app/core/cache/entities/pending_sync_entity.dart';
 import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
+import 'package:delivery_app/features/driver/shared/domain/entities/driver_profile_entity.dart';
 import 'package:delivery_app/features/notifications/shared/domain/entities/notification_entity.dart';
 import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
@@ -103,6 +104,23 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
       rideTierKey = reader.readBool() ? reader.readString() : null;
     }
 
+    String? riderId;
+    String? driverId;
+    double? driverLat;
+    double? driverLng;
+    if (reader.availableBytes > 0) {
+      riderId = reader.readString();
+    }
+    if (reader.availableBytes > 0) {
+      driverId = reader.readBool() ? reader.readString() : null;
+    }
+    if (reader.availableBytes > 0) {
+      driverLat = reader.readBool() ? reader.readDouble() : null;
+    }
+    if (reader.availableBytes > 0) {
+      driverLng = reader.readBool() ? reader.readDouble() : null;
+    }
+
     return entity.copyWith(
       driverAvatarUrl: driverAvatarUrl,
       driverRating: driverRating,
@@ -111,6 +129,10 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
       etaMinutes: etaMinutes,
       paymentMethodKey: paymentMethodKey,
       rideTierKey: rideTierKey,
+      riderId: riderId,
+      driverId: driverId,
+      driverLat: driverLat,
+      driverLng: driverLng,
     );
   }
 
@@ -152,6 +174,14 @@ class TripEntityAdapter extends TypeAdapter<TripEntity> {
     }
     writer.writeBool(obj.rideTierKey != null);
     if (obj.rideTierKey != null) writer.writeString(obj.rideTierKey!);
+    writer
+      ..writeString(obj.riderId)
+      ..writeBool(obj.driverId != null);
+    if (obj.driverId != null) writer.writeString(obj.driverId!);
+    writer.writeBool(obj.driverLat != null);
+    if (obj.driverLat != null) writer.writeDouble(obj.driverLat!);
+    writer.writeBool(obj.driverLng != null);
+    if (obj.driverLng != null) writer.writeDouble(obj.driverLng!);
   }
 }
 
@@ -202,7 +232,7 @@ class UserEntityAdapter extends TypeAdapter<UserEntity> {
 
   @override
   UserEntity read(BinaryReader reader) {
-    return UserEntity(
+    final entity = UserEntity(
       id: reader.readString(),
       name: reader.readString(),
       email: reader.readString(),
@@ -210,6 +240,26 @@ class UserEntityAdapter extends TypeAdapter<UserEntity> {
       walletBalance: reader.readDouble(),
       avatarUrl: reader.readBool() ? reader.readString() : null,
       isLoggedIn: reader.readBool(),
+    );
+
+    if (reader.availableBytes <= 0) return entity;
+
+    final isDriverRegistered = reader.readBool();
+    DriverProfileEntity? driverProfile;
+    if (reader.availableBytes > 0 && reader.readBool()) {
+      driverProfile = DriverProfileEntity(
+        phone: reader.readString(),
+        vehicleType: reader.readString(),
+        vehicleMakeModel: reader.readString(),
+        licensePlate: reader.readString(),
+        registeredAt: DateTime.parse(reader.readString()),
+        termsAccepted: reader.readBool(),
+      );
+    }
+
+    return entity.copyWith(
+      isDriverRegistered: isDriverRegistered,
+      driverProfile: driverProfile,
     );
   }
 
@@ -223,7 +273,20 @@ class UserEntityAdapter extends TypeAdapter<UserEntity> {
       ..writeDouble(obj.walletBalance)
       ..writeBool(obj.avatarUrl != null);
     if (obj.avatarUrl != null) writer.writeString(obj.avatarUrl!);
-    writer.writeBool(obj.isLoggedIn);
+    writer
+      ..writeBool(obj.isLoggedIn)
+      ..writeBool(obj.isDriverRegistered)
+      ..writeBool(obj.driverProfile != null);
+    if (obj.driverProfile != null) {
+      final profile = obj.driverProfile!;
+      writer
+        ..writeString(profile.phone)
+        ..writeString(profile.vehicleType)
+        ..writeString(profile.vehicleMakeModel)
+        ..writeString(profile.licensePlate)
+        ..writeString(profile.registeredAt.toIso8601String())
+        ..writeBool(profile.termsAccepted);
+    }
   }
 }
 

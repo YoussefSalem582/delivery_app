@@ -2,11 +2,10 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Notifications inbox with trip-joined status, category filters (Trip/Messages/Calls), and chat/call producers.
-
+> **Last Updated:** May 28, 2026 — Web client demo (Device Preview + GitHub Pages).
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
-> **Status:** ✅ MVP template complete | 📚 Agent docs initialized | 🚧 Production backend TBD
+> **Status:** ✅ MVP template complete | ✅ Dual-mode driver demo | ✅ Web client demo | 🚧 Production backend TBD
 
 ## Executive Summary
 
@@ -14,14 +13,27 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 
 ### Key Highlights
 
-- ✅ **6 feature domains** — auth, home, trips, notifications, profile, settings
+- ✅ **6 feature domains** — auth, home, trips, notifications, profile, settings (+ driver mode)
 - ✅ **Sub-feature layout** — `shared/` + presentation sub-folders per screen flow
 - ✅ **Offline-first** — Hive cache, pending sync queue, reconnect sync
 - ✅ **Maps** — flutter_map + OSRM + tile disk cache + live tracking
 - ✅ **i18n** — easy_localization JSON (EN + AR, RTL)
 - ✅ **Observability** — Talker (Dio, BLoC, in-app console)
 - ✅ **Agent docs** — AGENTS.md, 22 skills, Cursor/Claude/Codex/Copilot shims
-- ✅ **Native branding** — Android/iOS launcher icons from `assets/app_icon.png`; native splash + in-app wordmark use `assets/logo.png` (light) / `assets/logo_light.png` (dark)
+- ✅ **Native branding** — Android/iOS/Web launcher icons from `assets/app_icon.png` via `flutter_launcher_icons`; native splash + in-app wordmark use `assets/logo.png` (light) / `assets/logo_light.png` (dark)
+- ✅ **Web client demo** — shareable link with device frame (`device_preview`); auto-deploy to GitHub Pages from `feature/web-client-demo`
+
+## Client demo (web)
+
+| Item | Detail |
+|------|--------|
+| **Live URL** | https://youssefsalem582.github.io/delivery_app/ (deploys from `feature/web-client-demo` via GitHub Actions) |
+| **Deploy trigger** | Push to `feature/web-client-demo` or manual **Deploy Web Demo** workflow run |
+| **Local preview** | `flutter run -d chrome` |
+| **Release build** | `flutter build web --release --base-href /delivery_app/` |
+| **Deploy** | Push to `feature/web-client-demo` triggers `.github/workflows/deploy-web-demo.yml` |
+
+**Web demo limits:** push notifications simulated only; no Workmanager background sync; geocoding uses Photon (not Nominatim); open-in-maps opens Google Maps in a new tab.
 
 ## Feature Status
 
@@ -32,14 +44,16 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Trips (list, detail, tracking) | ✅ Demo complete (randomized driver near pickup ≤8 min approach, two-phase tracking, connected cache sync, current trip card, driver profile, chat + call) |
 | Notifications | ✅ Demo complete (typed inbox, All/Trip/Messages/Calls + Unread filters, live trip status chip, chat/call notifications, swipe delete + undo, mark-all-read, nav badge) |
 | Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |
-| Settings (theme, locale) | ✅ Complete |
+| Settings (theme, locale, driver mode) | ✅ Complete (shared `AppModeSwitchTile`, `LogoutButton`, `performAppLogout`) |
+| Driver mode (shell, offers, jobs, active trip) | ✅ Demo complete (offer map preview with passenger sheet; active trip uses shared `TrackingBloc` / `LiveTrackingPage`) |
+| Web client demo (Device Preview + GitHub Pages) | ✅ On `feature/web-client-demo`; deploys via GitHub Actions (no merge to `main` required) |
 | Real backend integration | 🚧 Mock API only |
 | Production auth (secure storage) | 🚧 Planned |
 | Payments / wallet (real) | 🚧 Demo top-up only (Hive-local) |
 
 ## Testing
 
-- `flutter test` — bloc tests (TripList, Order, Tracking), RouteService unit tests, fare estimate tests, route geometry tests, driver placement tests, demo destination search tests, sync dedupe tests, trip partition tests
+- `flutter test` — 72 tests including `GetRiderForTripUseCase`, `DriverOfferPreviewCubit`, `TrackingBloc` driver rider fields, `SwitchAppModeUseCase`, entity Hive round-trip, trip query filters
 
 ## Documentation
 

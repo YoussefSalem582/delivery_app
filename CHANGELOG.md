@@ -9,11 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL: `https://youssefsalem582.github.io/delivery_app/` (deploys from `feature/web-client-demo` via GitHub Actions)
+
 ### Changed
+
+- **Web PWA icons** — `flutter_launcher_icons` now generates `web/icons/*` and `web/favicon.png` from `assets/app_icon.png` (same source as Android/iOS); manifest uses Nokta name and brand colors (`#FFFFFF` / `#0050CB`).
+
+- **Driver active trip uses live tracking system** — driver active trip now shares `TrackingBloc`, `LiveTrackingPage`, OSRM two-leg route geometry, traveled/remaining polylines, animated marker, and `TrackingBottomSheet` with rider tracking; driver status actions (arrived/start/complete) and location publish live in `TrackingBloc` driver mode; removed `DriverActiveTripBloc`.
+
+- **Driver offer preview map UX** — tapping an offer opens a full-screen OSRM route preview with passenger bottom sheet (name, rating, chat/call) and accept/decline actions; active-trip driver sheet now shows `TrackingRiderRow`; added `RiderEntity`, `riders.json` mock, and `GetRiderForTripUseCase`.
+
+- **Driver/passenger widget deduplication (phase 2)** — passenger profile uses shared `ProfileUserCard` (hero variant), `StatSummaryCard` (wallet), `AppModeSwitchTile`, and `performAppLogout`; `NotificationShellScaffold` unifies passenger/driver bottom nav; notifications tab uses `ShellTabScaffold`; `MapTripScaffold` + `MapOverlayAppBar` shared by rider tracking and driver active trip; inline empty states migrated to `EmptyStateView`.
+
+- **Shared driver/passenger UI** — extracted `ShellTabAppBar`, `ShellTabScaffold`, `EmptyStateView`, `SectionHeader`, `AppBarRefreshIconButton`, `TripAccentCard`, `ActiveTripSection`, `ProfileUserCard`, `StatSummaryCard`, and `LogoutButton`; driver tabs now reuse the same shell, trip, empty-state, and profile widgets as passenger screens; removed duplicate always-visible `OfflineBanner` (app-wide `GlobalOfflineBanner` handles offline).
 
 - **Shell AppBar logo** — tab AppBars use proportional `leadingWidth` so the wordmark is not squashed; size tuned to 40dp (leading) / 44dp (home center).
 - **Profile AppBar** — removed header initial avatar chip (profile info remains in page body).
-
 
 - **Notifications screen** — full inbox UX: typed notifications (`NotificationType`), All/Unread filter, Today/Yesterday/Earlier grouping, swipe-to-delete with undo, mark-all-read, pull-to-refresh, error retry, and bottom-nav unread badge.
 - **Notifications inbox** — category filters (All / Trip / Messages / Calls) plus Unread toggle; trip rows show live `TripStatusChip` and route from joined `TripEntity`; message/call types with tap routing to chat/trip detail; mock seed aligned to trip statuses; chat send and call end emit notifications.
@@ -26,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Dual-mode driver flow** — one app for passengers and drivers: one-time driver onboarding from Profile → Settings, `AppModeCubit` toggle, dedicated driver shell (home / jobs / profile), mock dispatch (offers, accept/decline, driver-owned trip status), shared `trips_box` with `riderId`/`driverId` filters, `AppDataCoordinator` fan-out, `DriverPendingSyncHandler` for offline driver actions, rider waiting-for-driver UI on `CurrentTripCard` and trip detail, FCM simulate for offers/accept/complete, mock rider wallet debit on driver complete, go-online connectivity guard, and `EnvConfig.useMockDriverApi` wired to `/v1/driver/*` API paths.
+
 - **Notification domain types** — `NotificationType` on `NotificationEntity` (Hive + mock JSON + FCM/simulated producers); `MarkAllNotificationsRead`, `DeleteNotification`, and `AddNotification` use cases.
 
 - **Native branding assets** — `flutter_launcher_icons` + `flutter_native_splash` generate Android/iOS app icons from `assets/app_icon.png` and native splash screens from `assets/logo.png` (surface `#F7F9FC` background); fixed Android adaptive icon XML (`mipmap-anydpi-v26`).
@@ -34,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Driver demo offers** — seed `trip-demo-offer` (`requested`, rider `user-rider-demo`) in mock trips so driver mode shows an offer on one account; empty-state hint explains go-online + other-rider requests.
+- **Driver onboarding** — remove redundant `AuthCheckRequested` after register (coordinator already refreshes auth; avoids loading flash).
+- **Driver home on-trip UI** — hide "Go online" when availability is `onTrip`; show active trip or on-trip hint; release stale `onTrip` lock when no active assignment; return to online after trip complete.
 - **Notifications list layout** — wrap notification tile content in `IntrinsicHeight` so the unread accent bar no longer triggers unbounded-height `Row` errors in `ListView`.
 - **Tracking page dispose crash** — `TrackingPage` holds bloc reference directly instead of `context.read` in `dispose()`.
 - **OSRM route timeouts** — deduplicate concurrent `getRoute` calls, cache straight-line fallbacks, use 5s OSRM timeout, and skip OSRM for 5 min after failure on the same route key.

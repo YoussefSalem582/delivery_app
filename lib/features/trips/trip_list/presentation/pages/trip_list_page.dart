@@ -8,8 +8,11 @@ import 'package:delivery_app/features/trips/trip_list/presentation/widgets/curre
 import 'package:delivery_app/shared/widgets/banners/offline_banner.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/trip_list/presentation/bloc/trip_list_bloc.dart';
+import 'package:delivery_app/shared/widgets/feedback/empty_state_view.dart';
+import 'package:delivery_app/shared/widgets/feedback/section_header.dart';
 import 'package:delivery_app/shared/widgets/navigation/profile_avatar_button.dart';
-import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_tab_app_bar.dart';
+import 'package:delivery_app/shared/widgets/navigation/shell_tab_scaffold.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -25,14 +28,8 @@ class TripListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: sl<TripListBloc>(),
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          toolbarHeight: ShellAppBarLogo.tabToolbarHeight,
-          leadingWidth: ShellAppBarLogo.leadingWidth,
-          automaticallyImplyLeading: false,
-          leading: const ShellAppBarLogo(),
+      child: ShellTabScaffold(
+        appBar: ShellTabAppBar(
           title: Text('trips_title'.tr()),
           actions: [
             IconButton(
@@ -51,14 +48,14 @@ class TripListPage extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   children: [
-                    _SectionHeader(title: 'current_trip'.tr()),
+                    SectionHeader(title: 'current_trip'.tr()),
                     const Padding(
                       padding: EdgeInsets.only(bottom: AppSpacing.md),
                       child: SkeletonTripCard(),
                     ),
                     const AppButtonSkeleton(),
                     const SizedBox(height: AppSpacing.lg),
-                    _SectionHeader(title: 'trip_history'.tr()),
+                    SectionHeader(title: 'trip_history'.tr()),
                     ...List.generate(
                       3,
                       (_) => const Padding(
@@ -80,22 +77,9 @@ class TripListPage extends StatelessWidget {
             }
             if (state is TripListLoaded) {
               if (state.trips.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.directions_car_outlined,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        'no_trips'.tr(),
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ],
-                  ),
+                return EmptyStateView(
+                  icon: Icons.directions_car_outlined,
+                  title: 'no_trips'.tr(),
                 );
               }
 
@@ -112,8 +96,7 @@ class TripListPage extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.md),
                   children: [
                     if (state.isOffline) const OfflineTripsBanner(),
-                    if (currentTrip != null) ...[
-                      _SectionHeader(title: 'current_trip'.tr()),
+                    if (currentTrip != null)
                       CurrentTripCard(
                         trip: currentTrip,
                         pendingRetryCount:
@@ -128,21 +111,12 @@ class TripListPage extends StatelessWidget {
                             end: 0,
                             curve: Curves.easeOutCubic,
                           ),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
-                    _SectionHeader(title: 'trip_history'.tr()),
+                    SectionHeader(title: 'trip_history'.tr()),
                     if (historyTrips.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.md,
-                        ),
-                        child: Text(
-                          'no_trip_history'.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      EmptyStateView(
+                        icon: Icons.history,
+                        iconSize: 48,
+                        title: 'no_trip_history'.tr(),
                       )
                     else
                       ...historyTrips.asMap().entries.map(
@@ -178,25 +152,6 @@ class TripListPage extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
       ),
     );
   }
