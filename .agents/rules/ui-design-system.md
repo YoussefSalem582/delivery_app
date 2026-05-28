@@ -20,7 +20,17 @@ Theme-driven via `app_theme.dart` — Inter (EN) + Cairo (AR) via `google_fonts`
 
 ## Shared widgets
 
-Check `lib/shared/widgets/` and `lib/core/widgets/` before creating new UI (`AppButton`, `AppTextField`, `DeliveryMap`, `NoktaPrimaryButton`).
+Check `lib/shared/widgets/` and `lib/core/widgets/` before creating new UI (`AppButton`, `AppTextField`, `DeliveryMap`, `NoktaPrimaryButton`, `AppBrandIcon`).
+
+## Branding assets
+
+| Asset | Use |
+|-------|-----|
+| `assets/logo.svg` | In-app wordmark — `AppBrandIcon` |
+| `assets/logo.png` | Native splash (horizontal) |
+| `assets/app_icon.png` | Launcher icon source |
+
+Regenerate native icons/splash via `dart run flutter_launcher_icons` and `dart run flutter_native_splash:create` (config in `pubspec.yaml`).
 
 ## Strings
 

@@ -6,7 +6,7 @@
 
 - **Approval mode**: Default `auto-edit` for documentation, `suggest` for `lib/**`, `ios/**`, `android/**`.
 - **Sandbox**: Filesystem writes scoped to `delivery_app/` only.
-- **Network**: May run `flutter pub get`, `flutter analyze`, `flutter test`, `dart format`, `npx skills update`, and `scripts/*.ps1` without prompting. Other network/git commands need explicit approval.
+- **Network**: May run `flutter pub get`, `flutter analyze`, `flutter test`, `dart format`, `dart run flutter_launcher_icons`, `dart run flutter_native_splash:create`, `npx skills update`, and `scripts/*.ps1` without prompting. Other network/git commands need explicit approval.
 - **Shell**: Windows 11 / PowerShell — prefer `.ps1` scripts; no bash `&&` chaining.
 
 ## Codex-Specific Workflow Tips

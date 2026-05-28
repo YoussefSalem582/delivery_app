@@ -29,9 +29,11 @@ Edit conventions in `AGENTS.md` first; update `.cursor/rules/` only when adding 
 ### Composer / Agent mode
 
 - Read `AGENTS.md` + relevant `tech_readme_files/` doc before multi-file edits
+- Check [`tech_readme_files/CURRENT_STATUS.md`](tech_readme_files/CURRENT_STATUS.md) for live feature status
 - Prefer minimal diffs; match existing naming and folder layout
 - Run `flutter analyze` after substantive Dart changes
 - Windows PowerShell — no `&&` chaining
+- After logo/icon changes: `dart run flutter_launcher_icons` + `dart run flutter_native_splash:create`, then full app restart
 
 ### Approved commands (no prompt needed)
 

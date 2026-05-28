@@ -28,6 +28,11 @@ Trip creates/status updates should enqueue when offline via pending sync — see
 
 No attendance, KPI, Live Activity, or workforce-management patterns — keep maps, trips, FCM, Hive ride-hailing domain.
 
+## Don't reintroduce demo place catalog
+
+❌ `DemoPlace`, `DemoDestinations`, GPS-offset fake dropoff coordinates
+✅ Nominatim geocoding via `home/shared/` + `LocationSearchCubit`
+
 ## Don't edit official skills in place
 
 Skills tracked in `skills-lock.json` — run `npx skills update` instead.

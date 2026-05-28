@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-27 — AI agent docs sync
+
+**What changed:** Updated canonical `AGENTS.md` and all agent shims/rules (Cursor, Claude, Codex, Copilot, `.agents/rules/`) with latest features: Nominatim geocoding, per-km pricing, two-phase tracking, native branding assets, new key entry points. Updated `ONBOARDING.md` and `COMMON_PITFALLS.md` agent references.
+
+**Files touched:** `AGENTS.md`, `CURSOR.md`, `CLAUDE.md`, `.agents/AGENTS.md`, `.codex/AGENTS.md`, `.github/copilot-instructions.md`, `.agents/rules/*`, `.cursor/rules/*`, `ONBOARDING.md`, `COMMON_PITFALLS.md`
+
+---
+
 ## 2026-05-27 — README refresh
 
 **What changed:** Updated root `README.md` with latest features (Nominatim geocoding, per-km pricing, two-phase tracking, native branding, production roadmap). Hero image now uses `assets/logo.png` at 560px width.

@@ -24,9 +24,12 @@
 ### Comment-trigger generation
 
 - New BLoC → event/state pattern from canonical doc § State Management.
+- New Cubit (e.g. search) → simpler state class, debounce/cancel for async.
 - New repository method → `Either<Failure, T>` + exception mapping.
 - New screen → `RouteNames` + `app_router.dart` entry.
 - Offline writes → pending sync queue via `SyncService`.
+- Geocoding / place search → `home/shared/` repository + `LocationSearchCubit`; never reintroduce demo place catalog.
+- Fare / pricing → `EstimateFareUseCase` + OSRM distance; branding → `pubspec.yaml` icon/splash generators.
 
 ### Windows / PowerShell
 

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **AI agent docs** — `AGENTS.md` + all tool shims (Cursor, Claude, Codex, Copilot, `.agents/`) and scoped rules updated for Nominatim geocoding, per-km pricing, two-phase tracking, native branding, and current entry points.
+
 - **README** — refreshed with current feature set (Nominatim, per-km fares, two-phase tracking, native branding); hero logo switched to `assets/logo.png` at 560px width.
 
 ### Added

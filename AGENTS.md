@@ -25,7 +25,11 @@
 - [Design Tokens — Never Hardcode](#design-tokens--never-hardcode)
 - [State Management (BLoC)](#state-management-bloc)
 - [Offline-First Architecture](#offline-first-architecture)
+- [Geocoding & Location](#geocoding--location)
 - [Maps & Tracking](#maps--tracking)
+- [Pricing](#pricing)
+- [Branding & Native Assets](#branding--native-assets)
+- [Date & Time Formatting](#date--time-formatting)
 - [API Integration](#api-integration)
 - [DI Registration](#di-registration)
 - [Localization](#localization)
@@ -45,13 +49,17 @@ Flutter ride-hailing / delivery MVP template (**Nokta**). Current version: **`1.
 - **Routing**: GoRouter — use `RouteNames` in `lib/config/routes/route_names.dart`, never hardcode paths
 - **DI**: GetIt in `lib/injection_container.dart`
 - **Networking**: Dio via `ApiClient` + `MockApiInterceptor` for demo JSON
-- **Storage**: Hive boxes for trips, orders, user, notifications, routes; `SharedPreferences` for settings
+- **Storage**: Hive boxes for trips, orders, user, notifications, routes; `SharedPreferences` for settings and saved home/work places
 - **Secrets**: `--dart-define` + `EnvConfig` — never hardcode API keys
 - **Localization**: `easy_localization` + JSON in `assets/translations/` (EN + AR, RTL)
+- **Geocoding**: OpenStreetMap Nominatim — debounced autocomplete, reverse geocode, offline guard (`home/shared/` geocoding layer)
 - **Firebase**: Firebase Core + FCM (optional — app runs with simulated notifications)
 - **Observability**: Talker (`talker_flutter`, `talker_dio_logger`, `talker_bloc_logger`)
 - **Offline-First**: `ConnectivityCubit` + Hive cache + `SyncService` + pending sync queue
 - **Maps**: `flutter_map` (OpenStreetMap tiles), OSRM routing via `RouteService`, tile disk cache
+- **Pricing**: Per-km fares by tier (Economy / Premium / Delivery) via `EstimateFareUseCase` + OSRM route distance
+- **Tracking**: Two-phase simulation (driver → pickup → dropoff), randomized driver placement near pickup (≤8 min approach)
+- **Branding**: Native launcher icons + splash from `assets/app_icon.png` / `assets/logo.png`; in-app wordmark via `assets/logo.svg`
 - **Platform**: Windows 11 development environment (PowerShell-first scripts)
 
 ## Key Entry Points
@@ -64,6 +72,13 @@ Flutter ride-hailing / delivery MVP template (**Nokta**). Current version: **`1.
 | `lib/config/routes/app_router.dart` | GoRouter + auth redirects |
 | `lib/config/routes/route_names.dart` | All route name constants |
 | `lib/core/api/api_client.dart` | Dio wrapper + interceptors |
+| `lib/core/network/route_service.dart` | OSRM routing, route cache, `getTripRoutePlan()` |
+| `lib/core/utils/driver_placement.dart` | Deterministic random driver start near pickup |
+| `lib/features/home/shared/` | Nominatim geocoding (repository, datasource, use cases) |
+| `lib/features/home/ride_request/presentation/cubit/location_search_cubit.dart` | Debounced place search UI state |
+| `lib/features/trips/shared/domain/usecases/estimate_fare_usecase.dart` | Per-km fare by ride tier |
+| `lib/shared/utils/date_time_format.dart` | 12-hour clock formatters app-wide |
+| `pubspec.yaml` | `flutter_launcher_icons` + `flutter_native_splash` config |
 
 ## Feature Architecture
 
@@ -87,7 +102,7 @@ features/<domain>/
         └── widgets/
 ```
 
-**Examples**: `auth/shared/` + `auth/login/`, `trips/shared/` + `trips/trip_list/`, `profile/shared/` + `profile/orders/`.
+**Examples**: `auth/shared/` + `auth/login/`, `home/shared/` (geocoding) + `home/ride_request/`, `trips/shared/` + `trips/trip_list/`, `profile/shared/` + `profile/orders/`.
 
 **Dependency rule**: Presentation → Domain ← Data. Domain has zero Flutter imports.
 
@@ -152,12 +167,52 @@ class FeatureBloc extends Bloc<FeatureEvent, FeatureState> {
 - `PendingSyncLocalDataSource` queues trip mutations when offline
 - `SyncService.syncAll()` drains queue on reconnect or manual sync from profile
 
+## Geocoding & Location
+
+- **Layer**: `lib/features/home/shared/` — `NominatimRemoteDataSource`, `GeocodingRepositoryImpl`, `SearchPlaces`, `ReverseGeocode`
+- **UI**: `LocationSearchCubit` — debounced autocomplete, cancel in-flight requests, offline guard
+- **Saved places**: home/work quick chips via `SavedPlacesLocalDataSource` (SharedPreferences)
+- **Attribution**: Show OSM attribution where required; respect Nominatim usage policy in production (use own instance or commercial geocoder)
+- **Removed**: demo place catalog (`DemoPlace`, `DemoDestinations`) — do not reintroduce GPS-offset fake coordinates
+
 ## Maps & Tracking
 
 - Map widget: `lib/core/widgets/delivery_map.dart`
 - Tile config: `lib/core/utils/map_config.dart`; disk cache: `map_tile_cache.dart`
-- Routing: `RouteService` → OSRM demo server; falls back to straight line offline
-- Tracking: `TrackingBloc` + animated driver marker on `TrackingPage`
+- Routing: `RouteService` → OSRM demo server; deduplicated concurrent requests, 5s timeout, failure backoff, straight-line fallback offline
+- Two-leg routes: `getTripRoutePlan()` — driver → pickup → dropoff via `DriverPlacement.randomStartNearPickup()` (seeded by trip id, ≤8 min approach, retries closer if OSRM ETA too high)
+- Tracking: `TrackingBloc` — two-phase simulation with distance-based progress/ETA, phase labels, remaining km; animated driver marker on `TrackingPage`
+- Route geometry helpers: `concatenateRoutes`, `totalRouteDistance`, `progressAtDistance`, `remainingDistanceMeters`, `projectPointOntoRoute`
+
+## Pricing
+
+- Domain: `PricingConfig`, `TierPricing`, `FareEstimate` in `features/trips/shared/domain/`
+- Use case: `EstimateFareUseCase` — base fare + (distance × rate/km) per tier with minimum fare
+- UI: `RideSelectionSheet` shows dynamic prices and fare breakdown from OSRM route distance
+- Quote data flows into `TripEntity` and displays consistently on list, tracking, and detail screens
+
+## Branding & Native Assets
+
+| Asset | Use |
+|-------|-----|
+| `assets/logo.svg` | In-app wordmark — `AppBrandIcon`, `AppAssets.logo` |
+| `assets/logo.png` | Horizontal wordmark — native splash screen |
+| `assets/app_icon.png` | Square icon — Android adaptive + iOS launcher |
+
+Regenerate native assets after changing logos (full app restart required to see splash):
+
+```bash
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
+```
+
+Config lives in `pubspec.yaml` (`flutter_launcher_icons`, `flutter_native_splash`). Splash background: `#F7F9FC` (`AppColors.surface`).
+
+## Date & Time Formatting
+
+- Centralized in `lib/shared/utils/date_time_format.dart`
+- Use `formatAppClockTime`, `formatTripDate`, `formatAppDateTime` — 12-hour AM/PM app-wide
+- `MaterialApp` forces `alwaysUse24HourFormat: false`
 
 ## API Integration
 
@@ -170,6 +225,8 @@ class FeatureBloc extends Bloc<FeatureEvent, FeatureState> {
 7. Wire into BLoC; register in `injection_container.dart`
 
 Demo mode: `MockApiInterceptor` serves JSON from `assets/mock/`.
+
+External APIs (not mocked): Nominatim geocoding and OSRM routing use real HTTP via Dio — guard offline in UI, respect rate limits in production.
 
 ## DI Registration
 
@@ -199,7 +256,7 @@ Check `lib/shared/widgets/` and `lib/core/widgets/` before building new UI:
 
 **Inputs**: `AppTextField`
 **Buttons**: `AppButton`, `NoktaPrimaryButton`
-**Branding**: `AppBrandIcon`
+**Branding**: `AppBrandIcon` (`assets/logo.svg`), `AppAssets`
 **Navigation**: bottom nav in `main_shell`
 **Maps**: `DeliveryMap`
 **Feedback**: Talker console (long-press profile avatar), toastification
@@ -224,6 +281,7 @@ Check `lib/shared/widgets/` and `lib/core/widgets/` before building new UI:
 | Category | Command |
 |----------|---------|
 | Dart/Flutter | `flutter pub get`, `flutter analyze`, `flutter test`, `dart format <path>`, `dart run build_runner build` |
+| Branding codegen | `dart run flutter_launcher_icons`, `dart run flutter_native_splash:create` |
 | Doc tooling | `.\scripts\sync_ai_ignores.ps1`, `.\scripts\sync_ai_ignores.ps1 -Check`, `.\scripts\check_docs_freshness.ps1`, `.\scripts\check_skills_drift.ps1` |
 | Skills sync | `npx skills update`, `npx skills check` |
 | Lint | `npx markdownlint-cli2 "**/*.md"` |

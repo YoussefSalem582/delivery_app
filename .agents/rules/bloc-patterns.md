@@ -13,7 +13,8 @@ alwaysApply: false
 ## Rules
 
 - BLoCs call **use cases** returning `Either<Failure, T>`, not repositories
-- Use `result.fold((failure) => ..., (data) => ...)` in handlers
+- Cubits (e.g. `LocationSearchCubit`, `SettingsCubit`, `ConnectivityCubit`) for simpler UI/global state — debounce and cancel async work where needed
+- Use `result.fold((failure) => ..., (data) => ...)` in BLoC handlers
 - `BlocBuilder` for UI, `BlocListener` for side effects, `BlocConsumer` for both
 - Talker logs transitions via `TalkerBlocObserver` in `main.dart`
 

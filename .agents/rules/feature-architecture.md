@@ -38,5 +38,5 @@ Presentation → Domain ← Data. Domain has zero Flutter imports.
 
 ## Presentation
 
-- BLoC calls use cases only
+- BLoC calls use cases only; Cubits for lighter UI state (e.g. `LocationSearchCubit`)
 - Register BLoCs as `registerFactory` in `injection_container.dart`

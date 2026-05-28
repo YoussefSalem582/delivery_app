@@ -7,6 +7,13 @@
 
 - Edit files **only** inside `delivery_app/` (this repo).
 
+## Current feature snapshot (see canonical doc for details)
+
+- Nominatim geocoding in `home/shared/` + `LocationSearchCubit`
+- Per-km pricing via `EstimateFareUseCase`; two-phase tracking via `TrackingBloc`
+- Native branding: `flutter_launcher_icons` + `flutter_native_splash` in `pubspec.yaml`
+- Live status: [`../tech_readme_files/CURRENT_STATUS.md`](../tech_readme_files/CURRENT_STATUS.md)
+
 ## Skills (in this directory)
 
 All skill prompts live in [`./skills/`](./skills/) in universal SKILL.md format. **22 skills total**:

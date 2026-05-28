@@ -19,6 +19,7 @@
 - **Flutter**: SDK on PATH; run via `flutter <command>`.
 - **Approved commands** (no prompt needed):
   - Build / codegen: `flutter pub get`, `flutter analyze`, `flutter test`, `dart format`, `dart run build_runner build`
+  - Branding: `dart run flutter_launcher_icons`, `dart run flutter_native_splash:create`
   - Doc tooling: `.\scripts\sync_ai_ignores.ps1`, `.\scripts\sync_ai_ignores.ps1 -Check`, `.\scripts\check_docs_freshness.ps1`, `.\scripts\check_skills_drift.ps1`
   - Skills sync: `npx skills update`, `npx skills check`
 
