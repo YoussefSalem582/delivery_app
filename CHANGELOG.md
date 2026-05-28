@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL after merge to `main`: `https://youssefsalem582.github.io/delivery_app/`
+- **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL: `https://youssefsalem582.github.io/delivery_app/` (deploys from `feature/web-client-demo` via GitHub Actions)
 
 ### Changed
 

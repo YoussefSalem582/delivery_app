@@ -129,7 +129,7 @@ flutter run -d chrome
 flutter build web --release --base-href /delivery_app/
 ```
 
-Live demo (after merge to `main` + [GitHub Pages Actions setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)): **https://youssefsalem582.github.io/delivery_app/**
+Live demo (after push to `feature/web-client-demo` + [GitHub Pages Actions setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)): **https://youssefsalem582.github.io/delivery_app/**
 
 Do a **full restart** (not hot reload) after changing native splash or launcher icons.
 

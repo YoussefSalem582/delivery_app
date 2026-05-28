@@ -22,16 +22,17 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 - ✅ **Observability** — Talker (Dio, BLoC, in-app console)
 - ✅ **Agent docs** — AGENTS.md, 22 skills, Cursor/Claude/Codex/Copilot shims
 - ✅ **Native branding** — Android/iOS/Web launcher icons from `assets/app_icon.png` via `flutter_launcher_icons`; native splash + in-app wordmark use `assets/logo.png` (light) / `assets/logo_light.png` (dark)
-- ✅ **Web client demo** — shareable link with device frame (`device_preview`); auto-deploy to GitHub Pages on `main`
+- ✅ **Web client demo** — shareable link with device frame (`device_preview`); auto-deploy to GitHub Pages from `feature/web-client-demo`
 
 ## Client demo (web)
 
 | Item | Detail |
 |------|--------|
-| **Live URL** | https://youssefsalem582.github.io/delivery_app/ (live after merge to `main` + GitHub Pages Actions setup) |
+| **Live URL** | https://youssefsalem582.github.io/delivery_app/ (deploys from `feature/web-client-demo` via GitHub Actions) |
+| **Deploy trigger** | Push to `feature/web-client-demo` or manual **Deploy Web Demo** workflow run |
 | **Local preview** | `flutter run -d chrome` |
 | **Release build** | `flutter build web --release --base-href /delivery_app/` |
-| **Deploy** | Push to `main` triggers `.github/workflows/deploy-web-demo.yml` |
+| **Deploy** | Push to `feature/web-client-demo` triggers `.github/workflows/deploy-web-demo.yml` |
 
 **Web demo limits:** push notifications simulated only; no Workmanager background sync; geocoding uses Photon (not Nominatim); open-in-maps opens Google Maps in a new tab.
 
@@ -46,7 +47,7 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |
 | Settings (theme, locale, driver mode) | ✅ Complete (shared `AppModeSwitchTile`, `LogoutButton`, `performAppLogout`) |
 | Driver mode (shell, offers, jobs, active trip) | ✅ Demo complete (offer map preview with passenger sheet; active trip uses shared `TrackingBloc` / `LiveTrackingPage`) |
-| Web client demo (Device Preview + GitHub Pages) | ✅ Implemented on `feature/web-client-demo`; deploys from `main` |
+| Web client demo (Device Preview + GitHub Pages) | ✅ On `feature/web-client-demo`; deploys via GitHub Actions (no merge to `main` required) |
 | Real backend integration | 🚧 Mock API only |
 | Production auth (secure storage) | 🚧 Planned |
 | Payments / wallet (real) | 🚧 Demo top-up only (Hive-local) |

@@ -14,7 +14,7 @@
 
 ## 2026-05-28 — Web client demo (Device Preview + GitHub Pages)
 
-**What changed:** Flutter Web platform; `device_preview` shell on `kIsWeb`; Photon geocoding for browser CORS; web guards for Workmanager and map tile disk cache; `map_launcher` without `dart:io`; GitHub Actions deploy to Pages on `main` push.
+**What changed:** Flutter Web platform; `device_preview` shell on `kIsWeb`; Photon geocoding for browser CORS; web guards for Workmanager and map tile disk cache; `map_launcher` without `dart:io`; GitHub Actions deploy to Pages on `feature/web-client-demo` push.
 
 **Demo URL (after merge + Pages setup):** https://youssefsalem582.github.io/delivery_app/
 
