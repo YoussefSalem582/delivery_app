@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Tracking page dispose crash** — `TrackingPage` holds bloc reference directly instead of `context.read` in `dispose()`.
 - **Absurd approach distance** — when mock driver GPS is >5 km from pickup (e.g. catalog Cairo coords vs device GPS), snap driver to a demo offset near pickup before building the two-leg route.
+- **OSRM route timeouts** — deduplicate concurrent `getRoute` calls, cache straight-line fallbacks, use 5s OSRM timeout, and skip OSRM for 5 min after failure on the same route key.
 
 ### Changed
 

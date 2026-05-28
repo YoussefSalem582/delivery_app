@@ -54,14 +54,19 @@ class RouteService {
   final RouteCacheLocalDataSource _routeCache;
 
   static const _osrmBase = 'https://router.project-osrm.org';
+  static const _osrmConnectTimeout = Duration(seconds: 5);
+  static const _osrmReceiveTimeout = Duration(seconds: 8);
+  static const _osrmFailureCooldown = Duration(minutes: 5);
+
   final _memoryCache = <String, RouteResult>{};
+  final _inFlight = <String, Future<RouteResult>>{};
+  final _osrmFailureAt = <String, DateTime>{};
 
   Future<RouteResult> getRoute({
     required LatLng pickup,
     required LatLng dropoff,
   }) async {
-    final cacheKey =
-        '${pickup.latitude},${pickup.longitude}_${dropoff.latitude},${dropoff.longitude}';
+    final cacheKey = _cacheKey(pickup, dropoff);
 
     final memory = _memoryCache[cacheKey];
     if (memory != null) return memory;
@@ -79,13 +84,46 @@ class RouteService {
       return result;
     }
 
+    final inflight = _inFlight[cacheKey];
+    if (inflight != null) {
+      _talker.info('[RouteService] Awaiting in-flight route request');
+      return inflight;
+    }
+
+    final request = _resolveRoute(pickup, dropoff, cacheKey);
+    _inFlight[cacheKey] = request;
+    try {
+      return await request;
+    } finally {
+      _inFlight.remove(cacheKey);
+    }
+  }
+
+  Future<RouteResult> _resolveRoute(
+    LatLng pickup,
+    LatLng dropoff,
+    String cacheKey,
+  ) async {
     const distanceCalc = Distance();
     final straightMeters = distanceCalc(pickup, dropoff);
     if (straightMeters > DemoDestinations.maxOsrmDistanceMeters) {
       _talker.info(
         '[RouteService] Route exceeds OSRM demo range, using straight line',
       );
-      return _fallbackRoute(pickup, dropoff, straightMeters);
+      return _cacheRoute(
+        cacheKey,
+        _fallbackRoute(pickup, dropoff, straightMeters),
+      );
+    }
+
+    if (_isOsrmInCooldown(cacheKey)) {
+      _talker.info(
+        '[RouteService] OSRM recently failed for route; using cached straight line',
+      );
+      return _cacheRoute(
+        cacheKey,
+        _fallbackRoute(pickup, dropoff, straightMeters),
+      );
     }
 
     try {
@@ -100,18 +138,28 @@ class RouteService {
         options: Options(
           extra: {'skipMockInterceptor': true},
           validateStatus: (status) => status != null && status < 500,
+          connectTimeout: _osrmConnectTimeout,
+          receiveTimeout: _osrmReceiveTimeout,
         ),
       );
 
       if (response.statusCode == 400) {
         _talker.info('[RouteService] OSRM returned no route, using straight line');
-        return _fallbackRoute(pickup, dropoff, straightMeters);
+        _markOsrmFailure(cacheKey);
+        return _cacheRoute(
+          cacheKey,
+          _fallbackRoute(pickup, dropoff, straightMeters),
+        );
       }
 
       final data = response.data;
       final routes = data?['routes'] as List<dynamic>?;
       if (routes == null || routes.isEmpty) {
-        return _fallbackRoute(pickup, dropoff, straightMeters);
+        _markOsrmFailure(cacheKey);
+        return _cacheRoute(
+          cacheKey,
+          _fallbackRoute(pickup, dropoff, straightMeters),
+        );
       }
 
       final route = routes.first as Map<String, dynamic>;
@@ -132,21 +180,15 @@ class RouteService {
         distanceMeters: (route['distance'] as num).toDouble(),
         durationSeconds: (route['duration'] as num).toDouble(),
       );
-      _memoryCache[cacheKey] = result;
-      await _routeCache.put(
-        RouteCacheEntity(
-          cacheKey: cacheKey,
-          points: points,
-          distanceMeters: result.distanceMeters,
-          durationSeconds: result.durationSeconds,
-          createdAt: DateTime.now(),
-        ),
-      );
-      _talker.info('[RouteService] OSRM route with ${points.length} points');
-      return result;
+      _osrmFailureAt.remove(cacheKey);
+      return _cacheRoute(cacheKey, result);
     } catch (e, st) {
       _talker.handle(e, st, '[RouteService] Falling back to straight line');
-      return _fallbackRoute(pickup, dropoff, straightMeters);
+      _markOsrmFailure(cacheKey);
+      return _cacheRoute(
+        cacheKey,
+        _fallbackRoute(pickup, dropoff, straightMeters),
+      );
     }
   }
 
@@ -196,6 +238,39 @@ class RouteService {
       totalDistanceMeters: totalDistanceMeters,
       totalDurationSeconds: totalDurationSeconds,
     );
+  }
+
+  String _cacheKey(LatLng pickup, LatLng dropoff) =>
+      '${pickup.latitude},${pickup.longitude}_${dropoff.latitude},${dropoff.longitude}';
+
+  bool _isOsrmInCooldown(String cacheKey) {
+    final failedAt = _osrmFailureAt[cacheKey];
+    if (failedAt == null) return false;
+    return DateTime.now().difference(failedAt) < _osrmFailureCooldown;
+  }
+
+  void _markOsrmFailure(String cacheKey) {
+    _osrmFailureAt[cacheKey] = DateTime.now();
+  }
+
+  Future<RouteResult> _cacheRoute(String cacheKey, RouteResult result) async {
+    _memoryCache[cacheKey] = result;
+    await _routeCache.put(
+      RouteCacheEntity(
+        cacheKey: cacheKey,
+        points: result.points,
+        distanceMeters: result.distanceMeters,
+        durationSeconds: result.durationSeconds,
+        createdAt: DateTime.now(),
+      ),
+    );
+    if (!result.fromCache) {
+      _talker.info(
+        '[RouteService] Route cached (${result.points.length} points, '
+        '${result.distanceMeters.toStringAsFixed(0)} m)',
+      );
+    }
+    return result;
   }
 
   RouteResult _fallbackRoute(

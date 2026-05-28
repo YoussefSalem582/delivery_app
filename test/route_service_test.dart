@@ -128,8 +128,81 @@ void main() {
       ),
     );
 
-    final pickup = const LatLng(30.0, 31.0);
-    final dropoff = const LatLng(30.1, 31.1);
+    const pickup = LatLng(30.0, 31.0);
+    const dropoff = LatLng(30.1, 31.1);
+
+    await routeService.getRoute(pickup: pickup, dropoff: dropoff);
+    await routeService.getRoute(pickup: pickup, dropoff: dropoff);
+
+    verify(
+      () => dio.get<Map<String, dynamic>>(
+        any(),
+        queryParameters: any(named: 'queryParameters'),
+        options: any(named: 'options'),
+      ),
+    ).called(1);
+  });
+
+  test('deduplicates concurrent requests for the same route', () async {
+    when(() => dio.get<Map<String, dynamic>>(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        )).thenAnswer(
+      (_) async {
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        return Response(
+          requestOptions: RequestOptions(path: '/route'),
+          data: {
+            'routes': [
+              {
+                'distance': 1000.0,
+                'duration': 120.0,
+                'geometry': {
+                  'coordinates': [
+                    [31.0, 30.0],
+                    [31.1, 30.1],
+                  ],
+                },
+              },
+            ],
+          },
+        );
+      },
+    );
+
+    const pickup = LatLng(30.0, 31.0);
+    const dropoff = LatLng(30.1, 31.1);
+
+    final results = await Future.wait([
+      routeService.getRoute(pickup: pickup, dropoff: dropoff),
+      routeService.getRoute(pickup: pickup, dropoff: dropoff),
+    ]);
+
+    expect(results[0].distanceMeters, results[1].distanceMeters);
+    verify(
+      () => dio.get<Map<String, dynamic>>(
+        any(),
+        queryParameters: any(named: 'queryParameters'),
+        options: any(named: 'options'),
+      ),
+    ).called(1);
+  });
+
+  test('caches fallback route after OSRM failure', () async {
+    when(() => dio.get<Map<String, dynamic>>(
+          any(),
+          queryParameters: any(named: 'queryParameters'),
+          options: any(named: 'options'),
+        )).thenThrow(
+      DioException(
+        requestOptions: RequestOptions(path: '/route'),
+        type: DioExceptionType.connectionTimeout,
+      ),
+    );
+
+    const pickup = LatLng(30.0, 31.0);
+    const dropoff = LatLng(30.1, 31.1);
 
     await routeService.getRoute(pickup: pickup, dropoff: dropoff);
     await routeService.getRoute(pickup: pickup, dropoff: dropoff);
