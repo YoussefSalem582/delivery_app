@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-28 — Skills lock resync (CI)
+
+**What changed:** Ran `npx skills update` to refresh `dart-migrate-to-checks-package` from upstream and updated `skills-lock.json` `computedHash` so `scripts/docs/check_skills_drift.sh` passes in docs workflow.
+
+**Files touched:** `.agents/skills/dart-migrate-to-checks-package/SKILL.md`, `skills-lock.json`
+
+---
+
 ## 2026-05-28 — Web PWA icons aligned with mobile
 
 **What changed:** `flutter_launcher_icons` `web:` config generates favicon + 192/512/maskable icons from `assets/app_icon.png`; `web/manifest.json` branded as Nokta with primary theme color.

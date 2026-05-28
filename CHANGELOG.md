@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Skills lock drift (CI)** — resynced `dart-migrate-to-checks-package` from upstream via `npx skills update` and updated `skills-lock.json` so `check_skills_drift` passes.
+
 ### Added
 
 - **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL: `https://youssefsalem582.github.io/delivery_app/` (deploys from `feature/web-client-demo` via GitHub Actions)

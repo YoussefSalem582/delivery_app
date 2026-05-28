@@ -35,7 +35,7 @@
       "source": "dart-lang/skills",
       "sourceType": "github",
       "skillPath": "skills/dart-migrate-to-checks-package/SKILL.md",
-      "computedHash": "f0a9f90e76e4e807ff6fac2566913feaf6823df2456ff05efa20de75a064a8ff"
+      "computedHash": "c9e99ca93c56a78000d1afd1bbe9abdd263d0568ec3993b4034365dd663e0838"
     },
     "dart-resolve-package-conflicts": {
       "source": "dart-lang/skills",

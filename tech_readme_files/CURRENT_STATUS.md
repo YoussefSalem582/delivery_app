@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 28, 2026 — Web client demo (Device Preview + GitHub Pages).
+> **Last Updated:** May 28, 2026 — Skills lock resync for docs CI.
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
 > **Status:** ✅ MVP template complete | ✅ Dual-mode driver demo | ✅ Web client demo | 🚧 Production backend TBD
