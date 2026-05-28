@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-05-27 — Notifications dark mode contrast fix
+
+**What changed:** Fixed near-invisible notification titles in dark mode by assigning `titleSmall`/`titleMedium` colors in `AppTextStyles` and explicit `NotificationTheme` text colors (`onSurface` titles, brighter section headers, app bar title/action). Prior dark polish (card elevation, accents) retained.
+
+**Files touched:** `lib/config/theme/app_text_styles.dart`, `lib/features/notifications/notification_list/presentation/utils/notification_theme.dart`, `notification_tile.dart`, `notifications_page.dart`, `notification_empty_state.dart`, `CHANGELOG.md`
+
+---
+
+## 2026-05-27 — Notifications dark mode polish
+
+**What changed:** Added `NotificationTheme` helper and applied theme-aware colors across inbox widgets — unread cards use higher elevation in dark, `inversePrimary` accent bar/dot/borders, subtle card shadow, filter bar border/segment styling, empty-state icon tint, and mark-all-read button color.
+
+**Files touched:** `lib/features/notifications/notification_list/presentation/utils/notification_theme.dart`, `notification_tile.dart`, `notification_type_icon.dart`, `notification_filter_bar.dart`, `notification_empty_state.dart`, `notification_list_body.dart`, `notifications_page.dart`, `CHANGELOG.md`
+
+---
+
+## 2026-05-27 — Notifications list layout fix
+
+**What changed:** Fixed `BoxConstraints forces an infinite height` on notifications tab by wrapping the tile `Row` in `IntrinsicHeight`.
+
+**Files touched:** `lib/features/notifications/notification_list/presentation/widgets/notification_tile.dart`, `CHANGELOG.md`
+
+---
+
+## 2026-05-27 — Notifications inbox UX refactor
+
+**What changed:** Refactored notifications tab into decomposed widgets with `NotificationType`, grouped list (Today/Yesterday/Earlier), All/Unread `SegmentedButton`, swipe-to-delete with undo snackbar, mark-all-read AppBar action, pull-to-refresh, `ErrorView` retry, and bottom-nav unread `Badge`.
+
+**Files touched:** `lib/features/notifications/**`, `lib/shared/widgets/navigation/app_bottom_nav_bar.dart`, `lib/features/home/main_shell/presentation/pages/main_shell_page.dart`, `lib/core/network/fcm_service.dart`, `lib/core/cache/entities/hive_adapters.dart`, `assets/mock/notifications.json`, `assets/translations/en.json`, `assets/translations/ar.json`, `CHANGELOG.md`, `CURRENT_STATUS.md`
+
+---
+
 ## 2026-05-27 — Onboarding top bar polish
 
 **What changed:** Replaced "Nokta" text with theme-aware `AppBrandIcon` wordmark; redesigned skip control as a bordered pill button with forward arrow and improved tap target.

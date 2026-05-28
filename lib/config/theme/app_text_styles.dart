@@ -33,6 +33,18 @@ abstract final class AppTextStyles {
         fontWeight: FontWeight.w600,
         color: colorScheme.onSurface,
       ),
+      titleMedium: base.titleMedium?.copyWith(
+        fontSize: 16,
+        height: 24 / 16,
+        fontWeight: FontWeight.w600,
+        color: colorScheme.onSurface,
+      ),
+      titleSmall: base.titleSmall?.copyWith(
+        fontSize: 14,
+        height: 20 / 14,
+        fontWeight: FontWeight.w600,
+        color: colorScheme.onSurface,
+      ),
       bodyLarge: base.bodyLarge?.copyWith(
         fontSize: 16,
         height: 24 / 16,

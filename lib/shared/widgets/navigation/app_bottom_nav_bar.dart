@@ -56,10 +56,10 @@ class AppBottomNavBar extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        selected ? dest.selectedIcon : dest.icon,
+                      _NavIcon(
+                        destination: dest,
+                        selected: selected,
                         color: color,
-                        size: 24,
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -96,11 +96,42 @@ class AppNavDestination {
     required this.icon,
     required this.selectedIcon,
     required this.label,
+    this.badgeCount,
   });
 
   final IconData icon;
   final IconData selectedIcon;
   final String label;
+  final int? badgeCount;
+}
+
+class _NavIcon extends StatelessWidget {
+  const _NavIcon({
+    required this.destination,
+    required this.selected,
+    required this.color,
+  });
+
+  final AppNavDestination destination;
+  final bool selected;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final icon = Icon(
+      selected ? destination.selectedIcon : destination.icon,
+      color: color,
+      size: 24,
+    );
+
+    final count = destination.badgeCount;
+    if (count == null || count <= 0) return icon;
+
+    return Badge(
+      label: Text(count > 99 ? '99+' : '$count'),
+      child: icon,
+    );
+  }
 }
 
 class AppSheetHandle extends StatelessWidget {

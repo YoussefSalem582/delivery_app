@@ -5,5 +5,6 @@ abstract class NotificationRepository {
   Future<void> addNotification(NotificationEntity notification);
   Future<void> markAsRead(String id);
   Future<void> markAllAsRead();
+  Future<void> deleteNotification(String id);
   int get unreadCount;
 }

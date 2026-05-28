@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/core/utils/constants.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -55,6 +56,7 @@ class RequestRideBloc extends Bloc<RequestRideEvent, RequestRideState> {
           title: 'notification_trip_update',
           body: 'notification_trip_accepted',
           tripId: trip.id,
+          type: NotificationType.tripAccepted,
         );
         _onTripsChanged?.call();
         emit(RequestRideSuccess(trip));

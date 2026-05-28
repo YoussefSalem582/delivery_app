@@ -221,6 +221,9 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetCachedOrdersUseCase(sl()));
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkNotificationReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAllNotificationsReadUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteNotificationUseCase(sl()));
+  sl.registerLazySingleton(() => AddNotificationUseCase(sl()));
   sl.registerLazySingleton(() => GetUnreadNotificationCountUseCase(sl()));
   sl.registerLazySingleton(() => SearchPlacesUseCase(sl()));
   sl.registerLazySingleton(() => ReverseGeocodeUseCase(sl()));
@@ -330,6 +333,9 @@ Future<void> initDependencies() async {
     () => NotificationBloc(
       getNotifications: sl(),
       markNotificationRead: sl(),
+      markAllRead: sl(),
+      deleteNotification: sl(),
+      addNotification: sl(),
       getUnreadCount: sl(),
     ),
   );

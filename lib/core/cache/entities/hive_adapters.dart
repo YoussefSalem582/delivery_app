@@ -6,6 +6,7 @@ import 'package:delivery_app/core/cache/entities/cache_metadata_entity.dart';
 import 'package:delivery_app/core/cache/entities/pending_sync_entity.dart';
 import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
 import 'package:delivery_app/features/notifications/shared/domain/entities/notification_entity.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/features/profile/shared/domain/entities/order_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/location_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/route_cache_entity.dart';
@@ -232,13 +233,23 @@ class NotificationEntityAdapter extends TypeAdapter<NotificationEntity> {
 
   @override
   NotificationEntity read(BinaryReader reader) {
+    final id = reader.readString();
+    final title = reader.readString();
+    final body = reader.readString();
+    final createdAt = DateTime.parse(reader.readString());
+    final tripId = reader.readBool() ? reader.readString() : null;
+    final isRead = reader.readBool();
+    final type = reader.availableBytes > 0
+        ? NotificationType.values[reader.readByte()]
+        : NotificationType.inferFromTitleKey(title);
     return NotificationEntity(
-      id: reader.readString(),
-      title: reader.readString(),
-      body: reader.readString(),
-      createdAt: DateTime.parse(reader.readString()),
-      tripId: reader.readBool() ? reader.readString() : null,
-      isRead: reader.readBool(),
+      id: id,
+      title: title,
+      body: body,
+      createdAt: createdAt,
+      tripId: tripId,
+      isRead: isRead,
+      type: type,
     );
   }
 
@@ -251,7 +262,9 @@ class NotificationEntityAdapter extends TypeAdapter<NotificationEntity> {
       ..writeString(obj.createdAt.toIso8601String())
       ..writeBool(obj.tripId != null);
     if (obj.tripId != null) writer.writeString(obj.tripId!);
-    writer.writeBool(obj.isRead);
+    writer
+      ..writeBool(obj.isRead)
+      ..writeByte(obj.type.index);
   }
 }
 

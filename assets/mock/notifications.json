@@ -5,7 +5,8 @@
     "body": "notification_driver_heading_pickup",
     "createdAt": "2026-05-25T10:00:00.000Z",
     "tripId": "trip-001",
-    "isRead": false
+    "isRead": false,
+    "type": "driverOnTheWay"
   },
   {
     "id": "notif-002",
@@ -13,6 +14,7 @@
     "body": "notification_thanks_riding",
     "createdAt": "2026-05-24T18:30:00.000Z",
     "tripId": "trip-002",
-    "isRead": true
+    "isRead": true,
+    "type": "tripCompleted"
   }
 ]

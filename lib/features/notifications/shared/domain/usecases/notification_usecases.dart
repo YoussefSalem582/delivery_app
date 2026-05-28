@@ -55,3 +55,58 @@ class GetUnreadNotificationCountUseCase extends UseCase<int, NoParams> {
     return Right(_repository.unreadCount);
   }
 }
+
+class MarkAllNotificationsReadUseCase extends UseCase<void, NoParams> {
+  MarkAllNotificationsReadUseCase(this._repository);
+
+  final NotificationRepository _repository;
+
+  @override
+  Future<Either<Failure, void>> call(NoParams params) async {
+    try {
+      await _repository.markAllAsRead();
+      return const Right(null);
+    } catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+}
+
+class DeleteNotificationParams {
+  const DeleteNotificationParams(this.id);
+
+  final String id;
+}
+
+class AddNotificationUseCase extends UseCase<void, NotificationEntity> {
+  AddNotificationUseCase(this._repository);
+
+  final NotificationRepository _repository;
+
+  @override
+  Future<Either<Failure, void>> call(NotificationEntity params) async {
+    try {
+      await _repository.addNotification(params);
+      return const Right(null);
+    } catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+}
+
+class DeleteNotificationUseCase
+    extends UseCase<void, DeleteNotificationParams> {
+  DeleteNotificationUseCase(this._repository);
+
+  final NotificationRepository _repository;
+
+  @override
+  Future<Either<Failure, void>> call(DeleteNotificationParams params) async {
+    try {
+      await _repository.deleteNotification(params.id);
+      return const Right(null);
+    } catch (e) {
+      return Left(mapExceptionToFailure(e));
+    }
+  }
+}

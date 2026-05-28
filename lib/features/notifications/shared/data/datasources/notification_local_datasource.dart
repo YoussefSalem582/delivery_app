@@ -22,6 +22,10 @@ class NotificationLocalDataSource {
     }
   }
 
+  Future<void> delete(String id) async {
+    await _box.delete(id);
+  }
+
   int get unreadCount => _box.values.where((n) => !n.isRead).length;
 }
 

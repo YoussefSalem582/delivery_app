@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/core/utils/route_geometry.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
@@ -382,6 +383,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
           title: 'notification_trip_update',
           body: 'status_completed',
           tripId: completed.id,
+          type: NotificationType.tripCompleted,
         );
         _onTripsChanged?.call();
       },

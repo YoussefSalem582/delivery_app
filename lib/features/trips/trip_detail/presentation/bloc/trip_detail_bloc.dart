@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:delivery_app/core/error/failures.dart';
 import 'package:delivery_app/core/network/fcm_service.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_payment.dart';
@@ -78,6 +79,7 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
             title: 'notification_trip_update',
             body: 'notification_driver_arrived',
             tripId: trip.id,
+            type: NotificationType.driverArrived,
           );
         }
         _onTripsChanged?.call();
@@ -117,6 +119,7 @@ class TripDetailBloc extends Bloc<TripDetailEvent, TripDetailState> {
           title: 'notification_trip_update',
           body: 'status_completed',
           tripId: trip.id,
+          type: NotificationType.tripCompleted,
         );
         _onTripsChanged?.call();
         emit(TripDetailLoaded(trip));

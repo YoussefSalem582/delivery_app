@@ -64,5 +64,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
+  Future<void> deleteNotification(String id) async {
+    await _local.delete(id);
+  }
+
+  @override
   int get unreadCount => _local.unreadCount;
 }

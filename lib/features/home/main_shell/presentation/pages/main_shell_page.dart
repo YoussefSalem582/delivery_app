@@ -8,6 +8,7 @@ import 'package:delivery_app/features/trips/trip_list/presentation/pages/trip_li
 import 'package:delivery_app/injection_container.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// Bottom navigation shell for authenticated ride-hailing tabs.
@@ -36,34 +37,43 @@ class _MainShellPageState extends State<MainShellPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: widget.navigationShell,
-      bottomNavigationBar: AppBottomNavBar(
-        selectedIndex: widget.navigationShell.currentIndex,
-        onDestinationSelected: _onTabSelected,
-        destinations: [
-          AppNavDestination(
-            icon: Icons.home_outlined,
-            selectedIcon: Icons.home,
-            label: 'home_tab'.tr(),
+    return BlocBuilder<NotificationBloc, NotificationState>(
+      builder: (context, notificationState) {
+        final unreadCount = notificationState is NotificationLoaded
+            ? notificationState.unreadCount
+            : 0;
+
+        return Scaffold(
+          body: widget.navigationShell,
+          bottomNavigationBar: AppBottomNavBar(
+            selectedIndex: widget.navigationShell.currentIndex,
+            onDestinationSelected: _onTabSelected,
+            destinations: [
+              AppNavDestination(
+                icon: Icons.home_outlined,
+                selectedIcon: Icons.home,
+                label: 'home_tab'.tr(),
+              ),
+              AppNavDestination(
+                icon: Icons.directions_car_outlined,
+                selectedIcon: Icons.directions_car,
+                label: 'trips_tab'.tr(),
+              ),
+              AppNavDestination(
+                icon: Icons.notifications_outlined,
+                selectedIcon: Icons.notifications,
+                label: 'notifications_tab'.tr(),
+                badgeCount: unreadCount,
+              ),
+              AppNavDestination(
+                icon: Icons.person_outline,
+                selectedIcon: Icons.person,
+                label: 'profile_tab'.tr(),
+              ),
+            ],
           ),
-          AppNavDestination(
-            icon: Icons.directions_car_outlined,
-            selectedIcon: Icons.directions_car,
-            label: 'trips_tab'.tr(),
-          ),
-          AppNavDestination(
-            icon: Icons.notifications_outlined,
-            selectedIcon: Icons.notifications,
-            label: 'notifications_tab'.tr(),
-          ),
-          AppNavDestination(
-            icon: Icons.person_outline,
-            selectedIcon: Icons.person,
-            label: 'profile_tab'.tr(),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

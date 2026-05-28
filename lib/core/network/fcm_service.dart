@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:delivery_app/features/notifications/shared/domain/entities/notification_entity.dart';
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/features/notifications/shared/domain/repositories/notification_repository.dart';
 
 typedef NotificationHandler = void Function(NotificationEntity notification);
@@ -46,12 +47,14 @@ class FcmService {
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
+    final typeKey = message.data['type'] as String?;
     final notification = NotificationEntity(
       id: message.messageId ?? _uuid.v4(),
-      title: message.notification?.title ?? 'Trip Update',
+      title: message.notification?.title ?? 'notification_trip_update',
       body: message.notification?.body ?? '',
       createdAt: DateTime.now(),
       tripId: message.data['tripId'] as String?,
+      type: NotificationType.fromJsonKey(typeKey),
     );
     await _saveAndEmit(notification);
   }
@@ -64,6 +67,7 @@ class FcmService {
     required String title,
     required String body,
     String? tripId,
+    NotificationType type = NotificationType.tripUpdate,
   }) async {
     final notification = NotificationEntity(
       id: _uuid.v4(),
@@ -71,6 +75,7 @@ class FcmService {
       body: body,
       createdAt: DateTime.now(),
       tripId: tripId,
+      type: type,
     );
     await _saveAndEmit(notification);
     _talker.info('[FCM] Simulated notification: $title');

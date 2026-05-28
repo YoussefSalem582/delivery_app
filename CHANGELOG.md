@@ -11,11 +11,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Notifications screen** — full inbox UX: typed notifications (`NotificationType`), All/Unread filter, Today/Yesterday/Earlier grouping, swipe-to-delete with undo, mark-all-read, pull-to-refresh, error retry, and bottom-nav unread badge.
+- **Notifications dark mode** — theme-aware inbox styling via `NotificationTheme`: elevated unread cards (`surfaceContainerHigh`), `inversePrimary` accents/borders, subtle unread glow, improved filter bar and empty state, and brighter mark-all-read action.
+- **Dark text theme** — `titleSmall` / `titleMedium` now use `colorScheme.onSurface` in `AppTextStyles` (fixes near-invisible notification titles and other screens using those styles in dark mode).
+
 - **Onboarding logo animation** — replaced broken Hero/PageView approach with a simple anchored slide animation (center circle → top bar).
 
 - **README** — refreshed with current feature set (Nominatim, per-km fares, two-phase tracking, native branding); hero logo switched to `assets/logo.png` at 560px width.
 
 ### Added
+
+- **Notification domain types** — `NotificationType` on `NotificationEntity` (Hive + mock JSON + FCM/simulated producers); `MarkAllNotificationsRead`, `DeleteNotification`, and `AddNotification` use cases.
 
 - **Native branding assets** — `flutter_launcher_icons` + `flutter_native_splash` generate Android/iOS app icons from `assets/app_icon.png` and native splash screens from `assets/logo.png` (surface `#F7F9FC` background); fixed Android adaptive icon XML (`mipmap-anydpi-v26`).
 
@@ -23,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Notifications list layout** — wrap notification tile content in `IntrinsicHeight` so the unread accent bar no longer triggers unbounded-height `Row` errors in `ListView`.
 - **Tracking page dispose crash** — `TrackingPage` holds bloc reference directly instead of `context.read` in `dispose()`.
 - **OSRM route timeouts** — deduplicate concurrent `getRoute` calls, cache straight-line fallbacks, use 5s OSRM timeout, and skip OSRM for 5 min after failure on the same route key.
 

@@ -1,3 +1,4 @@
+import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:hive/hive.dart';
 
 class NotificationEntity extends HiveObject {
@@ -8,6 +9,7 @@ class NotificationEntity extends HiveObject {
     required this.createdAt,
     this.tripId,
     this.isRead = false,
+    this.type = NotificationType.general,
   });
 
   final String id;
@@ -16,8 +18,12 @@ class NotificationEntity extends HiveObject {
   final DateTime createdAt;
   final String? tripId;
   final bool isRead;
+  final NotificationType type;
 
-  NotificationEntity copyWith({bool? isRead}) {
+  NotificationEntity copyWith({
+    bool? isRead,
+    NotificationType? type,
+  }) {
     return NotificationEntity(
       id: id,
       title: title,
@@ -25,6 +31,7 @@ class NotificationEntity extends HiveObject {
       createdAt: createdAt,
       tripId: tripId,
       isRead: isRead ?? this.isRead,
+      type: type ?? this.type,
     );
   }
 
@@ -35,6 +42,7 @@ class NotificationEntity extends HiveObject {
         'createdAt': createdAt.toIso8601String(),
         'tripId': tripId,
         'isRead': isRead,
+        'type': type.toJsonKey(),
       };
 
   factory NotificationEntity.fromJson(Map<String, dynamic> json) {
@@ -45,6 +53,7 @@ class NotificationEntity extends HiveObject {
       createdAt: DateTime.parse(json['createdAt'] as String),
       tripId: json['tripId'] as String?,
       isRead: json['isRead'] as bool? ?? false,
+      type: NotificationType.fromJsonKey(json['type'] as String?),
     );
   }
 }
