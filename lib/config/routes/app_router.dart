@@ -62,13 +62,13 @@ class AppRouter {
         path: '/',
         name: RouteNames.splash,
         pageBuilder: (context, state) =>
-            _fadePage(state: state, child: const SplashPage()),
+            _heroPage(state: state, child: const SplashPage()),
       ),
       GoRoute(
         path: '/onboarding',
         name: RouteNames.onboarding,
         pageBuilder: (context, state) =>
-            _fadePage(state: state, child: const OnboardingPage()),
+            _heroPage(state: state, child: const OnboardingPage()),
       ),
       GoRoute(
         path: '/auth-select',
@@ -216,6 +216,17 @@ class AppRouter {
         return FadeTransition(opacity: animation, child: child);
       },
       transitionDuration: const Duration(milliseconds: 300),
+    );
+  }
+
+  /// Platform [MaterialPage] transition — required for [Hero] flights (splash → onboarding).
+  static Page<void> _heroPage({
+    required GoRouterState state,
+    required Widget child,
+  }) {
+    return MaterialPage<void>(
+      key: state.pageKey,
+      child: child,
     );
   }
 }

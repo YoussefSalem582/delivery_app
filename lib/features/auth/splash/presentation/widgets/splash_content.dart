@@ -1,6 +1,6 @@
 import 'package:delivery_app/features/auth/splash/presentation/splash_config.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
-import 'package:delivery_app/shared/widgets/branding/app_brand_icon.dart';
+import 'package:delivery_app/shared/widgets/branding/app_brand_hero.dart';
 import 'package:delivery_app/shared/widgets/feedback/app_loading_ring.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -30,27 +30,10 @@ class SplashContent extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Hero(
-                      tag: 'app_logo',
-                      child: AppBrandIcon(
-                        size: SplashConfig.wordmarkHeight,
-                        filled: false,
-                      ),
-                    )
-                        .animate()
-                        .fadeIn(duration: 500.ms, curve: Curves.easeOut)
-                        .scale(
-                          begin: const Offset(0.92, 0.92),
-                          end: const Offset(1, 1),
-                          duration: 650.ms,
-                          curve: Curves.easeOutBack,
-                        )
-                        .slideY(
-                          begin: 0.08,
-                          end: 0,
-                          duration: 650.ms,
-                          curve: Curves.easeOutCubic,
-                        ),
+                    AppBrandHero(
+                      size: SplashConfig.wordmarkHeight,
+                      filled: false,
+                    ),
                     const SizedBox(height: AppSpacing.xl),
                     const AppLoadingRing()
                         .animate()

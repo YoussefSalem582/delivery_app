@@ -11,35 +11,46 @@ class OnboardingSlideContent extends StatelessWidget {
     super.key,
     required this.slide,
     required this.pageIndex,
-    this.showBrandLogo = false,
+    this.showBrandCircle = false,
+    this.showBrandHero = false,
+    this.centerAnchorKey,
   });
 
   final OnboardingSlideData slide;
   final int pageIndex;
-  final bool showBrandLogo;
+  final bool showBrandCircle;
+  final bool showBrandHero;
+  final GlobalKey? centerAnchorKey;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
 
+    final illustration = OnboardingIllustration(
+      slide: slide,
+      showBrandCircle: showBrandCircle,
+      showBrandHero: showBrandHero,
+      centerAnchorKey: centerAnchorKey,
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          OnboardingIllustration(
-            slide: slide,
-            showBrandLogo: showBrandLogo,
-          )
-              .animate(key: ValueKey(pageIndex))
-              .fadeIn(duration: 350.ms, curve: Curves.easeOut)
-              .scale(
-                begin: const Offset(0.92, 0.92),
-                end: const Offset(1, 1),
-                duration: 450.ms,
-                curve: Curves.easeOutBack,
-              ),
+          if (showBrandCircle)
+            illustration
+          else
+            illustration
+                .animate(key: ValueKey(pageIndex))
+                .fadeIn(duration: 350.ms, curve: Curves.easeOut)
+                .scale(
+                  begin: const Offset(0.92, 0.92),
+                  end: const Offset(1, 1),
+                  duration: 450.ms,
+                  curve: Curves.easeOutBack,
+                ),
           const SizedBox(height: AppSpacing.xl),
           Text(
             slide.titleKey.tr(),

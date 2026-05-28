@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-27 — Onboarding top bar polish
+
+**What changed:** Replaced "Nokta" text with theme-aware `AppBrandIcon` wordmark; redesigned skip control as a bordered pill button with forward arrow and improved tap target.
+
+**Files touched:** `lib/features/auth/onboarding/presentation/widgets/onboarding_top_bar.dart`, `CHANGELOG.md`, `DOCUMENTATION_UPDATE_SUMMARY.md`
+
+---
+
 ## 2026-05-27 — Splash screen refactor (2s minimum)
 
 **What changed:** Refactored in-app splash into `SplashBackground`, `SplashContent`, and `SplashConfig`. Added gradient/dot background, staggered entrance animations, bottom progress bar, and a guaranteed 2-second minimum before auth-based navigation.

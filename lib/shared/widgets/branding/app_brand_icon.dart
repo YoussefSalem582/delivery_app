@@ -15,6 +15,11 @@ class AppBrandIcon extends StatelessWidget {
   static String assetPathFor(Brightness brightness) =>
       AppAssets.logoFor(brightness);
 
+  static const heroTag = 'app_logo';
+
+  /// Width ÷ height for `assets/logo.png` wordmark.
+  static const wordmarkAspectRatio = 1185 / 361;
+
   final double size;
   final bool filled;
 

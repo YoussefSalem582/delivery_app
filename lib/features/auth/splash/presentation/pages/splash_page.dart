@@ -52,7 +52,7 @@ class _SplashPageState extends State<SplashPage>
     if (authState is AuthAuthenticated) {
       context.goNamed(RouteNames.home);
     } else {
-      context.goNamed(RouteNames.onboarding);
+      context.replaceNamed(RouteNames.onboarding);
     }
   }
 
