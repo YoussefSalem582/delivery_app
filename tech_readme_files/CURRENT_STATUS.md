@@ -2,11 +2,11 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Notifications inbox with trip-joined status, category filters (Trip/Messages/Calls), and chat/call producers.
+> **Last Updated:** May 28, 2026 — Dual-mode driver flow (onboarding, driver shell, mock dispatch, shared trip store).
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
-> **Status:** ✅ MVP template complete | 📚 Agent docs initialized | 🚧 Production backend TBD
+> **Status:** ✅ MVP template complete | ✅ Dual-mode driver demo | 🚧 Production backend TBD
 
 ## Executive Summary
 
@@ -14,7 +14,7 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 
 ### Key Highlights
 
-- ✅ **6 feature domains** — auth, home, trips, notifications, profile, settings
+- ✅ **6 feature domains** — auth, home, trips, notifications, profile, settings (+ driver mode)
 - ✅ **Sub-feature layout** — `shared/` + presentation sub-folders per screen flow
 - ✅ **Offline-first** — Hive cache, pending sync queue, reconnect sync
 - ✅ **Maps** — flutter_map + OSRM + tile disk cache + live tracking
@@ -32,14 +32,15 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Trips (list, detail, tracking) | ✅ Demo complete (randomized driver near pickup ≤8 min approach, two-phase tracking, connected cache sync, current trip card, driver profile, chat + call) |
 | Notifications | ✅ Demo complete (typed inbox, All/Trip/Messages/Calls + Unread filters, live trip status chip, chat/call notifications, swipe delete + undo, mark-all-read, nav badge) |
 | Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |
-| Settings (theme, locale) | ✅ Complete |
+| Settings (theme, locale, driver mode) | ✅ Complete (Become a driver onboarding + mode toggle) |
+| Driver mode (shell, offers, jobs, active trip) | ✅ Demo complete (mock dispatch, shared trips_box, AppDataCoordinator) |
 | Real backend integration | 🚧 Mock API only |
 | Production auth (secure storage) | 🚧 Planned |
 | Payments / wallet (real) | 🚧 Demo top-up only (Hive-local) |
 
 ## Testing
 
-- `flutter test` — bloc tests (TripList, Order, Tracking), RouteService unit tests, fare estimate tests, route geometry tests, driver placement tests, demo destination search tests, sync dedupe tests, trip partition tests
+- `flutter test` — 66 tests including bloc/cubit tests, `SwitchAppModeUseCase`, entity Hive round-trip, trip query filters
 
 ## Documentation
 

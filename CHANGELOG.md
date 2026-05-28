@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Dual-mode driver flow** — one app for passengers and drivers: one-time driver onboarding from Profile → Settings, `AppModeCubit` toggle, dedicated driver shell (home / jobs / profile), mock dispatch (offers, accept/decline, driver-owned trip status), shared `trips_box` with `riderId`/`driverId` filters, `AppDataCoordinator` fan-out, `DriverPendingSyncHandler` for offline driver actions, rider waiting-for-driver UI on `CurrentTripCard` and trip detail, FCM simulate for offers/accept/complete, mock rider wallet debit on driver complete, go-online connectivity guard, and `EnvConfig.useMockDriverApi` wired to `/v1/driver/*` API paths.
+
 - **Notification domain types** — `NotificationType` on `NotificationEntity` (Hive + mock JSON + FCM/simulated producers); `MarkAllNotificationsRead`, `DeleteNotification`, and `AddNotification` use cases.
 
 - **Native branding assets** — `flutter_launcher_icons` + `flutter_native_splash` generate Android/iOS app icons from `assets/app_icon.png` and native splash screens from `assets/logo.png` (surface `#F7F9FC` background); fixed Android adaptive icon XML (`mipmap-anydpi-v26`).

@@ -4,6 +4,46 @@
 
 ---
 
+## 2026-05-28 — Plan exit-criteria polish (round 2)
+
+**What changed:** Added `SwitchAppModeUseCase`; vehicle-type dropdown (Economy/Premium/Delivery); registered-driver read-only onboarding summary; notification badge on driver shell home tab; full driver onboarding EN/AR strings; `SwitchAppModeUseCase` test (66 tests passing).
+
+**Files touched:** `lib/features/driver/onboarding/**`, `lib/features/driver/main_shell/**`, `lib/features/driver/shared/domain/usecases/switch_app_mode_usecase.dart`, `assets/translations/*`, `test/switch_app_mode_usecase_test.dart`
+
+---
+
+## 2026-05-28 — Plan exit-criteria gaps
+
+**What changed:** Wired `EnvConfig.useMockDriverApi` to `ApiEndpoints` (`/v1/driver/*` when false); mock interceptor normalizes v1 paths; driver availability offline queue; go-online connectivity guard; trip detail waiting-for-driver banner; `AppModeCubit` unit test (65 tests passing).
+
+**Files touched:** `lib/core/network/api_endpoints.dart`, `mock_api_interceptor.dart`, `driver_availability_cubit.dart`, `driver_home_page.dart`, `trip_detail_page.dart`, `assets/translations/*`, `test/app_mode_cubit_test.dart`
+
+---
+
+## 2026-05-28 — Driver active trip mock location publish
+
+**What changed:** `DriverActiveTripPage` publishes mock GPS every 5s via `updateDriverLocation` so rider `TrackingBloc` poll reads `driverLat`/`driverLng` from the shared trip record.
+
+**Files touched:** `lib/features/driver/active_trip/presentation/pages/driver_active_trip_page.dart`
+
+---
+
+## 2026-05-28 — Dual-mode driver flow polish + sync
+
+**What changed:** Completed remaining plan gaps: `DriverPendingSyncHandler` drains offline driver actions; rider `CurrentTripCard` waiting state; request-ride notification copy; FCM for driver offers/accept/complete; mock rider wallet debit on driver complete; entity Hive + onboarding cubit tests (63 tests passing).
+
+**Files touched:** `lib/core/sync/driver_pending_sync_handler.dart`, `lib/features/driver/**`, `lib/features/trips/trip_list/**`, `lib/features/home/map_view/**`, `lib/core/network/mock_api_interceptor.dart`, `test/entity_hive_test.dart`, `test/driver_onboarding_cubit_test.dart`, `CHANGELOG.md`, `CURRENT_STATUS.md`
+
+---
+
+## 2026-05-28 — Dual-mode driver flow
+
+**What changed:** Implemented full dual-mode driver flow on branch `feature/dual-mode-driver-flow`: extended `UserEntity`/`TripEntity`, `AppModeCubit`, driver onboarding, driver shell, mock dispatch, `AppDataCoordinator`, rider trip filters, subscriber tracking, EN/AR strings, ADR + API docs.
+
+**Files touched:** `lib/features/driver/**`, `lib/core/sync/app_data_coordinator.dart`, `lib/core/network/mock_api_store.dart`, `lib/config/routes/app_router.dart`, `lib/features/profile/**`, `lib/features/trips/**`, `assets/translations/*`, `assets/mock/trips.json`, `test/trip_query_test.dart`, `CHANGELOG.md`, `CURRENT_STATUS.md`, `09_api_endpoints.md`, `decisions/001-dual-mode-driver-flow.md`
+
+---
+
 ## 2026-05-27 — Notifications real trip data + category filters
 
 **What changed:** Replaced All/Unread-only filters with All/Trip/Messages/Calls chips plus Unread toggle; `NotificationBloc` joins trips for live status chips and routes; added `message`/`call` notification types; aligned mock seed; chat/call flows emit notifications via `FcmService`.
