@@ -28,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Shell AppBar logo** — tab AppBars use proportional `leadingWidth` so the wordmark is not squashed; size tuned to 40dp (leading) / 44dp (home center).
 - **Profile AppBar** — removed header initial avatar chip (profile info remains in page body).
 
-
 - **Notifications screen** — full inbox UX: typed notifications (`NotificationType`), All/Unread filter, Today/Yesterday/Earlier grouping, swipe-to-delete with undo, mark-all-read, pull-to-refresh, error retry, and bottom-nav unread badge.
 - **Notifications inbox** — category filters (All / Trip / Messages / Calls) plus Unread toggle; trip rows show live `TripStatusChip` and route from joined `TripEntity`; message/call types with tap routing to chat/trip detail; mock seed aligned to trip statuses; chat send and call end emit notifications.
 - **Notifications dark mode** — theme-aware inbox styling via `NotificationTheme`: elevated unread cards (`surfaceContainerHigh`), `inversePrimary` accents/borders, subtle unread glow, improved filter bar and empty state, and brighter mark-all-read action.
