@@ -54,6 +54,8 @@ dev_dependencies:
   build_runner: ^2.4.13
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.6
 
 flutter:
   uses-material-design: true
@@ -62,3 +64,22 @@ flutter:
     - assets/translations/
     - assets/lottie/
     - assets/logo.svg
+    - assets/logo.png
+    - assets/app_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/app_icon.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/app_icon.png
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  color: "#F7F9FC"
+  image: assets/logo.png
+  android_12:
+    color: "#F7F9FC"
+    image: assets/logo.png
+  ios: true
+  android: true

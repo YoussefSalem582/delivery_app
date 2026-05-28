@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Native branding assets** — `flutter_launcher_icons` + `flutter_native_splash` generate Android/iOS app icons from `assets/app_icon.png` and native splash screens from `assets/logo.png` (surface `#F7F9FC` background); fixed Android adaptive icon XML (`mipmap-anydpi-v26`).
+
 - **Real location search (Nominatim)** — pickup and dropoff use OpenStreetMap geocoding with debounced autocomplete, reverse geocode for GPS pickup, offline guard, and OSM attribution. Removed demo place catalog and GPS-offset dropoff coordinates.
 
 ### Fixed

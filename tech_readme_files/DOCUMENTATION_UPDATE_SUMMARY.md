@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-27 — App icon + native splash from Nokta logo
+
+**What changed:** Wired `flutter_launcher_icons` and `flutter_native_splash` in `pubspec.yaml`. App icons (Android adaptive + iOS) generated from `assets/app_icon.png`; native splash on Android (incl. Android 12) and iOS uses `assets/logo.png` on `#F7F9FC` background. Removed misnamed `mipmap-anydpi-v26 copy` folder; proper adaptive icon XML now in `mipmap-anydpi-v26/`.
+
+**Files touched:** `pubspec.yaml`, `assets/app_icon.png`, `assets/logo.png`, Android `res/` (mipmap, drawable, values-v31), iOS `LaunchImage.imageset`, `AppIcon.appiconset`
+
+---
+
 ## 2026-05-27 — Real location search with Nominatim
 
 **What changed:** Replaced demo place catalog and GPS-offset dropoffs with OpenStreetMap Nominatim geocoding. Both pickup and dropoff are searchable; GPS pickup is reverse-geocoded on sheet open. Quick chips use saved home/work (SharedPreferences) or airport Nominatim query.
