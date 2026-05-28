@@ -113,17 +113,10 @@ class TripListPage extends StatelessWidget {
                           ),
                     SectionHeader(title: 'trip_history'.tr()),
                     if (historyTrips.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: AppSpacing.md,
-                        ),
-                        child: Text(
-                          'no_trip_history'.tr(),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                          textAlign: TextAlign.center,
-                        ),
+                      EmptyStateView(
+                        icon: Icons.history,
+                        iconSize: 48,
+                        title: 'no_trip_history'.tr(),
                       )
                     else
                       ...historyTrips.asMap().entries.map(

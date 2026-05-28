@@ -1,6 +1,7 @@
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
+import 'package:delivery_app/core/widgets/map_trip_scaffold.dart';
 import 'package:delivery_app/core/widgets/skeleton_trip_card.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/widgets/tracking_bottom_sheet.dart';
@@ -52,70 +53,48 @@ class _TrackingPageState extends State<TrackingPage> {
             );
           }
         },
-        child: Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: AppSpacing.sm),
-              child: Material(
-                color: Theme.of(context).colorScheme.surfaceContainerLowest,
-                shape: const CircleBorder(),
-                elevation: 2,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => context.pop(),
-                ),
-              ),
-            ),
-            title: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerLowest
-                    .withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Text(
-                'tracking_title'.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              ),
-            ),
-            centerTitle: true,
-          ),
-          body: BlocBuilder<TrackingBloc, TrackingState>(
-            builder: (context, state) {
-              if (state is TrackingError) {
-                return ErrorView(
+        child: BlocBuilder<TrackingBloc, TrackingState>(
+          builder: (context, state) {
+            if (state is TrackingError) {
+              return MapTripScaffold(
+                title: 'tracking_title'.tr(),
+                onBack: () => context.pop(),
+                useOverlayAppBar: false,
+                body: ErrorView(
                   message: state.message,
                   onRetry: () => _bloc.add(
                     TrackingLoadRequested(widget.tripId),
                   ),
-                );
-              }
+                ),
+              );
+            }
 
-              if (state is TrackingLoading || state is TrackingInitial) {
-                return Skeletonizer(
+            if (state is TrackingLoading || state is TrackingInitial) {
+              return MapTripScaffold(
+                title: 'tracking_title'.tr(),
+                onBack: () => context.pop(),
+                useOverlayAppBar: false,
+                body: Skeletonizer(
                   enabled: true,
                   child: ListView(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     children: const [SkeletonTripCard()],
                   ),
-                );
-              }
+                ),
+              );
+            }
 
-              final mapData = _MapTrackingData.fromState(state);
-              if (mapData == null) {
-                return const SizedBox.shrink();
-              }
+            final mapData = _MapTrackingData.fromState(state);
+            if (mapData == null) {
+              return const SizedBox.shrink();
+            }
 
-              final scheme = Theme.of(context).colorScheme;
+            final scheme = Theme.of(context).colorScheme;
 
-              return Stack(
+            return MapTripScaffold(
+              title: 'tracking_title'.tr(),
+              onBack: () => context.pop(),
+              body: Stack(
                 children: [
                   Positioned.fill(
                     child: DeliveryMap(
@@ -170,9 +149,9 @@ class _TrackingPageState extends State<TrackingPage> {
                     ),
                   ),
                 ],
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

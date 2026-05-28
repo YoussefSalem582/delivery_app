@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Driver/passenger widget deduplication (phase 2)** — passenger profile uses shared `ProfileUserCard` (hero variant), `StatSummaryCard` (wallet), `AppModeSwitchTile`, and `performAppLogout`; `NotificationShellScaffold` unifies passenger/driver bottom nav; notifications tab uses `ShellTabScaffold`; `MapTripScaffold` + `MapOverlayAppBar` shared by rider tracking and driver active trip; inline empty states migrated to `EmptyStateView`.
+
 - **Shared driver/passenger UI** — extracted `ShellTabAppBar`, `ShellTabScaffold`, `EmptyStateView`, `SectionHeader`, `AppBarRefreshIconButton`, `TripAccentCard`, `ActiveTripSection`, `ProfileUserCard`, `StatSummaryCard`, and `LogoutButton`; driver tabs now reuse the same shell, trip, empty-state, and profile widgets as passenger screens; removed duplicate always-visible `OfflineBanner` (app-wide `GlobalOfflineBanner` handles offline).
 
 - **Shell AppBar logo** — tab AppBars use proportional `leadingWidth` so the wordmark is not squashed; size tuned to 40dp (leading) / 44dp (home center).
@@ -40,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Driver demo offers** — seed `trip-demo-offer` (`requested`, rider `user-rider-demo`) in mock trips so driver mode shows an offer on one account; empty-state hint explains go-online + other-rider requests.
 - **Driver onboarding** — remove redundant `AuthCheckRequested` after register (coordinator already refreshes auth; avoids loading flash).
+- **Driver home on-trip UI** — hide "Go online" when availability is `onTrip`; show active trip or on-trip hint; release stale `onTrip` lock when no active assignment; return to online after trip complete.
 - **Notifications list layout** — wrap notification tile content in `IntrinsicHeight` so the unread accent bar no longer triggers unbounded-height `Row` errors in `ListView`.
 - **Tracking page dispose crash** — `TrackingPage` holds bloc reference directly instead of `context.read` in `dispose()`.
 - **OSRM route timeouts** — deduplicate concurrent `getRoute` calls, cache straight-line fallbacks, use 5s OSRM timeout, and skip OSRM for 5 min after failure on the same route key.

@@ -83,4 +83,10 @@ class DriverAvailabilityCubit extends Cubit<DriverAvailabilityState> {
       DriverAvailability.onTrip.storageKey,
     );
   }
+
+  /// Clears stale on-trip lock when no active assignment remains (e.g. after complete or pop).
+  Future<void> releaseFromTrip() async {
+    if (state.availability != DriverAvailability.onTrip) return;
+    await goOnline();
+  }
 }

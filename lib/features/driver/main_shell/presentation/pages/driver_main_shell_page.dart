@@ -1,14 +1,14 @@
 import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/driver/home/presentation/pages/driver_home_page.dart';
 import 'package:delivery_app/features/driver/jobs/presentation/bloc/driver_jobs_bloc.dart';
+import 'package:delivery_app/features/notifications/notification_list/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/features/driver/jobs/presentation/pages/driver_jobs_page.dart';
 import 'package:delivery_app/features/driver/profile/presentation/pages/driver_profile_tab_page.dart';
-import 'package:delivery_app/features/notifications/notification_list/presentation/bloc/notification_bloc.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/shared/widgets/navigation/app_bottom_nav_bar.dart';
+import 'package:delivery_app/shared/widgets/navigation/notification_shell_scaffold.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 /// Bottom navigation shell for authenticated driver tabs.
@@ -45,38 +45,27 @@ class _DriverMainShellPageState extends State<DriverMainShellPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NotificationBloc, NotificationState>(
-      builder: (context, notificationState) {
-        final unreadCount = notificationState is NotificationLoaded
-            ? notificationState.unreadCount
-            : 0;
-
-        return Scaffold(
-          body: widget.navigationShell,
-          bottomNavigationBar: AppBottomNavBar(
-            selectedIndex: widget.navigationShell.currentIndex,
-            onDestinationSelected: _onTabSelected,
-            destinations: [
-              AppNavDestination(
-                icon: Icons.home_outlined,
-                selectedIcon: Icons.home,
-                label: 'driver_home_tab'.tr(),
-                badgeCount: unreadCount,
-              ),
-              AppNavDestination(
-                icon: Icons.work_outline,
-                selectedIcon: Icons.work,
-                label: 'driver_jobs_tab'.tr(),
-              ),
-              AppNavDestination(
-                icon: Icons.person_outline,
-                selectedIcon: Icons.person,
-                label: 'profile_tab'.tr(),
-              ),
-            ],
-          ),
-        );
-      },
+    return NotificationShellScaffold(
+      navigationShell: widget.navigationShell,
+      notificationBadgeTabIndex: 0,
+      onTabSelected: _onTabSelected,
+      destinations: [
+        AppNavDestination(
+          icon: Icons.home_outlined,
+          selectedIcon: Icons.home,
+          label: 'driver_home_tab'.tr(),
+        ),
+        AppNavDestination(
+          icon: Icons.work_outline,
+          selectedIcon: Icons.work,
+          label: 'driver_jobs_tab'.tr(),
+        ),
+        AppNavDestination(
+          icon: Icons.person_outline,
+          selectedIcon: Icons.person,
+          label: 'profile_tab'.tr(),
+        ),
+      ],
     );
   }
 }

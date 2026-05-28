@@ -4,6 +4,7 @@ import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/config/theme/app_colors.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
+import 'package:delivery_app/core/widgets/map_trip_scaffold.dart';
 import 'package:delivery_app/features/driver/active_trip/presentation/bloc/driver_active_trip_bloc.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_card.dart';
@@ -72,140 +73,138 @@ class _DriverActiveTripPageState extends State<DriverActiveTripPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('driver_active_trip'.tr())),
-      body: BlocConsumer<DriverActiveTripBloc, DriverActiveTripState>(
-        listener: (context, state) {
-          if (state is DriverActiveTripLoaded &&
-              state.trip.status == TripStatus.completed) {
-            Navigator.of(context).pop(true);
-          }
-        },
-        builder: (context, state) {
-          if (state is DriverActiveTripLoading) {
-            return LoadingView(message: 'loading');
-          }
-          if (state is DriverActiveTripError) {
-            return ErrorView(
+    return BlocConsumer<DriverActiveTripBloc, DriverActiveTripState>(
+      listener: (context, state) {
+        if (state is DriverActiveTripLoaded &&
+            state.trip.status == TripStatus.completed) {
+          Navigator.of(context).pop(true);
+        }
+      },
+      builder: (context, state) {
+        if (state is DriverActiveTripLoading) {
+          return MapTripScaffold(
+            title: 'driver_active_trip'.tr(),
+            onBack: () => Navigator.of(context).pop(),
+            useOverlayAppBar: false,
+            body: LoadingView(message: 'loading'),
+          );
+        }
+        if (state is DriverActiveTripError) {
+          return MapTripScaffold(
+            title: 'driver_active_trip'.tr(),
+            onBack: () => Navigator.of(context).pop(),
+            useOverlayAppBar: false,
+            body: ErrorView(
               message: state.message.tr(),
               onRetry: () => context.read<DriverActiveTripBloc>().add(
                 DriverActiveTripLoadRequested(tripId: widget.tripId),
               ),
-            );
-          }
-          if (state is DriverActiveTripLoaded) {
-            final trip = state.trip;
-            final driverPoint = trip.driverLat != null && trip.driverLng != null
-                ? LatLng(trip.driverLat!, trip.driverLng!)
-                : LatLng(trip.pickupLat, trip.pickupLng);
-            final center = driverPoint;
+            ),
+          );
+        }
+        if (state is DriverActiveTripLoaded) {
+          final trip = state.trip;
+          final driverPoint = trip.driverLat != null && trip.driverLng != null
+              ? LatLng(trip.driverLat!, trip.driverLng!)
+              : LatLng(trip.pickupLat, trip.pickupLng);
 
-            return Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      DeliveryMap(
-                        center: center,
-                        zoom: MapConfig.defaultZoom,
-                        markers: [
-                          MapMarkerData(
-                            point: LatLng(trip.pickupLat, trip.pickupLng),
-                            color: AppColors.primary,
-                          ),
-                          MapMarkerData(
-                            point: LatLng(trip.dropoffLat, trip.dropoffLng),
-                            color: AppColors.error,
-                          ),
-                          MapMarkerData(
-                            point: driverPoint,
-                            color: AppColors.secondary,
-                          ),
-                        ],
-                        polylines: [
-                          LatLng(trip.pickupLat, trip.pickupLng),
-                          LatLng(trip.dropoffLat, trip.dropoffLng),
-                        ],
+          return MapTripScaffold(
+            title: 'driver_active_trip'.tr(),
+            onBack: () => Navigator.of(context).pop(),
+            footer: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (state.canMarkArrived)
+                      AppButton(
+                        label: 'driver_mark_arrived'.tr(),
+                        loading: state.isUpdating,
+                        onPressed: state.isUpdating
+                            ? null
+                            : () => context.read<DriverActiveTripBloc>().add(
+                                  DriverActiveTripArrivedRequested(
+                                    tripId: widget.tripId,
+                                  ),
+                                ),
                       ),
-                      Positioned(
-                        left: AppSpacing.md,
-                        right: AppSpacing.md,
-                        bottom: AppSpacing.md,
-                        child: Material(
-                          elevation: 4,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMd,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(AppSpacing.sm),
-                            child: TripHeroCard(
-                              trip: trip,
-                              highlighted: true,
-                              liveStatus: true,
-                            ),
-                          ),
-                        ),
+                    if (state.canStartTrip)
+                      AppButton(
+                        label: 'driver_start_trip'.tr(),
+                        loading: state.isUpdating,
+                        onPressed: state.isUpdating
+                            ? null
+                            : () => context.read<DriverActiveTripBloc>().add(
+                                  DriverActiveTripStartRequested(
+                                    tripId: widget.tripId,
+                                  ),
+                                ),
                       ),
-                    ],
-                  ),
+                    if (state.canCompleteTrip)
+                      AppButton(
+                        label: 'driver_complete_trip'.tr(),
+                        loading: state.isUpdating,
+                        onPressed: state.isUpdating
+                            ? null
+                            : () => context.read<DriverActiveTripBloc>().add(
+                                  DriverActiveTripCompleteRequested(
+                                    tripId: widget.tripId,
+                                  ),
+                                ),
+                      ),
+                  ],
                 ),
-                SafeArea(
-                  top: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (state.canMarkArrived)
-                          AppButton(
-                            label: 'driver_mark_arrived'.tr(),
-                            loading: state.isUpdating,
-                            onPressed: state.isUpdating
-                                ? null
-                                : () =>
-                                      context.read<DriverActiveTripBloc>().add(
-                                        DriverActiveTripArrivedRequested(
-                                          tripId: widget.tripId,
-                                        ),
-                                      ),
-                          ),
-                        if (state.canStartTrip) ...[
-                          AppButton(
-                            label: 'driver_start_trip'.tr(),
-                            loading: state.isUpdating,
-                            onPressed: state.isUpdating
-                                ? null
-                                : () =>
-                                      context.read<DriverActiveTripBloc>().add(
-                                        DriverActiveTripStartRequested(
-                                          tripId: widget.tripId,
-                                        ),
-                                      ),
-                          ),
-                        ],
-                        if (state.canCompleteTrip)
-                          AppButton(
-                            label: 'driver_complete_trip'.tr(),
-                            loading: state.isUpdating,
-                            onPressed: state.isUpdating
-                                ? null
-                                : () =>
-                                      context.read<DriverActiveTripBloc>().add(
-                                        DriverActiveTripCompleteRequested(
-                                          tripId: widget.tripId,
-                                        ),
-                                      ),
-                          ),
-                      ],
+              ),
+            ),
+            body: Stack(
+              children: [
+                DeliveryMap(
+                  center: driverPoint,
+                  zoom: MapConfig.defaultZoom,
+                  markers: [
+                    MapMarkerData(
+                      point: LatLng(trip.pickupLat, trip.pickupLng),
+                      color: AppColors.primary,
+                    ),
+                    MapMarkerData(
+                      point: LatLng(trip.dropoffLat, trip.dropoffLng),
+                      color: AppColors.error,
+                    ),
+                    MapMarkerData(
+                      point: driverPoint,
+                      color: AppColors.secondary,
+                    ),
+                  ],
+                  polylines: [
+                    LatLng(trip.pickupLat, trip.pickupLng),
+                    LatLng(trip.dropoffLat, trip.dropoffLng),
+                  ],
+                ),
+                Positioned(
+                  left: AppSpacing.md,
+                  right: AppSpacing.md,
+                  bottom: AppSpacing.md,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      child: TripHeroCard(
+                        trip: trip,
+                        highlighted: true,
+                        liveStatus: true,
+                      ),
                     ),
                   ),
                 ),
               ],
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

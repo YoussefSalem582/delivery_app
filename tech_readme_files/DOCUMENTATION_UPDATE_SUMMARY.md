@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-05-28 — Driver home on-trip state fix
+
+**What changed:** Driver home no longer shows "Go online" while `onTrip`; stale on-trip lock clears when jobs have no active assignment; completing a trip returns driver to online.
+
+**Files touched:** `driver_home_page.dart`, `driver_availability_cubit.dart`
+
+---
+
+## 2026-05-28 — Driver/passenger widget deduplication (phase 2)
+
+**What changed:** `ProfileUserCard` hero variant; passenger wallet on `StatSummaryCard`; `performAppLogout`, `AppModeSwitchTile`, `NotificationShellScaffold`, `MapTripScaffold`; profile/orders/trip-history empty states on `EmptyStateView`; notifications on `ShellTabScaffold` (66 tests passing).
+
+**Files touched:** `lib/shared/widgets/profile/**`, `lib/shared/widgets/navigation/notification_shell_scaffold.dart`, `lib/core/widgets/map_trip_scaffold.dart`, `lib/features/auth/shared/presentation/utils/app_logout.dart`, `lib/features/profile/**`, `lib/features/driver/**`, `lib/features/home/main_shell/**`, `lib/features/notifications/**`, `lib/features/trips/tracking/**`
+
+---
+
 ## 2026-05-28 — Shared driver/passenger widgets
 
 **What changed:** Consolidated duplicated UI into shared widgets (`ShellTabAppBar`, `ShellTabScaffold`, `EmptyStateView`, `SectionHeader`, `TripAccentCard`, `ActiveTripSection`, `ProfileUserCard`, `StatSummaryCard`, `LogoutButton`); refactored driver home/jobs/profile and passenger trips/notifications/profile to use them.

@@ -50,16 +50,29 @@ class _DriverHomePageState extends State<DriverHomePage> {
   }
 
   void _openActiveTrip(BuildContext context, String tripId) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => BlocProvider(
-          create: (_) =>
-              sl<DriverActiveTripBloc>()
-                ..add(DriverActiveTripLoadRequested(tripId: tripId)),
-          child: DriverActiveTripPage(tripId: tripId),
-        ),
-      ),
-    );
+    Navigator.of(context)
+        .push<bool>(
+          MaterialPageRoute<bool>(
+            builder: (_) => BlocProvider(
+              create: (_) =>
+                  sl<DriverActiveTripBloc>()
+                    ..add(DriverActiveTripLoadRequested(tripId: tripId)),
+              child: DriverActiveTripPage(tripId: tripId),
+            ),
+          ),
+        )
+        .then((completed) {
+          if (!context.mounted) return;
+          if (completed == true) {
+            context.read<DriverAvailabilityCubit>().releaseFromTrip();
+          }
+          final authState = context.read<AuthBloc>().state;
+          if (authState is AuthAuthenticated) {
+            context.read<DriverJobsBloc>().add(
+              DriverJobsRefreshRequested(driverId: authState.user.id),
+            );
+          }
+        });
   }
 
   @override
@@ -84,6 +97,18 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 );
               }
               _openActiveTrip(context, state.acceptedTripId!);
+            },
+          ),
+          BlocListener<DriverJobsBloc, DriverJobsState>(
+            listenWhen: (previous, current) => current is DriverJobsLoaded,
+            listener: (context, state) {
+              if (state is! DriverJobsLoaded) return;
+              final availability =
+                  context.read<DriverAvailabilityCubit>().state.availability;
+              if (availability == DriverAvailability.onTrip &&
+                  state.activeTrip == null) {
+                context.read<DriverAvailabilityCubit>().releaseFromTrip();
+              }
             },
           ),
         ],
@@ -115,15 +140,33 @@ class _DriverHomePageState extends State<DriverHomePage> {
             ),
             BlocBuilder<DriverAvailabilityCubit, DriverAvailabilityState>(
               builder: (context, availabilityState) {
-                if (availabilityState.availability !=
-                    DriverAvailability.online) {
-                  return EmptyStateView(
-                    icon: Icons.power_settings_new,
-                    iconSize: 48,
-                    title: 'driver_go_online_hint'.tr(),
-                  );
-                }
-                return const _OffersSection();
+                return BlocBuilder<DriverJobsBloc, DriverJobsState>(
+                  builder: (context, jobsState) {
+                    final availability = availabilityState.availability;
+
+                    if (availability == DriverAvailability.onTrip) {
+                      if (jobsState is DriverJobsLoaded &&
+                          jobsState.activeTrip != null) {
+                        return const SizedBox.shrink();
+                      }
+                      return EmptyStateView(
+                        icon: Icons.local_taxi_outlined,
+                        iconSize: 48,
+                        title: 'driver_on_trip_hint'.tr(),
+                      );
+                    }
+
+                    if (availability != DriverAvailability.online) {
+                      return EmptyStateView(
+                        icon: Icons.power_settings_new,
+                        iconSize: 48,
+                        title: 'driver_go_online_hint'.tr(),
+                      );
+                    }
+
+                    return const _OffersSection();
+                  },
+                );
               },
             ),
           ],

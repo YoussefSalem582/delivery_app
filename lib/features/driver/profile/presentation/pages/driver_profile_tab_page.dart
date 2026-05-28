@@ -1,19 +1,19 @@
-import 'package:delivery_app/config/routes/route_names.dart';
+import 'package:delivery_app/features/auth/shared/presentation/utils/app_logout.dart';
 import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
-import 'package:delivery_app/features/driver/shared/presentation/cubit/app_mode_cubit.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_extensions.dart';
 import 'package:delivery_app/features/trips/shared/domain/repositories/trip_repository.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
+import 'package:delivery_app/shared/widgets/feedback/empty_state_view.dart';
 import 'package:delivery_app/shared/widgets/navigation/shell_tab_app_bar.dart';
 import 'package:delivery_app/shared/widgets/navigation/shell_tab_scaffold.dart';
+import 'package:delivery_app/shared/widgets/profile/app_mode_switch_tile.dart';
 import 'package:delivery_app/shared/widgets/profile/logout_button.dart';
 import 'package:delivery_app/shared/widgets/profile/profile_user_card.dart';
 import 'package:delivery_app/shared/widgets/profile/stat_summary_card.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 class DriverProfileTabPage extends StatelessWidget {
   const DriverProfileTabPage({super.key});
@@ -23,9 +23,12 @@ class DriverProfileTabPage extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         if (authState is! AuthAuthenticated) {
-          return Scaffold(
-            appBar: AppBar(title: Text('profile_title'.tr())),
-            body: Center(child: Text('auth_required'.tr())),
+          return ShellTabScaffold(
+            appBar: ShellTabAppBar(title: Text('profile_title'.tr())),
+            body: EmptyStateView(
+              icon: Icons.lock_outline,
+              title: 'auth_required'.tr(),
+            ),
           );
         }
 
@@ -59,27 +62,9 @@ class DriverProfileTabPage extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
               ],
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('driver_switch_passenger_mode'.tr()),
-                subtitle: Text('driver_switch_passenger_hint'.tr()),
-                value: false,
-                onChanged: (_) async {
-                  await context.read<AppModeCubit>().resetToPassenger();
-                  if (context.mounted) {
-                    context.goNamed(RouteNames.home);
-                  }
-                },
-              ),
+              const AppModeSwitchTile.driver(),
               const SizedBox(height: AppSpacing.lg),
-              LogoutButton(
-                onPressed: () async {
-                  await context.read<AppModeCubit>().resetToPassenger();
-                  if (!context.mounted) return;
-                  context.read<AuthBloc>().add(const AuthLogoutRequested());
-                  context.goNamed(RouteNames.splash);
-                },
-              ),
+              LogoutButton(onPressed: () => performAppLogout(context)),
             ],
           ),
         );

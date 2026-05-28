@@ -7,15 +7,18 @@ class ShellTabScaffold extends StatelessWidget {
     super.key,
     this.appBar,
     required this.body,
+    this.backgroundColor,
   });
 
   final PreferredSizeWidget? appBar;
   final Widget body;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      backgroundColor:
+          backgroundColor ?? Theme.of(context).colorScheme.surfaceContainer,
       appBar: appBar,
       body: body,
     );

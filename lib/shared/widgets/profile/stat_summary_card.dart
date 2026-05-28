@@ -25,6 +25,7 @@ class StatSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final trailingWidget = trailing;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -53,7 +54,7 @@ class StatSummaryCard extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) trailing!,
+          if (trailingWidget != null) trailingWidget,
         ],
       ),
     );
