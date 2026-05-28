@@ -79,7 +79,6 @@ class _DriverOnboardingPageState extends State<DriverOnboardingPage> {
                 previous.status != current.status,
             listener: (context, state) {
               if (state.status == DriverOnboardingStatus.success) {
-                context.read<AuthBloc>().add(const AuthCheckRequested());
                 AppToast.success(context, 'driver_onboarding_success'.tr());
                 Navigator.of(context).pop(true);
               } else if (state.status == DriverOnboardingStatus.failure &&

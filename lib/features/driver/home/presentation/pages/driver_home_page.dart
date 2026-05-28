@@ -300,9 +300,21 @@ class _OffersSection extends StatelessWidget {
             return Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                child: Text(
-                  'driver_no_offers'.tr(),
-                  style: Theme.of(context).textTheme.titleMedium,
+                child: Column(
+                  children: [
+                    Text(
+                      'driver_no_offers'.tr(),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'driver_no_offers_hint'.tr(),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );

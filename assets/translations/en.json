@@ -189,6 +189,7 @@
   "driver_offline_status": "You are offline",
   "driver_offers_title": "Trip offers",
   "driver_no_offers": "No offers right now",
+  "driver_no_offers_hint": "Go online to see requests. Passengers on other accounts (or the demo rider trip) appear here.",
   "driver_accept_offer": "Accept",
   "driver_decline_offer": "Decline",
   "driver_jobs_title": "My jobs",

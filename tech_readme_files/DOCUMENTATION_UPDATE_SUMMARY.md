@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-28 — Driver demo offer seed
+
+**What changed:** Added `trip-demo-offer` to mock trips (requested, rider `user-rider-demo`) so single-account driver mode shows an offer; driver empty-state hint; removed redundant auth refresh after onboarding.
+
+**Files touched:** `assets/mock/trips.json`, `assets/translations/*`, `driver_home_page.dart`, `driver_onboarding_page.dart`
+
+---
+
 ## 2026-05-28 — Plan exit-criteria polish (round 2)
 
 **What changed:** Added `SwitchAppModeUseCase`; vehicle-type dropdown (Economy/Premium/Delivery); registered-driver read-only onboarding summary; notification badge on driver shell home tab; full driver onboarding EN/AR strings; `SwitchAppModeUseCase` test (66 tests passing).

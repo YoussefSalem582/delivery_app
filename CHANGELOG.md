@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Driver demo offers** — seed `trip-demo-offer` (`requested`, rider `user-rider-demo`) in mock trips so driver mode shows an offer on one account; empty-state hint explains go-online + other-rider requests.
+- **Driver onboarding** — remove redundant `AuthCheckRequested` after register (coordinator already refreshes auth; avoids loading flash).
 - **Notifications list layout** — wrap notification tile content in `IntrinsicHeight` so the unread accent bar no longer triggers unbounded-height `Row` errors in `ListView`.
 - **Tracking page dispose crash** — `TrackingPage` holds bloc reference directly instead of `context.read` in `dispose()`.
 - **OSRM route timeouts** — deduplicate concurrent `getRoute` calls, cache straight-line fallbacks, use 5s OSRM timeout, and skip OSRM for 5 min after failure on the same route key.

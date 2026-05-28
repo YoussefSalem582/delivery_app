@@ -189,6 +189,7 @@
   "driver_offline_status": "أنت غير متصل",
   "driver_offers_title": "عروض الرحلات",
   "driver_no_offers": "لا توجد عروض حالياً",
+  "driver_no_offers_hint": "اتصل لرؤية الطلبات. تظهر هنا طلبات الركاب من حسابات أخرى (أو رحلة العرض التجريبية).",
   "driver_accept_offer": "قبول",
   "driver_decline_offer": "رفض",
   "driver_jobs_title": "رحلاتي",
