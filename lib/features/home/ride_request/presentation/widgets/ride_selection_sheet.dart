@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:delivery_app/core/network/route_service.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_option_card.dart';
 import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/fare_estimate.dart';
+import 'package:delivery_app/features/trips/shared/domain/usecases/estimate_fare_usecase.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/shared/widgets/banners/app_toast.dart';
@@ -25,7 +27,8 @@ class RideSelectionSheet extends StatefulWidget {
 }
 
 class _RideSelectionSheetState extends State<RideSelectionSheet> {
-  final _options = RideOption.defaults();
+  late List<RideOption> _options;
+  final Map<String, FareEstimate> _fareEstimates = {};
   RideTier _selected = RideTier.economy;
   String _paymentMethodKey = 'payment_card';
   String? _appliedPromo;
@@ -33,16 +36,19 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
   double? _routeDistanceKm;
   bool _loadingRoute = true;
 
+  @override
+  void initState() {
+    super.initState();
+    _options = List<RideOption>.from(RideOption.defaults());
+    unawaited(_loadRouteQuote());
+  }
+
   RideOption get _selectedOption =>
       _options.firstWhere((o) => o.tier == _selected);
 
   String get _selectedTierKey => _selectedOption.nameKey;
 
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_loadRouteQuote());
-  }
+  FareEstimate? get _selectedFareEstimate => _fareEstimates[_selectedTierKey];
 
   Future<void> _loadRouteQuote() async {
     try {
@@ -51,9 +57,46 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
         dropoff: LatLng(widget.draft.dropoffLat, widget.draft.dropoffLng),
       );
       if (!mounted) return;
+
+      final distanceKm = result.distanceMeters / 1000;
+      final estimateFare = sl<EstimateFareUseCase>();
+      final updatedOptions = <RideOption>[];
+      final estimates = <String, FareEstimate>{};
+
+      for (final option in RideOption.defaults()) {
+        final fareResult = await estimateFare(
+          EstimateFareParams(
+            tierKey: option.nameKey,
+            distanceKm: distanceKm,
+          ),
+        );
+        fareResult.fold(
+          (_) {},
+          (estimate) {
+            estimates[option.nameKey] = estimate;
+            updatedOptions.add(
+              RideOption(
+                tier: option.tier,
+                nameKey: option.nameKey,
+                subtitleKey: option.subtitleKey,
+                icon: option.icon,
+                price: estimate.fare,
+                etaMinutes: option.etaMinutes,
+                capacity: option.capacity,
+              ),
+            );
+          },
+        );
+      }
+
+      if (!mounted) return;
       setState(() {
         _routeEtaMinutes = result.etaMinutes;
-        _routeDistanceKm = result.distanceMeters / 1000;
+        _routeDistanceKm = distanceKm;
+        _fareEstimates
+          ..clear()
+          ..addAll(estimates);
+        _options = updatedOptions.isNotEmpty ? updatedOptions : _options;
         _loadingRoute = false;
       });
     } catch (_) {
@@ -207,6 +250,26 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                         ),
                       ),
                     ),
+                    if (_selectedFareEstimate != null && !_loadingRoute)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: Text(
+                          'fare_base_plus_distance'.tr(
+                            namedArgs: {
+                              'distance':
+                                  _routeDistanceKm?.toStringAsFixed(1) ?? '0',
+                              'base': _selectedFareEstimate!.baseFare
+                                  .toStringAsFixed(0),
+                              'distance_charge': _selectedFareEstimate!
+                                  .distanceCharge
+                                  .toStringAsFixed(2),
+                            },
+                          ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ),
                     const SizedBox(height: AppSpacing.sm),
                     Row(
                       children: [
@@ -234,7 +297,9 @@ class _RideSelectionSheetState extends State<RideSelectionSheet> {
                         args: [_selectedOption.nameKey.tr()],
                       ),
                       loading: loading,
-                      onPressed: loading || _loadingRoute
+                      onPressed: loading ||
+                              _loadingRoute ||
+                              _fareEstimates.isEmpty
                           ? null
                           : () {
                               context.read<RequestRideBloc>().add(

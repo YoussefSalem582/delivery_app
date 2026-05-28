@@ -153,6 +153,99 @@ List<LatLng> densifyRoute(
   return densified;
 }
 
+/// Total polyline length in meters.
+double totalRouteDistance(List<LatLng> route) {
+  final cumulative = buildCumulativeDistances(route);
+  if (cumulative.isEmpty) return 0;
+  return cumulative.last;
+}
+
+/// Normalized progress (0–1) at [distanceMeters] along [route].
+double progressAtDistance(List<LatLng> route, double distanceMeters) {
+  if (route.isEmpty) return 0;
+  if (route.length == 1) return 0;
+
+  final total = totalRouteDistance(route);
+  if (total == 0) return 0;
+
+  return (distanceMeters / total).clamp(0.0, 1.0);
+}
+
+/// Remaining distance in meters from [progress] to route end.
+double remainingDistanceMeters(List<LatLng> route, double progress) {
+  final total = totalRouteDistance(route);
+  if (total == 0) return 0;
+  return total * (1 - progress.clamp(0.0, 1.0));
+}
+
+/// Merges two polylines, skipping duplicate junction vertex when endpoints match.
+List<LatLng> concatenateRoutes(List<LatLng> first, List<LatLng> second) {
+  if (first.isEmpty) return List<LatLng>.from(second);
+  if (second.isEmpty) return List<LatLng>.from(first);
+
+  const distance = Distance();
+  final junctionGap = distance(first.last, second.first);
+  if (junctionGap < 5) {
+    return [...first, ...second.skip(1)];
+  }
+  return [...first, ...second];
+}
+
+/// Projects [point] onto the nearest segment of [route].
+({LatLng projected, double distanceAlongRoute}) projectPointOntoRoute(
+  List<LatLng> route,
+  LatLng point,
+) {
+  if (route.isEmpty) {
+    throw ArgumentError('Route must not be empty');
+  }
+  if (route.length == 1) {
+    return (projected: route.first, distanceAlongRoute: 0);
+  }
+
+  final cumulative = buildCumulativeDistances(route);
+  var bestDistance = double.infinity;
+  var bestProjected = route.first;
+  var bestAlongRoute = 0.0;
+
+  for (var i = 1; i < route.length; i++) {
+    final segmentStart = route[i - 1];
+    final segmentEnd = route[i];
+    final projection = _projectPointOntoSegment(
+      point,
+      segmentStart,
+      segmentEnd,
+    );
+    final alongRoute =
+        cumulative[i - 1] + _distance(segmentStart, projection);
+
+    final gap = _distance(point, projection);
+    if (gap < bestDistance) {
+      bestDistance = gap;
+      bestProjected = projection;
+      bestAlongRoute = alongRoute;
+    }
+  }
+
+  return (projected: bestProjected, distanceAlongRoute: bestAlongRoute);
+}
+
+LatLng _projectPointOntoSegment(LatLng point, LatLng a, LatLng b) {
+  final dx = b.longitude - a.longitude;
+  final dy = b.latitude - a.latitude;
+  final lengthSquared = dx * dx + dy * dy;
+  if (lengthSquared == 0) return a;
+
+  final t = ((point.longitude - a.longitude) * dx +
+          (point.latitude - a.latitude) * dy) /
+      lengthSquared;
+  final clamped = t.clamp(0.0, 1.0);
+  return LatLng(
+    a.latitude + dy * clamped,
+    a.longitude + dx * clamped,
+  );
+}
+
 LatLng _lerpLatLng(LatLng a, LatLng b, double t) {
   return LatLng(
     a.latitude + (b.latitude - a.latitude) * t,

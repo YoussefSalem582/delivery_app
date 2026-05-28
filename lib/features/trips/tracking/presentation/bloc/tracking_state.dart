@@ -1,5 +1,7 @@
 part of 'tracking_bloc.dart';
 
+enum TrackingPhase { approach, onTrip }
+
 abstract class TrackingState extends Equatable {
   const TrackingState();
 
@@ -30,6 +32,8 @@ class TrackingActive extends TrackingState {
     required this.remainingRoute,
     required this.progress,
     required this.etaMinutes,
+    required this.phase,
+    required this.remainingDistanceKm,
     this.driverRating,
     this.driverVehicle,
     this.driverPhone,
@@ -43,6 +47,8 @@ class TrackingActive extends TrackingState {
   final List<LatLng> remainingRoute;
   final double progress;
   final int etaMinutes;
+  final TrackingPhase phase;
+  final double remainingDistanceKm;
   final double? driverRating;
   final String? driverVehicle;
   final String? driverPhone;
@@ -56,6 +62,8 @@ class TrackingActive extends TrackingState {
     List<LatLng>? remainingRoute,
     double? progress,
     int? etaMinutes,
+    TrackingPhase? phase,
+    double? remainingDistanceKm,
     double? driverRating,
     String? driverVehicle,
     String? driverPhone,
@@ -69,6 +77,8 @@ class TrackingActive extends TrackingState {
       remainingRoute: remainingRoute ?? this.remainingRoute,
       progress: progress ?? this.progress,
       etaMinutes: etaMinutes ?? this.etaMinutes,
+      phase: phase ?? this.phase,
+      remainingDistanceKm: remainingDistanceKm ?? this.remainingDistanceKm,
       driverRating: driverRating ?? this.driverRating,
       driverVehicle: driverVehicle ?? this.driverVehicle,
       driverPhone: driverPhone ?? this.driverPhone,
@@ -83,6 +93,8 @@ class TrackingActive extends TrackingState {
         driverBearing,
         progress,
         etaMinutes,
+        phase,
+        remainingDistanceKm,
         driverRating,
         driverVehicle,
         driverPhone,
@@ -91,7 +103,8 @@ class TrackingActive extends TrackingState {
   @override
   String toString() =>
       'TrackingActive(tripId: ${trip.id}, status: ${trip.status.name}, '
-      'progress: ${(progress * 100).toStringAsFixed(0)}%, eta: $etaMinutes min)';
+      'phase: ${phase.name}, progress: ${(progress * 100).toStringAsFixed(0)}%, '
+      'eta: $etaMinutes min, remaining: ${remainingDistanceKm.toStringAsFixed(1)} km)';
 }
 
 class TrackingCompleted extends TrackingState {

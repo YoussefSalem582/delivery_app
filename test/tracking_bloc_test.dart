@@ -56,6 +56,43 @@ const _driver = DriverEntity(
   lng: 31.245,
 );
 
+TripRoutePlan _sampleRoutePlan({
+  double approachMeters = 2000,
+  double tripMeters = 5000,
+  double approachSeconds = 240,
+  double tripSeconds = 600,
+}) {
+  final approachPoints = [
+    const LatLng(30.055, 31.245),
+    const LatLng(30.03, 31.02),
+    const LatLng(30, 31),
+  ];
+  final tripPoints = [
+    const LatLng(30, 31),
+    const LatLng(30.05, 31.05),
+    const LatLng(30.1, 31.1),
+  ];
+  final approachLeg = RouteResult(
+    points: approachPoints,
+    distanceMeters: approachMeters,
+    durationSeconds: approachSeconds,
+  );
+  final tripLeg = RouteResult(
+    points: tripPoints,
+    distanceMeters: tripMeters,
+    durationSeconds: tripSeconds,
+  );
+  final totalDistance = approachMeters + tripMeters;
+  return TripRoutePlan(
+    approachLeg: approachLeg,
+    tripLeg: tripLeg,
+    fullRoute: [...approachPoints, ...tripPoints.skip(1)],
+    phaseBoundaryProgress: approachMeters / totalDistance,
+    totalDistanceMeters: totalDistance,
+    totalDurationSeconds: approachSeconds + tripSeconds,
+  );
+}
+
 void main() {
   late MockRouteService routeService;
   late MockGetTripDetailUseCase getTripDetail;
@@ -111,21 +148,12 @@ void main() {
       ),
     ).thenAnswer((_) async {});
     when(
-      () => routeService.getRoute(
+      () => routeService.getTripRoutePlan(
+        driver: any(named: 'driver'),
         pickup: any(named: 'pickup'),
         dropoff: any(named: 'dropoff'),
       ),
-    ).thenAnswer(
-      (_) async => RouteResult(
-        points: [
-          const LatLng(30.055, 31.245),
-          const LatLng(30.05, 31.05),
-          const LatLng(30.1, 31.1),
-        ],
-        distanceMeters: 5000,
-        durationSeconds: 600,
-      ),
-    );
+    ).thenAnswer((_) async => _sampleRoutePlan());
   });
 
   TrackingBloc buildBloc({VoidCallback? onTripsChanged}) {
@@ -141,7 +169,7 @@ void main() {
   }
 
   blocTest<TrackingBloc, TrackingState>(
-    'loads route from driver GPS on tracking start',
+    'loads two-leg route plan on tracking start',
     build: () {
       when(() => getTripDetail(any())).thenAnswer(
         (_) async => Right(_sampleTrip()),
@@ -156,10 +184,11 @@ void main() {
     verify: (bloc) {
       final active = bloc.state as TrackingActive;
       expect(active.driverRating, 4.8);
-      expect(active.driverVehicle, 'Hyundai Elantra - Silver');
-      expect(active.driverPhone, '+201987654321');
+      expect(active.phase, TrackingPhase.approach);
+      expect(active.remainingDistanceKm, greaterThan(0));
       verify(
-        () => routeService.getRoute(
+        () => routeService.getTripRoutePlan(
+          driver: const LatLng(30.055, 31.245),
           pickup: const LatLng(30, 31),
           dropoff: const LatLng(30.1, 31.1),
         ),
@@ -185,7 +214,8 @@ void main() {
     ],
     verify: (_) {
       verify(
-        () => routeService.getRoute(
+        () => routeService.getTripRoutePlan(
+          driver: const LatLng(30, 31),
           pickup: const LatLng(30, 31),
           dropoff: const LatLng(30.1, 31.1),
         ),
@@ -194,25 +224,23 @@ void main() {
   );
 
   blocTest<TrackingBloc, TrackingState>(
-    'increases progress over time-based ticks',
+    'increases progress over distance-based ticks',
     build: () {
       when(() => getTripDetail(any())).thenAnswer(
         (_) async => Right(_sampleTrip()),
       );
       when(
-        () => routeService.getRoute(
+        () => routeService.getTripRoutePlan(
+          driver: any(named: 'driver'),
           pickup: any(named: 'pickup'),
           dropoff: any(named: 'dropoff'),
         ),
       ).thenAnswer(
-        (_) async => RouteResult(
-          points: [
-            const LatLng(30, 31),
-            const LatLng(30.05, 31.05),
-            const LatLng(30.1, 31.1),
-          ],
-          distanceMeters: 5000,
-          durationSeconds: 10,
+        (_) async => _sampleRoutePlan(
+          approachMeters: 1000,
+          tripMeters: 1000,
+          approachSeconds: 10,
+          tripSeconds: 10,
         ),
       );
       return buildBloc();
@@ -224,8 +252,42 @@ void main() {
     },
     verify: (bloc) {
       final active = bloc.state as TrackingActive;
-      expect(active.progress, greaterThan(0.4));
-      expect(active.progress, lessThan(0.6));
+      expect(active.progress, greaterThan(0.2));
+      expect(active.progress, lessThan(0.8));
+      expect(active.etaMinutes, greaterThan(0));
+    },
+  );
+
+  blocTest<TrackingBloc, TrackingState>(
+    'transitions to onTrip phase after approach leg',
+    build: () {
+      when(() => getTripDetail(any())).thenAnswer(
+        (_) async => Right(_sampleTrip()),
+      );
+      when(
+        () => routeService.getTripRoutePlan(
+          driver: any(named: 'driver'),
+          pickup: any(named: 'pickup'),
+          dropoff: any(named: 'dropoff'),
+        ),
+      ).thenAnswer(
+        (_) async => _sampleRoutePlan(
+          approachMeters: 500,
+          tripMeters: 9500,
+          approachSeconds: 5,
+          tripSeconds: 95,
+        ),
+      );
+      return buildBloc();
+    },
+    act: (bloc) async {
+      bloc.add(const TrackingLoadRequested('1'));
+      await Future<void>.delayed(Duration.zero);
+      bloc.add(TrackingTick(DateTime.now().add(const Duration(seconds: 6))));
+    },
+    verify: (bloc) {
+      final active = bloc.state as TrackingActive;
+      expect(active.phase, TrackingPhase.onTrip);
     },
   );
 
@@ -236,18 +298,17 @@ void main() {
         (_) async => Right(_sampleTrip()),
       );
       when(
-        () => routeService.getRoute(
+        () => routeService.getTripRoutePlan(
+          driver: any(named: 'driver'),
           pickup: any(named: 'pickup'),
           dropoff: any(named: 'dropoff'),
         ),
       ).thenAnswer(
-        (_) async => RouteResult(
-          points: [
-            const LatLng(30, 31),
-            const LatLng(30.1, 31.1),
-          ],
-          distanceMeters: 1000,
-          durationSeconds: 10,
+        (_) async => _sampleRoutePlan(
+          approachMeters: 500,
+          tripMeters: 500,
+          approachSeconds: 5,
+          tripSeconds: 5,
         ),
       );
       return buildBloc();

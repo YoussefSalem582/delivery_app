@@ -86,6 +86,23 @@ class _ActiveSheet extends StatelessWidget {
                           ),
                     ),
                     Text(
+                      active.phase == TrackingPhase.approach
+                          ? 'tracking_phase_approach'.tr()
+                          : 'tracking_phase_on_trip'.tr(),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color: scheme.secondary,
+                          ),
+                    ),
+                    Text(
+                      'tracking_remaining_km'.tr(
+                        namedArgs: {
+                          'distance':
+                              active.remainingDistanceKm.toStringAsFixed(1),
+                        },
+                      ),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    Text(
                       '${active.trip.fare.toStringAsFixed(2)} EGP',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: scheme.onSurfaceVariant,

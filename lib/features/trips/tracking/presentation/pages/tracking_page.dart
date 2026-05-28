@@ -30,7 +30,8 @@ class _TrackingPageState extends State<TrackingPage> {
     return BlocProvider(
       create: (_) =>
           sl<TrackingBloc>()..add(TrackingLoadRequested(widget.tripId)),
-      child: BlocListener<TrackingBloc, TrackingState>(
+      child: _TrackingLifecycle(
+        child: BlocListener<TrackingBloc, TrackingState>(
         listenWhen: (previous, current) => current is TrackingError,
         listener: (context, state) {
           if (state is TrackingError) {
@@ -161,9 +162,30 @@ class _TrackingPageState extends State<TrackingPage> {
             },
           ),
         ),
+        ),
       ),
     );
   }
+}
+
+class _TrackingLifecycle extends StatefulWidget {
+  const _TrackingLifecycle({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_TrackingLifecycle> createState() => _TrackingLifecycleState();
+}
+
+class _TrackingLifecycleState extends State<_TrackingLifecycle> {
+  @override
+  void dispose() {
+    context.read<TrackingBloc>().add(const TrackingStopped());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 class _MapTrackingData {

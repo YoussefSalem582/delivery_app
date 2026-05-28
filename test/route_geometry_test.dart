@@ -68,4 +68,52 @@ void main() {
 
     expect(densified.length, 2);
   });
+
+  test('totalRouteDistance sums segment lengths', () {
+    final total = totalRouteDistance(route);
+
+    expect(total, greaterThan(0));
+    expect(total, buildCumulativeDistances(route).last);
+  });
+
+  test('remainingDistanceMeters decreases with progress', () {
+    final atStart = remainingDistanceMeters(route, 0);
+    final atHalf = remainingDistanceMeters(route, 0.5);
+    final atEnd = remainingDistanceMeters(route, 1);
+
+    expect(atStart, greaterThan(atHalf));
+    expect(atHalf, greaterThan(atEnd));
+    expect(atEnd, 0);
+  });
+
+  test('progressAtDistance maps meters to normalized progress', () {
+    final total = totalRouteDistance(route);
+    final half = progressAtDistance(route, total / 2);
+
+    expect(half, closeTo(0.5, 0.01));
+  });
+
+  test('concatenateRoutes merges without duplicate junction point', () {
+    const first = [LatLng(30.0, 31.0), LatLng(30.01, 31.0)];
+    const second = [LatLng(30.01, 31.0), LatLng(30.02, 31.01)];
+
+    final merged = concatenateRoutes(first, second);
+
+    expect(merged.first, first.first);
+    expect(merged.last, second.last);
+    expect(merged.length, 3);
+  });
+
+  test('projectPointOntoRoute snaps point to nearest segment', () {
+    const segmentRoute = [
+      LatLng(30.0, 31.0),
+      LatLng(30.01, 31.0),
+    ];
+    const nearPoint = LatLng(30.005, 31.001);
+
+    final projection = projectPointOntoRoute(segmentRoute, nearPoint);
+
+    expect(projection.distanceAlongRoute, greaterThan(0));
+    expect(projection.distanceAlongRoute, lessThan(totalRouteDistance(segmentRoute)));
+  });
 }

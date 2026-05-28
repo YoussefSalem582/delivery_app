@@ -22,6 +22,30 @@ class RouteResult {
   int get etaMinutes => (durationSeconds / 60).ceil().clamp(1, 99);
 }
 
+class TripRoutePlan {
+  const TripRoutePlan({
+    required this.approachLeg,
+    required this.tripLeg,
+    required this.fullRoute,
+    required this.phaseBoundaryProgress,
+    required this.totalDistanceMeters,
+    required this.totalDurationSeconds,
+  });
+
+  final RouteResult approachLeg;
+  final RouteResult tripLeg;
+  final List<LatLng> fullRoute;
+  final double phaseBoundaryProgress;
+  final double totalDistanceMeters;
+  final double totalDurationSeconds;
+
+  double get avgSpeedMps =>
+      totalDurationSeconds > 0 ? totalDistanceMeters / totalDurationSeconds : 8.33;
+
+  int get totalEtaMinutes =>
+      (totalDurationSeconds / 60).ceil().clamp(1, 99);
+}
+
 class RouteService {
   RouteService(this._dio, this._talker, this._routeCache);
 
@@ -124,6 +148,39 @@ class RouteService {
       _talker.handle(e, st, '[RouteService] Falling back to straight line');
       return _fallbackRoute(pickup, dropoff, straightMeters);
     }
+  }
+
+  /// Two-leg plan: driver → pickup (approach), then pickup → dropoff (trip).
+  Future<TripRoutePlan> getTripRoutePlan({
+    required LatLng driver,
+    required LatLng pickup,
+    required LatLng dropoff,
+  }) async {
+    final approachLeg = await getRoute(pickup: driver, dropoff: pickup);
+    final tripLeg = await getRoute(pickup: pickup, dropoff: dropoff);
+
+    final fullRoute = concatenateRoutes(approachLeg.points, tripLeg.points);
+    final totalDistanceMeters =
+        approachLeg.distanceMeters + tripLeg.distanceMeters;
+    final totalDurationSeconds =
+        approachLeg.durationSeconds + tripLeg.durationSeconds;
+    final phaseBoundaryProgress = totalDistanceMeters > 0
+        ? approachLeg.distanceMeters / totalDistanceMeters
+        : 0.5;
+
+    _talker.info(
+      '[RouteService] Trip route plan: approach ${approachLeg.distanceMeters.toStringAsFixed(0)}m, '
+      'trip ${tripLeg.distanceMeters.toStringAsFixed(0)}m',
+    );
+
+    return TripRoutePlan(
+      approachLeg: approachLeg,
+      tripLeg: tripLeg,
+      fullRoute: fullRoute,
+      phaseBoundaryProgress: phaseBoundaryProgress,
+      totalDistanceMeters: totalDistanceMeters,
+      totalDurationSeconds: totalDurationSeconds,
+    );
   }
 
   RouteResult _fallbackRoute(

@@ -43,6 +43,7 @@ import 'features/profile/shared/domain/repositories/order_repository.dart';
 import 'features/profile/shared/domain/usecases/get_profile_usecase.dart';
 import 'features/profile/shared/domain/usecases/order_usecases.dart';
 import 'features/notifications/shared/domain/usecases/notification_usecases.dart';
+import 'features/trips/shared/domain/usecases/estimate_fare_usecase.dart';
 import 'features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/trips/shared/data/datasources/chat_local_datasource.dart';
@@ -199,6 +200,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetDriverReviewsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateTripStatusUseCase(sl()));
   sl.registerLazySingleton(() => RequestTripUseCase(sl()));
+  sl.registerLazySingleton(() => EstimateFareUseCase());
   sl.registerLazySingleton(() => GetChatMessagesUseCase(sl()));
   sl.registerLazySingleton(() => SendChatMessageUseCase(sl()));
   sl.registerLazySingleton(() => GetOrdersUseCase(sl()));

@@ -51,9 +51,12 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
   Timer? _animationTimer;
   Timer? _statusPollTimer;
   List<LatLng> _route = [];
-  DateTime? _startedAt;
-  double _durationSeconds = 600;
-  int _initialEtaMinutes = 12;
+  DateTime? _lastTickAt;
+  double _distanceTraveledMeters = 0;
+  double _totalDistanceMeters = 1;
+  double _avgSpeedMps = 8.33;
+  double _phaseBoundaryProgress = 0.5;
+  bool _driverArrivedNotified = false;
   String? _tripId;
 
   Future<void> _onLoadRequested(
@@ -92,25 +95,45 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
 
     final pickup = LatLng(activeTrip.pickupLat, activeTrip.pickupLng);
     final dropoff = LatLng(activeTrip.dropoffLat, activeTrip.dropoffLng);
+    final driverLocation = driver != null
+        ? LatLng(driver!.lat, driver!.lng)
+        : pickup;
 
     try {
-      final routeResult = await _routeService.getRoute(
+      final routePlan = await _routeService.getTripRoutePlan(
+        driver: driverLocation,
         pickup: pickup,
         dropoff: dropoff,
       );
 
-      _route = routeResult.points;
-      _initialEtaMinutes = activeTrip.etaMinutes ?? routeResult.etaMinutes;
-      _durationSeconds = activeTrip.etaMinutes != null
-          ? activeTrip.etaMinutes! * 60
-          : routeResult.durationSeconds;
-      _startedAt = DateTime.now();
+      _route = routePlan.fullRoute;
+      _totalDistanceMeters = routePlan.totalDistanceMeters;
+      _avgSpeedMps = routePlan.avgSpeedMps;
+      _phaseBoundaryProgress = routePlan.phaseBoundaryProgress;
+      _driverArrivedNotified =
+          activeTrip.status == TripStatus.driverArrived ||
+          activeTrip.status == TripStatus.inProgress;
 
-      final driverPosition = driver != null
-          ? LatLng(driver!.lat, driver!.lng)
-          : pickup;
+      final projection = projectPointOntoRoute(
+        routePlan.approachLeg.points,
+        driverLocation,
+      );
+      _distanceTraveledMeters = _resolveInitialDistanceTraveled(
+        trip: activeTrip,
+        projectedDistanceOnApproach: projection.distanceAlongRoute,
+        approachDistanceMeters: routePlan.approachLeg.distanceMeters,
+        totalDistanceMeters: routePlan.totalDistanceMeters,
+      );
 
-      final split = splitRouteAtProgress(_route, 0);
+      final progress = (_distanceTraveledMeters / _totalDistanceMeters)
+          .clamp(0.0, 1.0)
+          .toDouble();
+      final split = splitRouteAtProgress(_route, progress);
+      final phase = _phaseForProgress(progress);
+      final remainingMeters = remainingDistanceMeters(_route, progress);
+      final etaMinutes =
+          _etaMinutesFromRemainingMeters(remainingMeters, _avgSpeedMps);
+
       final driverRating = driver?.rating ?? activeTrip.driverRating;
       final driverVehicle = driver?.vehicle ?? activeTrip.driverVehicle;
       final driverPhone = driver?.phone ?? activeTrip.driverPhone;
@@ -119,23 +142,45 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
         TrackingActive(
           trip: activeTrip,
           route: _route,
-          driverPosition: driverPosition,
-          driverBearing: bearingAtProgress(_route, 0),
+          driverPosition: interpolateAlongRoute(_route, progress),
+          driverBearing: bearingAtProgress(_route, progress),
           traveledRoute: split.traveled,
           remainingRoute: split.remaining,
-          progress: 0,
-          etaMinutes: _initialEtaMinutes,
+          progress: progress,
+          etaMinutes: etaMinutes,
+          phase: phase,
+          remainingDistanceKm: remainingMeters / 1000,
           driverRating: driverRating,
           driverVehicle: driverVehicle,
           driverPhone: driverPhone,
         ),
       );
 
+      _lastTickAt = DateTime.now();
       _startTimers();
       _onTripsChanged?.call();
     } catch (_) {
       emit(const TrackingError('error_generic'));
     }
+  }
+
+  double _resolveInitialDistanceTraveled({
+    required TripEntity trip,
+    required double projectedDistanceOnApproach,
+    required double approachDistanceMeters,
+    required double totalDistanceMeters,
+  }) {
+    var initial = projectedDistanceOnApproach;
+
+    if (trip.status == TripStatus.inProgress) {
+      final elapsedSeconds =
+          DateTime.now().difference(trip.updatedAt).inSeconds.toDouble();
+      if (elapsedSeconds > 10) {
+        initial = approachDistanceMeters + (elapsedSeconds * _avgSpeedMps);
+      }
+    }
+
+    return initial.clamp(0, totalDistanceMeters);
   }
 
   void _startTimers() {
@@ -156,17 +201,34 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     _statusPollTimer?.cancel();
   }
 
-  void _onTick(TrackingTick event, Emitter<TrackingState> emit) {
-    if (state is! TrackingActive || _startedAt == null || _route.length < 2) {
+  Future<void> _onTick(TrackingTick event, Emitter<TrackingState> emit) async {
+    if (state is! TrackingActive || _route.length < 2) {
       return;
     }
 
     final current = state as TrackingActive;
-    final elapsedSeconds =
-        event.now.difference(_startedAt!).inMilliseconds / 1000;
-    final progress =
-        (elapsedSeconds / _durationSeconds).clamp(0.0, 1.0).toDouble();
+    final lastTick = _lastTickAt ?? event.now;
+    final deltaSeconds =
+        event.now.difference(lastTick).inMilliseconds / 1000;
+    _lastTickAt = event.now;
+
+    _distanceTraveledMeters = (_distanceTraveledMeters +
+            (_avgSpeedMps * deltaSeconds))
+        .clamp(0, _totalDistanceMeters);
+
+    final progress = (_distanceTraveledMeters / _totalDistanceMeters)
+        .clamp(0.0, 1.0)
+        .toDouble();
     final split = splitRouteAtProgress(_route, progress);
+    final remainingMeters = remainingDistanceMeters(_route, progress);
+    final etaMinutes =
+        _etaMinutesFromRemainingMeters(remainingMeters, _avgSpeedMps);
+    final phase = _phaseForProgress(progress);
+
+    if (phase == TrackingPhase.onTrip && !_driverArrivedNotified) {
+      _driverArrivedNotified = true;
+      unawaited(_markDriverArrived(current.trip));
+    }
 
     if (progress >= 1.0) {
       _cancelTimers();
@@ -194,9 +256,38 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
         traveledRoute: split.traveled,
         remainingRoute: split.remaining,
         progress: progress,
-        etaMinutes: ((1 - progress) * _initialEtaMinutes).ceil().clamp(1, 99),
+        etaMinutes: etaMinutes,
+        phase: phase,
+        remainingDistanceKm: remainingMeters / 1000,
       ),
     );
+  }
+
+  TrackingPhase _phaseForProgress(double progress) {
+    return progress >= _phaseBoundaryProgress
+        ? TrackingPhase.onTrip
+        : TrackingPhase.approach;
+  }
+
+  int _etaMinutesFromRemainingMeters(double remainingMeters, double speedMps) {
+    if (speedMps <= 0) return 1;
+    return (remainingMeters / speedMps / 60).ceil().clamp(1, 99);
+  }
+
+  Future<void> _markDriverArrived(TripEntity trip) async {
+    if (trip.status == TripStatus.driverArrived ||
+        trip.status == TripStatus.inProgress ||
+        trip.status == TripStatus.completed) {
+      return;
+    }
+
+    await _updateTripStatus(
+      UpdateTripStatusParams(
+        tripId: trip.id,
+        status: TripStatus.driverArrived,
+      ),
+    );
+    _onTripsChanged?.call();
   }
 
   Future<void> _onStatusPoll(
@@ -251,6 +342,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     bool notify = true,
   }) async {
     if (trip.status == TripStatus.inProgress ||
+        trip.status == TripStatus.driverArrived ||
         trip.status == TripStatus.completed ||
         trip.status == TripStatus.cancelled) {
       return trip;
