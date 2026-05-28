@@ -5,6 +5,7 @@ import 'package:delivery_app/core/constants/app_constants.dart';
 import 'package:delivery_app/features/auth/shared/domain/entities/user_entity.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import 'package:delivery_app/core/network/api_endpoints.dart';
+import 'package:delivery_app/core/network/mock_session_context.dart';
 import 'package:delivery_app/core/network/network_status.dart';
 import 'package:delivery_app/core/utils/cache_freshness.dart';
 
@@ -58,6 +59,7 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     await _local.saveUser(user);
+    MockSessionContext.setUserId(user.id);
     return user;
   }
 
@@ -74,7 +76,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> logout() => _local.clearUser();
+  Future<void> logout() async {
+    MockSessionContext.clear();
+    await _local.clearUser();
+  }
 
   @override
   Future<void> requestPasswordReset({required String email}) async {
