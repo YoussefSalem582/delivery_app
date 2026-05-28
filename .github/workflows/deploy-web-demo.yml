@@ -2,7 +2,7 @@ name: Deploy Web Demo
 
 on:
   push:
-    branches: [feature/web-client-demo]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web demo
-        run: flutter build web --release --base-href /delivery_app/
+        run: flutter build web --release --base-href /Nokta-Delivery-App/ --no-wasm-dry-run
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

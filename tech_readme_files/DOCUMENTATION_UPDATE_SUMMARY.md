@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-05-28 — GitHub Pages deploy fix (base-href + main trigger)
+
+**What changed:** Updated `--base-href` to `/Nokta-Delivery-App/` to match renamed repo; added `--no-wasm-dry-run` to CI build; deploy workflow now triggers on `main` (web demo merged from `feature/web-client-demo`).
+
+**Demo URL:** https://youssefsalem582.github.io/Nokta-Delivery-App/
+
+**One-time setup:** Repo Settings → Pages → Source: **GitHub Actions**
+
+**Files touched:** `.github/workflows/deploy-web-demo.yml`, `README.md`, `CHANGELOG.md`, `tech_readme_files/CURRENT_STATUS.md`
+
+---
+
 ## 2026-05-28 — Skills lock LF alignment (CI)
 
 **What changed:** Fixed cross-platform skills drift: lock hashes now match LF git blobs (Linux CI). Added `.agents/skills/**` + `skills-lock.json` to `.gitattributes` (`eol=lf`); regenerated all 19 `computedHash` entries; drift scripts normalize CRLF→LF on read.
@@ -32,7 +44,7 @@
 
 **What changed:** Flutter Web platform; `device_preview` shell on `kIsWeb`; Photon geocoding for browser CORS; web guards for Workmanager and map tile disk cache; `map_launcher` without `dart:io`; GitHub Actions deploy to Pages on `feature/web-client-demo` push.
 
-**Demo URL (after merge + Pages setup):** https://youssefsalem582.github.io/delivery_app/
+**Demo URL (after merge + Pages setup):** https://youssefsalem582.github.io/Nokta-Delivery-App/
 
 **One-time setup:** Repo Settings → Pages → Source: **GitHub Actions**
 

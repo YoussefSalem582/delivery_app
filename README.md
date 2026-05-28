@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://youssefsalem582.github.io/delivery_app/">Try web demo</a> ·
+  <a href="https://youssefsalem582.github.io/Nokta-Delivery-App/">Try web demo</a> ·
   <a href="tech_readme_files/CURRENT_STATUS.md">Live status</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="AGENTS.md">Agent conventions</a> ·
@@ -126,10 +126,10 @@ flutter run
 
 ```bash
 flutter run -d chrome
-flutter build web --release --base-href /delivery_app/
+flutter build web --release --base-href /Nokta-Delivery-App/
 ```
 
-Live demo (after push to `feature/web-client-demo` + [GitHub Pages Actions setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)): **https://youssefsalem582.github.io/delivery_app/**
+Live demo (after push to `main` + [GitHub Pages Actions setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)): **https://youssefsalem582.github.io/Nokta-Delivery-App/**
 
 Do a **full restart** (not hot reload) after changing native splash or launcher icons.
 

@@ -11,11 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **GitHub Pages deploy** — corrected `--base-href` from `/delivery_app/` to `/Nokta-Delivery-App/` after repo rename; deploy workflow now triggers on `main` (web demo merged from `feature/web-client-demo`).
 - **Skills lock drift (CI)** — root cause was Windows `autocrlf` checkout (CRLF working tree) vs LF git blobs hashed on Linux CI; regenerated all 19 `computedHash` values from LF bytes, force `eol=lf` on `.agents/skills/**`, and normalize CRLF→LF in both drift-check scripts.
 
 ### Added
 
-- **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL: `https://youssefsalem582.github.io/delivery_app/` (deploys from `feature/web-client-demo` via GitHub Actions)
+- **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL: `https://youssefsalem582.github.io/Nokta-Delivery-App/` (deploys from `main` via GitHub Actions)
 
 ### Changed
 
