@@ -16,7 +16,9 @@ import 'package:delivery_app/features/driver/shared/presentation/cubit/app_mode_
 import 'package:delivery_app/features/driver/shared/presentation/cubit/driver_availability_cubit.dart';
 import 'package:delivery_app/injection_container.dart';
 import 'package:delivery_app/shared/widgets/banners/offline_banner.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -73,15 +75,16 @@ class _NoktaAppState extends State<NoktaApp> {
             return MaterialApp.router(
               title: AppConstants.appName,
               debugShowCheckedModeBanner: false,
+              useInheritedMediaQuery: kIsWeb,
               localizationsDelegates: context.localizationDelegates,
               supportedLocales: context.supportedLocales,
-              locale: settings.locale,
+              locale: kIsWeb ? DevicePreview.locale(context) : settings.locale,
               theme: AppTheme.light(locale: settings.locale.languageCode),
               darkTheme: AppTheme.dark(locale: settings.locale.languageCode),
               themeMode: settings.themeMode,
               routerConfig: AppRouter.router,
               builder: (context, child) {
-                return BlocBuilder<ConnectivityCubit, ConnectivityStatus>(
+                final appContent = BlocBuilder<ConnectivityCubit, ConnectivityStatus>(
                   builder: (context, status) {
                     final content = MediaQuery(
                       data: MediaQuery.of(
@@ -98,6 +101,11 @@ class _NoktaAppState extends State<NoktaApp> {
                     );
                   },
                 );
+
+                if (kIsWeb) {
+                  return DevicePreview.appBuilder(context, appContent);
+                }
+                return appContent;
               },
             );
           },
