@@ -54,9 +54,9 @@ class RequestRideBloc extends Bloc<RequestRideEvent, RequestRideState> {
       (trip) async {
         await _fcmService.simulateTripNotification(
           title: 'notification_trip_update',
-          body: 'notification_trip_accepted',
+          body: 'waiting_for_driver',
           tripId: trip.id,
-          type: NotificationType.tripAccepted,
+          type: NotificationType.tripUpdate,
         );
         _onTripsChanged?.call();
         emit(RequestRideSuccess(trip));

@@ -86,11 +86,17 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       return;
     }
 
-    final activeTrip = await _ensureInProgress(trip, notify: false);
+    final activeTrip = trip.status == TripStatus.requested ||
+            trip.status == TripStatus.accepted
+        ? trip
+        : await _ensureInProgress(trip, notify: false);
 
     DriverEntity? driver;
     final driverResult = await _getDriverForTrip(
-      GetDriverForTripParams(driverName: activeTrip.driverName),
+      GetDriverForTripParams(
+        driverId: activeTrip.driverId,
+        driverName: activeTrip.driverName,
+      ),
     );
     driverResult.fold((_) {}, (value) => driver = value);
 
@@ -156,7 +162,17 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       );
 
       _lastTickAt = DateTime.now();
-      _startTimers();
+      if (activeTrip.driverId == null &&
+          activeTrip.status != TripStatus.requested &&
+          activeTrip.status != TripStatus.accepted) {
+        _startTimers();
+      } else {
+        _statusPollTimer?.cancel();
+        _statusPollTimer = Timer.periodic(
+          const Duration(seconds: 10),
+          (_) => add(const TrackingStatusPollRequested()),
+        );
+      }
       _onTripsChanged?.call();
     } catch (_) {
       emit(const TrackingError('error_generic'));
@@ -206,6 +222,9 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     }
 
     final current = state as TrackingActive;
+    if (current.trip.driverId != null) {
+      return;
+    }
     final lastTick = _lastTickAt ?? event.now;
     final deltaSeconds =
         event.now.difference(lastTick).inMilliseconds / 1000;
@@ -326,6 +345,19 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       }
 
       emit(current.copyWith(trip: updatedTrip));
+
+      if (updatedTrip.driverLat != null && updatedTrip.driverLng != null) {
+        final driverPos = LatLng(
+          updatedTrip.driverLat!,
+          updatedTrip.driverLng!,
+        );
+        emit(
+          current.copyWith(
+            trip: updatedTrip,
+            driverPosition: driverPos,
+          ),
+        );
+      }
     });
   }
 

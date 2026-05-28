@@ -22,6 +22,7 @@ class CurrentTripCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final driverName = trip.driverName;
+    final isWaitingForDriver = trip.status == TripStatus.requested;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -61,7 +62,30 @@ class CurrentTripCard extends StatelessWidget {
             ),
           ),
         ),
-        if (driverName != null && driverName.isNotEmpty) ...[
+        if (isWaitingForDriver) ...[
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: scheme.primary,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  'waiting_for_driver'.tr(),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ] else if (driverName != null && driverName.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
@@ -108,8 +132,10 @@ class CurrentTripCard extends StatelessWidget {
         ],
         const SizedBox(height: AppSpacing.md),
         AppButton(
-          label: 'track_trip'.tr(),
-          icon: Icons.navigation,
+          label: isWaitingForDriver
+              ? 'waiting_for_driver'.tr()
+              : 'track_trip'.tr(),
+          icon: isWaitingForDriver ? Icons.hourglass_top : Icons.navigation,
           onPressed: () => context.pushNamed(
             RouteNames.tracking,
             pathParameters: {'tripId': trip.id},
