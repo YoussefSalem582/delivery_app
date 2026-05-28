@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Randomized driver placement for live tracking.
+> **Last Updated:** May 27, 2026 — Real Nominatim location search for pickup and dropoff.
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
@@ -27,7 +27,7 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Feature | Status |
 |---------|--------|
 | Auth (splash, onboarding, login, register) | ✅ Demo complete |
-| Home / map / ride request | ✅ Demo complete (destination autocomplete, per-km fare from OSRM distance, payment/promo pickers wired) |
+| Home / map / ride request | ✅ Demo complete (Nominatim geocoding for pickup + dropoff, saved home/work chips, OSRM routing, per-km fare, payment/promo pickers) |
 | Trips (list, detail, tracking) | ✅ Demo complete (randomized driver near pickup ≤8 min approach, two-phase tracking, connected cache sync, current trip card, driver profile, chat + call) |
 | Notifications | ✅ Demo complete |
 | Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |

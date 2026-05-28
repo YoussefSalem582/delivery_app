@@ -1,3 +1,4 @@
+import 'package:delivery_app/features/home/ride_request/domain/entities/quick_destination_type.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/shared/widgets/navigation/app_bottom_nav_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -11,7 +12,7 @@ class HomeDestinationPanel extends StatelessWidget {
   });
 
   final VoidCallback onSearchTap;
-  final ValueChanged<String>? onQuickDestination;
+  final ValueChanged<QuickDestinationType>? onQuickDestination;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class HomeDestinationPanel extends StatelessWidget {
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Text(
-                          'search_destination'.tr(),
+                          'search_locations'.tr(),
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: scheme.outline,
                               ),
@@ -92,19 +93,19 @@ class HomeDestinationPanel extends StatelessWidget {
                   _QuickChip(
                     icon: Icons.home_outlined,
                     label: 'quick_home'.tr(),
-                    onTap: () => onQuickDestination?.call('home'),
+                    onTap: () => onQuickDestination?.call(QuickDestinationType.home),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   _QuickChip(
                     icon: Icons.work_outline,
                     label: 'quick_work'.tr(),
-                    onTap: () => onQuickDestination?.call('work'),
+                    onTap: () => onQuickDestination?.call(QuickDestinationType.work),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   _QuickChip(
                     icon: Icons.flight_takeoff,
                     label: 'quick_airport'.tr(),
-                    onTap: () => onQuickDestination?.call('airport'),
+                    onTap: () => onQuickDestination?.call(QuickDestinationType.airport),
                   ),
                 ],
               ),

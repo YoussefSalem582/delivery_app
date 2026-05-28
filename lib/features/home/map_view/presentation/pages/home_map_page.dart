@@ -8,11 +8,15 @@ import 'package:delivery_app/shared/widgets/banners/app_toast.dart';
 import 'package:delivery_app/core/utils/map_config.dart';
 import 'package:delivery_app/core/utils/ui_helpers.dart';
 import 'package:delivery_app/core/widgets/delivery_map.dart';
+import 'package:delivery_app/features/home/ride_request/domain/entities/quick_destination_type.dart';
+import 'package:delivery_app/features/home/ride_request/presentation/cubit/location_search_state.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_option_card.dart';
 import 'package:delivery_app/features/home/map_view/presentation/bloc/map_bloc.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/home_destination_panel.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/request_ride_sheet.dart';
 import 'package:delivery_app/features/home/ride_request/presentation/widgets/ride_selection_sheet.dart';
+import 'package:delivery_app/features/home/shared/data/datasources/saved_places_local_datasource.dart';
+import 'package:delivery_app/features/home/shared/domain/entities/place_suggestion.dart';
 import 'package:delivery_app/shared/widgets/navigation/profile_avatar_button.dart';
 import 'package:delivery_app/shared/widgets/navigation/shell_app_bar_logo.dart';
 import 'package:delivery_app/injection_container.dart';
@@ -37,8 +41,47 @@ class _HomeMapPageState extends State<HomeMapPage> {
   Future<void> _startRideFlow(
     BuildContext context,
     MapReady mapState, {
-    String? dropoffKey,
+    QuickDestinationType? quickDestination,
   }) async {
+    PlaceSuggestion? initialDropoff;
+    String? initialDropoffQuery;
+    String? hintMessageKey;
+    LocationSearchField? initialActiveField;
+
+    if (quickDestination != null) {
+      initialActiveField = LocationSearchField.dropoff;
+      switch (quickDestination) {
+        case QuickDestinationType.home:
+          final saved = sl<SavedPlacesLocalDataSource>().getHome();
+          if (saved != null) {
+            initialDropoff = PlaceSuggestion(
+              id: 'saved_home',
+              title: saved.address ?? 'quick_home'.tr(),
+              subtitle: '',
+              lat: saved.lat,
+              lng: saved.lng,
+            );
+          } else {
+            hintMessageKey = 'saved_place_missing_home';
+          }
+        case QuickDestinationType.work:
+          final saved = sl<SavedPlacesLocalDataSource>().getWork();
+          if (saved != null) {
+            initialDropoff = PlaceSuggestion(
+              id: 'saved_work',
+              title: saved.address ?? 'quick_work'.tr(),
+              subtitle: '',
+              lat: saved.lat,
+              lng: saved.lng,
+            );
+          } else {
+            hintMessageKey = 'saved_place_missing_work';
+          }
+        case QuickDestinationType.airport:
+          initialDropoffQuery = 'place_airport_search_query'.tr();
+      }
+    }
+
     final draft = await showModalBottomSheet<RideRequestDraft>(
       context: context,
       isScrollControlled: true,
@@ -46,7 +89,10 @@ class _HomeMapPageState extends State<HomeMapPage> {
       builder: (_) => RequestRideSheet(
         pickupLat: mapState.userPosition.latitude,
         pickupLng: mapState.userPosition.longitude,
-        initialDropoffKey: dropoffKey,
+        initialDropoff: initialDropoff,
+        initialDropoffQuery: initialDropoffQuery,
+        hintMessageKey: hintMessageKey,
+        initialActiveField: initialActiveField,
       ),
     );
 
@@ -205,8 +251,8 @@ class _HomeMapPageState extends State<HomeMapPage> {
                     bottom: 0,
                     child: HomeDestinationPanel(
                       onSearchTap: () => _startRideFlow(context, state),
-                      onQuickDestination: (key) =>
-                          _startRideFlow(context, state, dropoffKey: key),
+                      onQuickDestination: (type) =>
+                          _startRideFlow(context, state, quickDestination: type),
                     ),
                   ),
               ],

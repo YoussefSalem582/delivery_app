@@ -9,4 +9,9 @@ abstract final class EnvConfig {
     'ENABLE_LOGGING',
     defaultValue: true,
   );
+
+  static const String nominatimBaseUrl = String.fromEnvironment(
+    'NOMINATIM_BASE_URL',
+    defaultValue: 'https://nominatim.openstreetmap.org',
+  );
 }

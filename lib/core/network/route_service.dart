@@ -1,7 +1,7 @@
 import 'package:delivery_app/core/cache/datasources/route_cache_local_datasource.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/route_cache_entity.dart';
 import 'package:delivery_app/core/utils/driver_placement.dart';
-import 'package:delivery_app/core/utils/demo_destinations.dart';
+import 'package:delivery_app/core/utils/route_constants.dart';
 import 'package:delivery_app/core/utils/route_geometry.dart';
 import 'package:dio/dio.dart';
 import 'package:latlong2/latlong.dart';
@@ -109,7 +109,7 @@ class RouteService {
   ) async {
     const distanceCalc = Distance();
     final straightMeters = distanceCalc(pickup, dropoff);
-    if (straightMeters > DemoDestinations.maxOsrmDistanceMeters) {
+    if (straightMeters > RouteConstants.maxOsrmDistanceMeters) {
       _talker.info(
         '[RouteService] Route exceeds OSRM demo range, using straight line',
       );

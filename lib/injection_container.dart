@@ -30,6 +30,13 @@ import 'features/auth/shared/domain/usecases/logout_usecase.dart';
 import 'features/auth/shared/domain/usecases/register_usecase.dart';
 import 'features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'features/home/map_view/presentation/bloc/map_bloc.dart';
+import 'features/home/ride_request/presentation/cubit/location_search_cubit.dart';
+import 'features/home/shared/data/datasources/nominatim_remote_datasource.dart';
+import 'features/home/shared/data/datasources/saved_places_local_datasource.dart';
+import 'features/home/shared/data/repositories/geocoding_repository_impl.dart';
+import 'features/home/shared/domain/repositories/geocoding_repository.dart';
+import 'features/home/shared/domain/usecases/reverse_geocode.dart';
+import 'features/home/shared/domain/usecases/search_places.dart';
 import 'features/notifications/notification_list/presentation/bloc/notification_bloc.dart';
 import 'features/notifications/shared/data/datasources/notification_local_datasource.dart';
 import 'features/notifications/shared/data/repositories/notification_repository_impl.dart';
@@ -145,6 +152,12 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => CacheMetadataLocalDataSource(sl()));
   sl.registerLazySingleton(() => RouteCacheLocalDataSource(sl()));
 
+  sl.registerLazySingleton(() => NominatimRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => SavedPlacesLocalDataSource(sl()));
+  sl.registerLazySingleton<GeocodingRepository>(
+    () => GeocodingRepositoryImpl(remote: sl()),
+  );
+
   // ─── Repositories ────────────────────────────────────────────
   sl.registerLazySingleton<TripRepository>(
     () => TripRepositoryImpl(
@@ -209,6 +222,8 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkNotificationReadUseCase(sl()));
   sl.registerLazySingleton(() => GetUnreadNotificationCountUseCase(sl()));
+  sl.registerLazySingleton(() => SearchPlacesUseCase(sl()));
+  sl.registerLazySingleton(() => ReverseGeocodeUseCase(sl()));
 
   // ─── Services ────────────────────────────────────────────────
   sl.registerLazySingleton(
@@ -260,6 +275,13 @@ Future<void> initDependencies() async {
     ),
   );
   sl.registerFactory(() => MapBloc());
+  sl.registerFactory(
+    () => LocationSearchCubit(
+      searchPlaces: sl(),
+      reverseGeocode: sl(),
+      connectivityCubit: sl(),
+    ),
+  );
   sl.registerFactory(
     () => TrackingBloc(
       routeService: sl(),

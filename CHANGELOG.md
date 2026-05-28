@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Real location search (Nominatim)** — pickup and dropoff use OpenStreetMap geocoding with debounced autocomplete, reverse geocode for GPS pickup, offline guard, and OSM attribution. Removed demo place catalog and GPS-offset dropoff coordinates.
+
 ### Fixed
 
 - **Tracking page dispose crash** — `TrackingPage` holds bloc reference directly instead of `context.read` in `dispose()`.
@@ -21,9 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Two-phase live tracking** — `TrackingBloc` simulates driver → pickup → dropoff with distance-based progress/ETA, phase labels, remaining km, and `getTripRoutePlan()` two-leg routing.
 - **12-hour clock (AM/PM) app-wide** — Centralized `formatAppClockTime` / `formatTripDate` / `formatAppDateTime` in `date_time_format.dart`; chat bubbles, ride ETA labels, trip/notification timestamps, and order details use 12-hour format; `MaterialApp` forces `alwaysUse24HourFormat: false`.
 
-### Added
+### Removed
 
-- **Destination autocomplete** — "Where to?" sheet filters a local demo place catalog while typing; user must pick a suggestion before Continue; selected place drives dropoff coordinates for pricing and routing.
+- **Demo place catalog** — `DemoPlace`, `DemoDestinations`, and GPS-offset dropoff coordinates replaced by Nominatim geocoding.
+
+### Added (prior)
+
+- **Destination autocomplete (demo)** — superseded by Nominatim real location search above.
 - **Pricing domain** — `PricingConfig`, `TierPricing`, `FareEstimate`, `EstimateFareUseCase` (Economy/Premium/Delivery base + per-km rates with minimum fare).
 - **Route geometry helpers** — `concatenateRoutes`, `totalRouteDistance`, `progressAtDistance`, `remainingDistanceMeters`, `projectPointOntoRoute` for accurate tracking simulation.
 - **Driver placement** — `DriverPlacement.randomStartNearPickup()` for deterministic per-trip driver GPS near pickup, separated from dropoff, capped at ~8 min straight-line approach.

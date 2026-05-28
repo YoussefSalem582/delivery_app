@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-05-27 — Real location search with Nominatim
+
+**What changed:** Replaced demo place catalog and GPS-offset dropoffs with OpenStreetMap Nominatim geocoding. Both pickup and dropoff are searchable; GPS pickup is reverse-geocoded on sheet open. Quick chips use saved home/work (SharedPreferences) or airport Nominatim query.
+
+**Architecture:** `features/home/shared/` geocoding layer (repository, Nominatim datasource, use cases) + `LocationSearchCubit` with debounce, cancel, offline guard.
+
+**Removed:** `DemoPlace`, `DemoDestinations`, `demo_destinations_test.dart`
+
+**Files touched:** `place_suggestion.dart`, `nominatim_remote_datasource.dart`, `geocoding_repository_impl.dart`, `saved_places_local_datasource.dart`, `location_search_cubit.dart`, `request_ride_sheet.dart`, `home_map_page.dart`, `home_destination_panel.dart`, `route_constants.dart`, `env_config.dart`, `injection_container.dart`, `en.json`, `ar.json`, `nominatim_place_model_test.dart`, `location_search_cubit_test.dart`
+
+---
+
 ## 2026-05-27 — Randomized driver placement for live tracking
 
 **What changed:** Driver GPS at tracking start is no longer taken from static catalog coords. Each trip gets a deterministic random start near pickup (seeded by trip id), kept away from the dropoff, with max ~8 min approach ETA. OSRM retries up to 4 times with closer placement if road ETA exceeds 8 min.
