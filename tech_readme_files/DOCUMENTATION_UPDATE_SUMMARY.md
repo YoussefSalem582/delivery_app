@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-05-28 — Web PWA icons aligned with mobile
+
+**What changed:** `flutter_launcher_icons` `web:` config generates favicon + 192/512/maskable icons from `assets/app_icon.png`; `web/manifest.json` branded as Nokta with primary theme color.
+
+**Files touched:** `pubspec.yaml`, `web/icons/**`, `web/favicon.png`, `web/manifest.json`
+
+---
+
+## 2026-05-28 — Web client demo (Device Preview + GitHub Pages)
+
+**What changed:** Flutter Web platform; `device_preview` shell on `kIsWeb`; Photon geocoding for browser CORS; web guards for Workmanager and map tile disk cache; `map_launcher` without `dart:io`; GitHub Actions deploy to Pages on `main` push.
+
+**Demo URL (after merge + Pages setup):** https://youssefsalem582.github.io/delivery_app/
+
+**One-time setup:** Repo Settings → Pages → Source: **GitHub Actions**
+
+**Files touched:** `web/**`, `pubspec.yaml`, `lib/main.dart`, `lib/app.dart`, `lib/core/utils/map_launcher.dart`, `lib/core/sync/sync_service.dart`, `lib/core/utils/map_tile_cache.dart`, `lib/features/home/shared/data/datasources/photon_remote_datasource.dart`, `lib/features/home/shared/data/repositories/geocoding_repository_impl.dart`, `lib/injection_container.dart`, `.github/workflows/deploy-web-demo.yml`, `README.md`
+
+---
+
 ## 2026-05-28 — Driver offer preview + passenger sheet
 
 **What changed:** Offer cards open `DriverOfferPreviewPage` (OSRM route map, passenger info, accept/decline); `TrackingRiderRow` on driver active-trip sheet; `RiderEntity` + `GetRiderForTripUseCase` + `assets/mock/riders.json`.

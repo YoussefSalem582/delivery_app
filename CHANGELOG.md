@@ -9,7 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Web client demo** — Flutter Web + [`device_preview`](https://pub.dev/packages/device_preview) phone-frame shell for shareable browser demos; Photon geocoding on web (CORS-safe); GitHub Pages deploy workflow (`.github/workflows/deploy-web-demo.yml`); demo URL after merge to `main`: `https://youssefsalem582.github.io/delivery_app/`
+
 ### Changed
+
+- **Web PWA icons** — `flutter_launcher_icons` now generates `web/icons/*` and `web/favicon.png` from `assets/app_icon.png` (same source as Android/iOS); manifest uses Nokta name and brand colors (`#FFFFFF` / `#0050CB`).
 
 - **Driver active trip uses live tracking system** — driver active trip now shares `TrackingBloc`, `LiveTrackingPage`, OSRM two-leg route geometry, traveled/remaining polylines, animated marker, and `TrackingBottomSheet` with rider tracking; driver status actions (arrived/start/complete) and location publish live in `TrackingBloc` driver mode; removed `DriverActiveTripBloc`.
 

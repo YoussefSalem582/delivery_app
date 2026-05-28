@@ -2,11 +2,11 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 28, 2026 — Driver offer route preview + passenger sheet on active trip.
+> **Last Updated:** May 28, 2026 — Web client demo (Device Preview + GitHub Pages).
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
-> **Status:** ✅ MVP template complete | ✅ Dual-mode driver demo | 🚧 Production backend TBD
+> **Status:** ✅ MVP template complete | ✅ Dual-mode driver demo | ✅ Web client demo | 🚧 Production backend TBD
 
 ## Executive Summary
 
@@ -21,7 +21,19 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 - ✅ **i18n** — easy_localization JSON (EN + AR, RTL)
 - ✅ **Observability** — Talker (Dio, BLoC, in-app console)
 - ✅ **Agent docs** — AGENTS.md, 22 skills, Cursor/Claude/Codex/Copilot shims
-- ✅ **Native branding** — Android/iOS launcher icons from `assets/app_icon.png`; native splash + in-app wordmark use `assets/logo.png` (light) / `assets/logo_light.png` (dark)
+- ✅ **Native branding** — Android/iOS/Web launcher icons from `assets/app_icon.png` via `flutter_launcher_icons`; native splash + in-app wordmark use `assets/logo.png` (light) / `assets/logo_light.png` (dark)
+- ✅ **Web client demo** — shareable link with device frame (`device_preview`); auto-deploy to GitHub Pages on `main`
+
+## Client demo (web)
+
+| Item | Detail |
+|------|--------|
+| **Live URL** | https://youssefsalem582.github.io/delivery_app/ (live after merge to `main` + GitHub Pages Actions setup) |
+| **Local preview** | `flutter run -d chrome` |
+| **Release build** | `flutter build web --release --base-href /delivery_app/` |
+| **Deploy** | Push to `main` triggers `.github/workflows/deploy-web-demo.yml` |
+
+**Web demo limits:** push notifications simulated only; no Workmanager background sync; geocoding uses Photon (not Nominatim); open-in-maps opens Google Maps in a new tab.
 
 ## Feature Status
 
@@ -34,6 +46,7 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |
 | Settings (theme, locale, driver mode) | ✅ Complete (shared `AppModeSwitchTile`, `LogoutButton`, `performAppLogout`) |
 | Driver mode (shell, offers, jobs, active trip) | ✅ Demo complete (offer map preview with passenger sheet; active trip uses shared `TrackingBloc` / `LiveTrackingPage`) |
+| Web client demo (Device Preview + GitHub Pages) | ✅ Implemented on `feature/web-client-demo`; deploys from `main` |
 | Real backend integration | 🚧 Mock API only |
 | Production auth (secure storage) | 🚧 Planned |
 | Payments / wallet (real) | 🚧 Demo top-up only (Hive-local) |

@@ -15,6 +15,7 @@
 </p>
 
 <p align="center">
+  <a href="https://youssefsalem582.github.io/delivery_app/">Try web demo</a> ·
   <a href="tech_readme_files/CURRENT_STATUS.md">Live status</a> ·
   <a href="CHANGELOG.md">Changelog</a> ·
   <a href="AGENTS.md">Agent conventions</a> ·
@@ -121,6 +122,15 @@ flutter pub get
 flutter run
 ```
 
+**Web client demo** (shareable browser preview with device frame):
+
+```bash
+flutter run -d chrome
+flutter build web --release --base-href /delivery_app/
+```
+
+Live demo (after merge to `main` + [GitHub Pages Actions setup](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow)): **https://youssefsalem582.github.io/delivery_app/**
+
 Do a **full restart** (not hot reload) after changing native splash or launcher icons.
 
 ### 3. Maps & routing
@@ -150,7 +160,7 @@ Without Firebase, the app still runs — trip notifications are simulated via `F
 
 ### 5. Regenerate app icon & native splash
 
-Icons and splash are generated from assets via `flutter_launcher_icons` and `flutter_native_splash` (configured in `pubspec.yaml`):
+Icons and splash are generated from assets via `flutter_launcher_icons` and `flutter_native_splash` (configured in `pubspec.yaml`). Launcher icons cover **Android, iOS, and Web** (PWA favicon + manifest icons):
 
 ```bash
 dart run flutter_launcher_icons
@@ -159,7 +169,7 @@ dart run flutter_native_splash:create
 
 | Asset | Purpose |
 |-------|---------|
-| `assets/app_icon.png` | Square launcher icon (Android adaptive + iOS) |
+| `assets/app_icon.png` | Square launcher icon (Android adaptive + iOS + Web PWA) |
 | `assets/logo.png` | Horizontal wordmark for native splash screen |
 | `assets/logo.png` | In-app branding + native splash — light theme (`AppBrandIcon`) |
 | `assets/logo_light.png` | In-app branding + native splash — dark theme |
