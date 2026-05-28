@@ -49,9 +49,9 @@ build_content() {
     cat <<EOF
 # ============================================================
 # ${agent_file} - Exclude from ${agent_name} context
-# AUTO-GENERATED from scripts/docs/ai_ignore_template.txt by scripts/sync_ai_ignores.sh
+# AUTO-GENERATED from scripts/docs/ai_ignore_template.txt
 # DO NOT EDIT BY HAND. To change exclusions, edit the template and re-run the sync.
-# Paths are relative to this file's location (technology_ninety_two_app/).
+# Paths are relative to this file's location (repo root).
 # ============================================================
 
 ${RULES_BODY}
