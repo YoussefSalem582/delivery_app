@@ -11,12 +11,18 @@ abstract class TripRepository {
     required double dropoffLat,
     required double dropoffLng,
     required double fare,
+    required String riderId,
     double? distanceKm,
     int? etaMinutes,
     String? paymentMethodKey,
     String? rideTierKey,
   });
   Future<TripEntity> updateTripStatus(String id, TripStatus status);
+  Future<TripEntity> updateDriverLocation(
+    String id, {
+    required double lat,
+    required double lng,
+  });
   Future<void> syncPendingChanges();
   List<TripEntity> getCachedTrips();
   int getPendingRetryCount(String tripId);

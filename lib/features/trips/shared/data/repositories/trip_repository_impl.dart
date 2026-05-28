@@ -6,9 +6,11 @@ import 'package:delivery_app/core/cache/datasources/pending_sync_local_datasourc
 import 'package:delivery_app/features/trips/shared/data/datasources/trip_local_datasource.dart';
 import 'package:delivery_app/features/trips/shared/data/datasources/trip_remote_datasource.dart';
 import 'package:delivery_app/core/cache/entities/pending_sync_entity.dart';
+import 'package:delivery_app/core/sync/driver_pending_sync_handler.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/repositories/trip_repository.dart';
 import 'package:delivery_app/core/network/network_status.dart';
+import 'package:delivery_app/core/sync/app_data_coordinator.dart';
 import 'package:delivery_app/core/utils/cache_freshness.dart';
 
 class TripRepositoryImpl implements TripRepository {
@@ -19,12 +21,14 @@ class TripRepositoryImpl implements TripRepository {
     required CacheMetadataLocalDataSource cacheMetadata,
     required NetworkStatus networkStatus,
     required Talker talker,
+    required AppDataCoordinator coordinator,
   })  : _local = local,
         _remote = remote,
         _pendingSync = pendingSync,
         _cacheMetadata = cacheMetadata,
         _networkStatus = networkStatus,
-        _talker = talker;
+        _talker = talker,
+        _coordinator = coordinator;
 
   final TripLocalDataSource _local;
   final TripRemoteDataSource _remote;
@@ -32,6 +36,7 @@ class TripRepositoryImpl implements TripRepository {
   final CacheMetadataLocalDataSource _cacheMetadata;
   final NetworkStatus _networkStatus;
   final Talker _talker;
+  final AppDataCoordinator _coordinator;
   final _uuid = const Uuid();
 
   @override
@@ -96,6 +101,11 @@ class TripRepositoryImpl implements TripRepository {
     }
   }
 
+  Future<void> _saveTrip(TripEntity trip) async {
+    await _local.save(trip);
+    _coordinator.notifyTripDataChanged();
+  }
+
   @override
   Future<TripEntity> requestTrip({
     required String pickupAddress,
@@ -105,6 +115,7 @@ class TripRepositoryImpl implements TripRepository {
     required double dropoffLat,
     required double dropoffLng,
     required double fare,
+    required String riderId,
     double? distanceKm,
     int? etaMinutes,
     String? paymentMethodKey,
@@ -121,6 +132,7 @@ class TripRepositoryImpl implements TripRepository {
       dropoffLat: dropoffLat,
       dropoffLng: dropoffLng,
       status: TripStatus.requested,
+      riderId: riderId,
       fare: fare,
       distanceKm: distanceKm,
       etaMinutes: etaMinutes,
@@ -131,7 +143,7 @@ class TripRepositoryImpl implements TripRepository {
       isPendingSync: true,
     );
 
-    await _local.save(optimisticTrip);
+    await _saveTrip(optimisticTrip);
     await _pendingSync.enqueueOrReplace(
       PendingSyncEntity(
         id: optimisticId,
@@ -143,10 +155,11 @@ class TripRepositoryImpl implements TripRepository {
 
     if (await _networkStatus.isOnline) {
       try {
-        final remote = await _remote.requestTrip(optimisticTrip.toJson());
+        final payload = optimisticTrip.toJson()..['riderId'] = riderId;
+        final remote = await _remote.requestTrip(payload);
         final synced = remote.copyWith(isPendingSync: false);
         await _local.delete(optimisticId);
-        await _local.save(synced);
+        await _saveTrip(synced);
         await _pendingSync.remove(optimisticId);
         return synced;
       } on DioException catch (e, st) {
@@ -170,7 +183,7 @@ class TripRepositoryImpl implements TripRepository {
       updatedAt: DateTime.now(),
       isPendingSync: true,
     );
-    await _local.save(updated);
+    await _saveTrip(updated);
     final queueId = 'status:$id';
     await _pendingSync.enqueueOrReplace(
       PendingSyncEntity(
@@ -185,7 +198,7 @@ class TripRepositoryImpl implements TripRepository {
       try {
         await _remote.updateStatus(id, status);
         final synced = updated.copyWith(isPendingSync: false);
-        await _local.save(synced);
+        await _saveTrip(synced);
         await _pendingSync.remove(queueId);
         return synced;
       } on DioException catch (e, st) {
@@ -197,11 +210,36 @@ class TripRepositoryImpl implements TripRepository {
   }
 
   @override
+  Future<TripEntity> updateDriverLocation(
+    String id, {
+    required double lat,
+    required double lng,
+  }) async {
+    final existing = _local.getById(id);
+    if (existing == null) {
+      throw StateError('Trip not found: $id');
+    }
+
+    final updated = existing.copyWith(
+      driverLat: lat,
+      driverLng: lng,
+      updatedAt: DateTime.now(),
+    );
+    await _saveTrip(updated);
+    return updated;
+  }
+
+  @override
   Future<void> syncPendingChanges() async {
     if (!await _networkStatus.isOnline) return;
 
     final pending = _pendingSync.getAll();
     for (final item in pending) {
+      if (DriverPendingSyncHandler.isDriverAction(item.action)) continue;
+      if (item.action == SyncAction.updateTripStatus &&
+          item.payload['driverOwned'] == true) {
+        continue;
+      }
       try {
         switch (item.action) {
           case SyncAction.createTrip:
@@ -218,7 +256,7 @@ class TripRepositoryImpl implements TripRepository {
             await _remote.updateStatus(tripId, status);
             final existing = _local.getById(tripId);
             if (existing != null) {
-              await _local.save(
+              await _saveTrip(
                 existing.copyWith(
                   status: status,
                   isPendingSync: false,
@@ -226,6 +264,11 @@ class TripRepositoryImpl implements TripRepository {
                 ),
               );
             }
+          case SyncAction.registerDriver:
+          case SyncAction.acceptTripOffer:
+          case SyncAction.updateDriverAvailability:
+          case SyncAction.updateDriverLocation:
+            break;
         }
         await _pendingSync.remove(item.id);
         _talker.info('[TripRepo] Synced pending item ${item.id}');

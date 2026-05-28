@@ -6,5 +6,7 @@ abstract class DriverRepository {
 
   Future<DriverEntity?> findByName(String name);
 
+  Future<DriverEntity?> findById(String id);
+
   Future<List<DriverReviewEntity>> getReviews(String driverId);
 }

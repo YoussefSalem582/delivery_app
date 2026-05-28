@@ -27,6 +27,15 @@ class DriverRepositoryImpl implements DriverRepository {
   }
 
   @override
+  Future<DriverEntity?> findById(String id) async {
+    final drivers = await getDrivers();
+    for (final driver in drivers) {
+      if (driver.id == id) return driver;
+    }
+    return null;
+  }
+
+  @override
   Future<List<DriverReviewEntity>> getReviews(String driverId) async {
     return _reviewRemote.fetchReviews(driverId);
   }
