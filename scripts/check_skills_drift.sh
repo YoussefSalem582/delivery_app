@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec "$(dirname "$0")/docs/check_skills_drift.sh" "$@"
+exec bash "$(dirname "$0")/docs/check_skills_drift.sh" "$@"
