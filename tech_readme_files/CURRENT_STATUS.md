@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 27, 2026 — Theme-aware PNG wordmark (light/dark) across in-app UI and native splash.
+> **Last Updated:** May 27, 2026 — Splash screen refactor with 2s minimum display and polished animations.
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)

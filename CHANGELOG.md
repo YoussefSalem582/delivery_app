@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Theme-aware wordmark** — in-app branding uses `assets/logo.png` (light mode) and `assets/logo_light.png` (dark mode) via `AppBrandIcon`; native splash matches with light/dark variants.
+- **Splash screen** — refactored UI (gradient background, staggered wordmark/loader animations, progress bar); enforces a 2-second minimum display before routing to home or onboarding.
 
 - **README** — refreshed with current feature set (Nominatim, per-km fares, two-phase tracking, native branding); hero logo switched to `assets/logo.png` at 560px width.
 

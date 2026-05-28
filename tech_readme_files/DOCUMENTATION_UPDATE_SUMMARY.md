@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-27 — Splash screen refactor (2s minimum)
+
+**What changed:** Refactored in-app splash into `SplashBackground`, `SplashContent`, and `SplashConfig`. Added gradient/dot background, staggered entrance animations, bottom progress bar, and a guaranteed 2-second minimum before auth-based navigation.
+
+**Files touched:** `lib/features/auth/splash/presentation/**`, `CHANGELOG.md`, `CURRENT_STATUS.md`, `DOCUMENTATION_UPDATE_SUMMARY.md`
+
+---
+
 ## 2026-05-27 — Theme-aware wordmark (PNG light/dark)
 
 **What changed:** Replaced in-app SVG wordmark with theme-aware PNG assets — `assets/logo.png` in light mode, `assets/logo_light.png` in dark mode. Updated `AppBrandIcon`, `AppAssets`, logo precache, `pubspec.yaml` assets, and `flutter_native_splash` dark-mode config. Removed unused `flutter_svg` dependency.
