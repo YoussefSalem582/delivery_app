@@ -46,7 +46,8 @@ import 'features/auth/shared/domain/usecases/register_usecase.dart';
 import 'features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'features/home/map_view/presentation/bloc/map_bloc.dart';
 import 'features/home/ride_request/presentation/cubit/location_search_cubit.dart';
-import 'features/home/shared/data/datasources/nominatim_remote_datasource.dart';
+import 'package:delivery_app/features/home/shared/data/datasources/nominatim_remote_datasource.dart';
+import 'package:delivery_app/features/home/shared/data/datasources/photon_remote_datasource.dart';
 import 'features/home/shared/data/datasources/saved_places_local_datasource.dart';
 import 'features/home/shared/data/repositories/geocoding_repository_impl.dart';
 import 'features/home/shared/domain/repositories/geocoding_repository.dart';
@@ -209,9 +210,10 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => RouteCacheLocalDataSource(sl()));
 
   sl.registerLazySingleton(() => NominatimRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => PhotonRemoteDataSource(sl()));
   sl.registerLazySingleton(() => SavedPlacesLocalDataSource(sl()));
   sl.registerLazySingleton<GeocodingRepository>(
-    () => GeocodingRepositoryImpl(remote: sl()),
+    () => GeocodingRepositoryImpl(nominatim: sl(), photon: sl()),
   );
 
   // ─── Repositories ────────────────────────────────────────────
