@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:delivery_app/core/sync/driver_pending_sync_handler.dart';
 import 'package:delivery_app/features/auth/shared/domain/repositories/auth_repository.dart';
 import 'package:delivery_app/features/profile/shared/domain/repositories/order_repository.dart';
 import 'package:delivery_app/features/trips/shared/domain/repositories/trip_repository.dart';
@@ -16,18 +17,21 @@ class SyncService {
     required AuthRepository authRepository,
     required NetworkStatus networkStatus,
     required Talker talker,
+    required DriverPendingSyncHandler driverPendingSyncHandler,
     this.onTripsChanged,
   })  : _tripRepository = tripRepository,
         _orderRepository = orderRepository,
         _authRepository = authRepository,
         _networkStatus = networkStatus,
-        _talker = talker;
+        _talker = talker,
+        _driverPendingSyncHandler = driverPendingSyncHandler;
 
   final TripRepository _tripRepository;
   final OrderRepository _orderRepository;
   final AuthRepository _authRepository;
   final NetworkStatus _networkStatus;
   final Talker _talker;
+  final DriverPendingSyncHandler _driverPendingSyncHandler;
   VoidCallback? onTripsChanged;
 
   StreamSubscription<bool>? _subscription;
@@ -56,6 +60,8 @@ class SyncService {
   }
 
   Future<void> syncAll() async {
+    await _driverPendingSyncHandler.syncPending();
+    await _driverPendingSyncHandler.syncDriverStatusUpdates();
     await _tripRepository.syncPendingChanges();
     await _orderRepository.getOrders(forceRefresh: true);
     await _authRepository.getProfile(forceRefresh: true);
