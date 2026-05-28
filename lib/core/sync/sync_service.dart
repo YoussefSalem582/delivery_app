@@ -38,17 +38,23 @@ class SyncService {
   bool _wasOffline = false;
 
   Future<void> init() async {
-    await Workmanager().initialize(callbackDispatcher);
-    await Workmanager().registerPeriodicTask(
-      AppConstants.workmanagerUniqueName,
-      AppConstants.workmanagerTaskName,
-      frequency: const Duration(minutes: 15),
-      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
-    );
+    if (!kIsWeb) {
+      await Workmanager().initialize(callbackDispatcher);
+      await Workmanager().registerPeriodicTask(
+        AppConstants.workmanagerUniqueName,
+        AppConstants.workmanagerTaskName,
+        frequency: const Duration(minutes: 15),
+        existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+      );
+    }
 
     _wasOffline = !(await _networkStatus.isOnline);
     _subscription = _networkStatus.onOnlineChanged.listen(_onOnlineChanged);
-    _talker.info('[SyncService] Initialized with WorkManager + connectivity listener');
+    _talker.info(
+      kIsWeb
+          ? '[SyncService] Initialized with connectivity listener (web)'
+          : '[SyncService] Initialized with WorkManager + connectivity listener',
+    );
   }
 
   Future<void> _onOnlineChanged(bool isOnline) async {
