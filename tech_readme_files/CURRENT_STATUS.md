@@ -2,7 +2,7 @@
 
 > [INDEX](INDEX.md) > Current Status
 >
-> **Last Updated:** May 28, 2026 — Driver active trip unified with rider live tracking (`TrackingBloc` driver mode).
+> **Last Updated:** May 28, 2026 — Driver offer route preview + passenger sheet on active trip.
 
 > **Version:** `1.0.0+1`
 > **Flutter:** 3.16+ (SDK ^3.12.0)
@@ -33,14 +33,14 @@ Nokta is a Flutter ride-hailing / delivery MVP template with Clean Architecture 
 | Notifications | ✅ Demo complete (typed inbox, All/Trip/Messages/Calls + Unread filters, live trip status chip, chat/call notifications, swipe delete + undo, mark-all-read, nav badge) |
 | Profile / orders | ✅ Demo complete (wallet top-up, edit name, order details) |
 | Settings (theme, locale, driver mode) | ✅ Complete (shared `AppModeSwitchTile`, `LogoutButton`, `performAppLogout`) |
-| Driver mode (shell, offers, jobs, active trip) | ✅ Demo complete (active trip uses shared `TrackingBloc` / `LiveTrackingPage` with driver status actions) |
+| Driver mode (shell, offers, jobs, active trip) | ✅ Demo complete (offer map preview with passenger sheet; active trip uses shared `TrackingBloc` / `LiveTrackingPage`) |
 | Real backend integration | 🚧 Mock API only |
 | Production auth (secure storage) | 🚧 Planned |
 | Payments / wallet (real) | 🚧 Demo top-up only (Hive-local) |
 
 ## Testing
 
-- `flutter test` — 67 tests including bloc/cubit tests, `TrackingBloc` driver mode, `SwitchAppModeUseCase`, entity Hive round-trip, trip query filters
+- `flutter test` — 72 tests including `GetRiderForTripUseCase`, `DriverOfferPreviewCubit`, `TrackingBloc` driver rider fields, `SwitchAppModeUseCase`, entity Hive round-trip, trip query filters
 
 ## Documentation
 

@@ -10,6 +10,7 @@ import 'package:delivery_app/features/trips/shared/domain/entities/driver_entity
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_payment.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
+import 'package:delivery_app/features/trips/shared/domain/usecases/get_rider_for_trip_usecase.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -26,6 +27,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
     required RouteService routeService,
     required GetTripDetailUseCase getTripDetail,
     required GetDriverForTripUseCase getDriverForTrip,
+    required GetRiderForTripUseCase getRiderForTrip,
     required UpdateTripStatusUseCase updateTripStatus,
     required DriverTripRepository driverTripRepository,
     required AuthRepository authRepository,
@@ -34,6 +36,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
   })  : _routeService = routeService,
         _getTripDetail = getTripDetail,
         _getDriverForTrip = getDriverForTrip,
+        _getRiderForTrip = getRiderForTrip,
         _updateTripStatus = updateTripStatus,
         _driverTripRepository = driverTripRepository,
         _authRepository = authRepository,
@@ -50,6 +53,7 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
   final RouteService _routeService;
   final GetTripDetailUseCase _getTripDetail;
   final GetDriverForTripUseCase _getDriverForTrip;
+  final GetRiderForTripUseCase _getRiderForTrip;
   final UpdateTripStatusUseCase _updateTripStatus;
   final DriverTripRepository _driverTripRepository;
   final AuthRepository _authRepository;
@@ -109,6 +113,24 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
       ),
     );
     driverResult.fold((_) {}, (value) => driver = value);
+
+    double? riderRating;
+    String? riderName;
+    String? riderPhone;
+    String? riderAvatarUrl;
+    if (_role == TrackingRole.driver) {
+      final riderResult = await _getRiderForTrip(
+        GetRiderForTripParams(riderId: activeTrip.riderId),
+      );
+      riderResult.fold((_) {}, (rider) {
+        if (rider != null) {
+          riderName = rider.name;
+          riderPhone = rider.phone;
+          riderAvatarUrl = rider.avatarUrl;
+          riderRating = rider.rating;
+        }
+      });
+    }
 
     final pickup = LatLng(activeTrip.pickupLat, activeTrip.pickupLng);
     final dropoff = LatLng(activeTrip.dropoffLat, activeTrip.dropoffLng);
@@ -170,6 +192,10 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
           driverVehicle: driverVehicle,
           driverPhone: driverPhone,
           role: _role,
+          riderName: riderName,
+          riderPhone: riderPhone,
+          riderAvatarUrl: riderAvatarUrl,
+          riderRating: riderRating,
         ),
       );
 
@@ -295,6 +321,10 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
           driverRating: current.driverRating,
           driverVehicle: current.driverVehicle,
           driverPhone: current.driverPhone,
+          riderName: current.riderName,
+          riderPhone: current.riderPhone,
+          riderAvatarUrl: current.riderAvatarUrl,
+          riderRating: current.riderRating,
         ),
       );
       return;
@@ -401,6 +431,10 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
             driverVehicle: current.driverVehicle,
             driverPhone: current.driverPhone,
             role: current.role,
+            riderName: current.riderName,
+            riderPhone: current.riderPhone,
+            riderAvatarUrl: current.riderAvatarUrl,
+            riderRating: current.riderRating,
           ),
         );
       } else {
@@ -517,6 +551,11 @@ class TrackingBloc extends Bloc<TrackingEvent, TrackingState> {
             driverRating: current.driverRating,
             driverVehicle: current.driverVehicle,
             driverPhone: current.driverPhone,
+            role: current.role,
+            riderName: current.riderName,
+            riderPhone: current.riderPhone,
+            riderAvatarUrl: current.riderAvatarUrl,
+            riderRating: current.riderRating,
           ),
         );
         return;

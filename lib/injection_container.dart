@@ -71,17 +71,21 @@ import 'features/settings/presentation/cubit/settings_cubit.dart';
 import 'features/trips/shared/data/datasources/chat_local_datasource.dart';
 import 'features/trips/shared/data/datasources/driver_remote_datasource.dart';
 import 'features/trips/shared/data/datasources/driver_review_remote_datasource.dart';
+import 'features/trips/shared/data/datasources/rider_remote_datasource.dart';
 import 'features/trips/shared/data/datasources/trip_local_datasource.dart';
 import 'features/trips/shared/data/datasources/trip_remote_datasource.dart';
 import 'features/trips/shared/data/repositories/chat_repository_impl.dart';
 import 'features/trips/shared/data/repositories/driver_repository_impl.dart';
+import 'features/trips/shared/data/repositories/rider_repository_impl.dart';
 import 'features/trips/shared/data/repositories/trip_repository_impl.dart';
 import 'features/trips/shared/domain/repositories/chat_repository.dart';
 import 'features/trips/shared/domain/repositories/driver_repository.dart';
+import 'features/trips/shared/domain/repositories/rider_repository.dart';
 import 'features/trips/shared/domain/repositories/trip_repository.dart';
 import 'features/trips/shared/domain/usecases/chat_usecases.dart';
 import 'features/trips/shared/domain/usecases/get_driver_reviews_usecase.dart';
 import 'features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
+import 'features/trips/shared/domain/usecases/get_rider_for_trip_usecase.dart';
 import 'features/trips/driver_chat/presentation/bloc/driver_chat_bloc.dart';
 import 'features/trips/driver_call/presentation/bloc/driver_call_bloc.dart';
 import 'features/trips/driver_profile/presentation/bloc/driver_profile_bloc.dart';
@@ -191,6 +195,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => TripLocalDataSource(sl()));
   sl.registerLazySingleton(() => TripRemoteDataSource(sl()));
   sl.registerLazySingleton(() => DriverRemoteDataSource(sl()));
+  sl.registerLazySingleton(() => RiderRemoteDataSource(sl()));
   sl.registerLazySingleton(() => DriverReviewRemoteDataSource(sl()));
   sl.registerLazySingleton(() => ChatLocalDataSource(sl()));
   sl.registerLazySingleton(() => OrderLocalDataSource(sl()));
@@ -243,6 +248,9 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<DriverRepository>(
     () => DriverRepositoryImpl(sl(), sl()),
   );
+  sl.registerLazySingleton<RiderRepository>(
+    () => RiderRepositoryImpl(sl()),
+  );
   sl.registerLazySingleton<ChatRepository>(
     () => ChatRepositoryImpl(local: sl()),
   );
@@ -281,6 +289,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton(() => GetTripDetailUseCase(sl()));
   sl.registerLazySingleton(() => GetCachedTripDetailUseCase(sl()));
   sl.registerLazySingleton(() => GetDriverForTripUseCase(sl()));
+  sl.registerLazySingleton(() => GetRiderForTripUseCase(sl()));
   sl.registerLazySingleton(() => GetDriverReviewsUseCase(sl()));
   sl.registerLazySingleton(() => UpdateTripStatusUseCase(sl()));
   sl.registerLazySingleton(() => RequestTripUseCase(sl(), sl()));
@@ -389,6 +398,7 @@ Future<void> initDependencies() async {
       routeService: sl(),
       getTripDetail: sl(),
       getDriverForTrip: sl(),
+      getRiderForTrip: sl(),
       updateTripStatus: sl(),
       driverTripRepository: sl(),
       authRepository: sl(),

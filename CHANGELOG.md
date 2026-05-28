@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Driver active trip uses live tracking system** — driver active trip now shares `TrackingBloc`, `LiveTrackingPage`, OSRM two-leg route geometry, traveled/remaining polylines, animated marker, and `TrackingBottomSheet` with rider tracking; driver status actions (arrived/start/complete) and location publish live in `TrackingBloc` driver mode; removed `DriverActiveTripBloc`.
 
+- **Driver offer preview map UX** — tapping an offer opens a full-screen OSRM route preview with passenger bottom sheet (name, rating, chat/call) and accept/decline actions; active-trip driver sheet now shows `TrackingRiderRow`; added `RiderEntity`, `riders.json` mock, and `GetRiderForTripUseCase`.
+
 - **Driver/passenger widget deduplication (phase 2)** — passenger profile uses shared `ProfileUserCard` (hero variant), `StatSummaryCard` (wallet), `AppModeSwitchTile`, and `performAppLogout`; `NotificationShellScaffold` unifies passenger/driver bottom nav; notifications tab uses `ShellTabScaffold`; `MapTripScaffold` + `MapOverlayAppBar` shared by rider tracking and driver active trip; inline empty states migrated to `EmptyStateView`.
 
 - **Shared driver/passenger UI** — extracted `ShellTabAppBar`, `ShellTabScaffold`, `EmptyStateView`, `SectionHeader`, `AppBarRefreshIconButton`, `TripAccentCard`, `ActiveTripSection`, `ProfileUserCard`, `StatSummaryCard`, and `LogoutButton`; driver tabs now reuse the same shell, trip, empty-state, and profile widgets as passenger screens; removed duplicate always-visible `OfflineBanner` (app-wide `GlobalOfflineBanner` handles offline).

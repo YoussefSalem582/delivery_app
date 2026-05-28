@@ -5,6 +5,7 @@ import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_met
 import 'package:delivery_app/features/trips/shared/presentation/widgets/trip_widgets.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/widgets/tracking_driver_row.dart';
+import 'package:delivery_app/features/trips/tracking/presentation/widgets/tracking_rider_row.dart';
 import 'package:delivery_app/shared/spacing/app_spacing.dart';
 import 'package:delivery_app/shared/widgets/buttons/app_button.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -144,6 +145,15 @@ class _ActiveSheet extends StatelessWidget {
               rating: active.driverRating ?? active.trip.driverRating,
               vehicle: active.driverVehicle ?? active.trip.driverVehicle,
               phone: active.driverPhone ?? active.trip.driverPhone,
+            ),
+          ],
+          if (isDriver) ...[
+            TrackingRiderRow(
+              tripId: tripId,
+              riderName: active.riderName ?? 'passenger'.tr(),
+              avatarUrl: active.riderAvatarUrl,
+              rating: active.riderRating,
+              phone: active.riderPhone,
             ),
           ],
           TripMetaRow(trip: active.trip, compact: true),

@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-05-28 — Driver offer preview + passenger sheet
+
+**What changed:** Offer cards open `DriverOfferPreviewPage` (OSRM route map, passenger info, accept/decline); `TrackingRiderRow` on driver active-trip sheet; `RiderEntity` + `GetRiderForTripUseCase` + `assets/mock/riders.json`.
+
+**Files touched:** `lib/features/driver/offers/**`, `lib/features/trips/shared/**`, `lib/features/trips/tracking/**`, `lib/features/driver/home/**`, `assets/mock/riders.json`, `assets/translations/*`, tests
+
+---
+
 ## 2026-05-28 — Driver active trip unified with live tracking
 
 **What changed:** Driver active trip uses shared `LiveTrackingPage` + `TrackingBloc` driver mode (OSRM route, animated marker, bottom sheet ETA/phase, driver status buttons, location publish); `DriverActiveTripPage` is a thin wrapper; `DriverActiveTripBloc` removed from DI.

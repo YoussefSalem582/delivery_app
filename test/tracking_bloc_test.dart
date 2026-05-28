@@ -9,7 +9,9 @@ import 'package:delivery_app/features/driver/shared/domain/repositories/driver_t
 import 'package:delivery_app/features/notifications/shared/domain/entities/notification_type.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/driver_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/entities/trip_entity.dart';
+import 'package:delivery_app/features/trips/shared/domain/entities/rider_entity.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/get_driver_for_trip_usecase.dart';
+import 'package:delivery_app/features/trips/shared/domain/usecases/get_rider_for_trip_usecase.dart';
 import 'package:delivery_app/features/trips/shared/domain/usecases/trip_usecases.dart';
 import 'package:delivery_app/features/trips/tracking/presentation/bloc/tracking_bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -23,6 +25,9 @@ class MockGetTripDetailUseCase extends Mock implements GetTripDetailUseCase {}
 
 class MockGetDriverForTripUseCase extends Mock
     implements GetDriverForTripUseCase {}
+
+class MockGetRiderForTripUseCase extends Mock
+    implements GetRiderForTripUseCase {}
 
 class MockUpdateTripStatusUseCase extends Mock
     implements UpdateTripStatusUseCase {}
@@ -58,6 +63,13 @@ const _driver = DriverEntity(
   vehicle: 'Hyundai Elantra - Silver',
   lat: 30.055,
   lng: 31.245,
+);
+
+const _rider = RiderEntity(
+  id: 'user-rider-demo',
+  name: 'Sara Ali',
+  phone: '+201112223344',
+  rating: 4.9,
 );
 
 TripRoutePlan _sampleRoutePlan({
@@ -102,6 +114,7 @@ void main() {
   late MockRouteService routeService;
   late MockGetTripDetailUseCase getTripDetail;
   late MockGetDriverForTripUseCase getDriverForTrip;
+  late MockGetRiderForTripUseCase getRiderForTrip;
   late MockUpdateTripStatusUseCase updateTripStatus;
   late MockAuthRepository authRepository;
   late MockFcmService fcmService;
@@ -112,6 +125,7 @@ void main() {
     registerFallbackValue(const GetTripDetailParams(''));
     registerFallbackValue(NotificationType.tripAccepted);
     registerFallbackValue(const GetDriverForTripParams(driverName: 'x'));
+    registerFallbackValue(const GetRiderForTripParams(riderId: 'x'));
     registerFallbackValue(
       const UpdateTripStatusParams(
         tripId: '',
@@ -125,6 +139,7 @@ void main() {
     routeService = MockRouteService();
     getTripDetail = MockGetTripDetailUseCase();
     getDriverForTrip = MockGetDriverForTripUseCase();
+    getRiderForTrip = MockGetRiderForTripUseCase();
     updateTripStatus = MockUpdateTripStatusUseCase();
     authRepository = MockAuthRepository();
     fcmService = MockFcmService();
@@ -147,6 +162,9 @@ void main() {
 
     when(() => getDriverForTrip(any())).thenAnswer(
       (_) async => const Right(_driver),
+    );
+    when(() => getRiderForTrip(any())).thenAnswer(
+      (_) async => const Right(_rider),
     );
     when(() => updateTripStatus(any())).thenAnswer(
       (invocation) async {
@@ -186,6 +204,7 @@ void main() {
       routeService: routeService,
       getTripDetail: getTripDetail,
       getDriverForTrip: getDriverForTrip,
+      getRiderForTrip: getRiderForTrip,
       updateTripStatus: updateTripStatus,
       driverTripRepository: driverTripRepository,
       authRepository: authRepository,
@@ -364,6 +383,37 @@ void main() {
       isA<TrackingLoading>(),
       isA<TrackingError>(),
     ],
+  );
+
+  blocTest<TrackingBloc, TrackingState>(
+    'driver mode load includes rider profile fields',
+    build: () {
+      when(() => getTripDetail(any())).thenAnswer(
+        (_) async => Right(
+          _sampleTrip(status: TripStatus.accepted).copyWith(
+            riderId: 'user-rider-demo',
+            driverId: 'driver-002',
+          ),
+        ),
+      );
+      return buildBloc();
+    },
+    act: (bloc) => bloc.add(
+      const TrackingLoadRequested(
+        '1',
+        role: TrackingRole.driver,
+      ),
+    ),
+    expect: () => [
+      isA<TrackingLoading>(),
+      isA<TrackingActive>(),
+    ],
+    verify: (bloc) {
+      final active = bloc.state as TrackingActive;
+      expect(active.riderName, 'Sara Ali');
+      expect(active.riderPhone, '+201112223344');
+      expect(active.riderRating, 4.9);
+    },
   );
 
   blocTest<TrackingBloc, TrackingState>(

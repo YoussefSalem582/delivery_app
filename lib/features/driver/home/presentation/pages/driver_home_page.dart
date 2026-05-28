@@ -3,6 +3,7 @@ import 'package:delivery_app/core/network/connectivity_cubit.dart';
 import 'package:delivery_app/core/network/connectivity_state.dart';
 import 'package:delivery_app/features/auth/shared/presentation/bloc/auth_bloc.dart';
 import 'package:delivery_app/features/driver/active_trip/presentation/pages/driver_active_trip_page.dart';
+import 'package:delivery_app/features/driver/offers/presentation/pages/driver_offer_preview_page.dart';
 import 'package:delivery_app/features/driver/jobs/presentation/bloc/driver_jobs_bloc.dart';
 import 'package:delivery_app/features/driver/offers/presentation/bloc/driver_offers_bloc.dart';
 import 'package:delivery_app/features/driver/shared/domain/entities/driver_availability.dart';
@@ -332,38 +333,32 @@ class _OfferCard extends StatelessWidget {
   final TripEntity trip;
   final bool isBusy;
 
+  void _openPreview(BuildContext context) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => DriverOfferPreviewPage(trip: trip),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TripHeroCard(trip: trip),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isBusy ? null : () => _openPreview(context),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            child: TripHeroCard(trip: trip),
+          ),
+        ),
         const SizedBox(height: AppSpacing.sm),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton(
-                onPressed: isBusy
-                    ? null
-                    : () => context.read<DriverOffersBloc>().add(
-                        DriverOffersDeclineRequested(tripId: trip.id),
-                      ),
-                child: Text('driver_decline_offer'.tr()),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: AppButton(
-                label: 'driver_accept_offer'.tr(),
-                loading: isBusy,
-                onPressed: isBusy
-                    ? null
-                    : () => context.read<DriverOffersBloc>().add(
-                        DriverOffersAcceptRequested(tripId: trip.id),
-                      ),
-              ),
-            ),
-          ],
+        AppButton(
+          label: 'driver_view_offer'.tr(),
+          icon: Icons.map_outlined,
+          onPressed: isBusy ? null : () => _openPreview(context),
         ),
       ],
     );

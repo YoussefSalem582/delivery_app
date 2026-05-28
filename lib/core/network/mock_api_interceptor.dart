@@ -106,6 +106,10 @@ class MockApiInterceptor extends Interceptor {
       return _ok(options, _store.drivers);
     }
 
+    if (method == 'GET' && path == ApiEndpoints.riders) {
+      return _ok(options, _store.riders);
+    }
+
     if (method == 'GET' &&
         path.startsWith('/drivers/') &&
         path.endsWith('/reviews')) {

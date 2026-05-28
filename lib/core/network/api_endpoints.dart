@@ -6,6 +6,7 @@ class ApiEndpoints {
   static const orders = '/orders';
   static const profile = '/profile';
   static const drivers = '/drivers';
+  static const riders = '/riders';
   static const requestTrip = '/trips/request';
 
   static String get driverRegister => _driverPath('/register');

@@ -12,6 +12,7 @@ class MockApiStore {
   Map<String, dynamic>? _profile;
   List<Map<String, dynamic>> _trips = [];
   List<Map<String, dynamic>> _drivers = [];
+  List<Map<String, dynamic>> _riders = [];
   final Set<String> _declinedOfferIds = {};
   DriverAvailabilityState _availability = DriverAvailabilityState.offline;
 
@@ -25,6 +26,9 @@ class MockApiStore {
     _drivers = (await _loadJsonList('assets/mock/drivers.json'))
         .cast<Map<String, dynamic>>()
         .toList();
+    _riders = (await _loadJsonList('assets/mock/riders.json'))
+        .cast<Map<String, dynamic>>()
+        .toList();
     _initialized = true;
   }
 
@@ -33,6 +37,7 @@ class MockApiStore {
     _profile = null;
     _trips = [];
     _drivers = [];
+    _riders = [];
     _declinedOfferIds.clear();
     _availability = DriverAvailabilityState.offline;
   }
@@ -46,6 +51,9 @@ class MockApiStore {
 
   List<Map<String, dynamic>> get drivers =>
       _drivers.map(Map<String, dynamic>.from).toList();
+
+  List<Map<String, dynamic>> get riders =>
+      _riders.map(Map<String, dynamic>.from).toList();
 
   DriverAvailabilityState get availability => _availability;
 
