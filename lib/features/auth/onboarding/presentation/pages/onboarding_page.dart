@@ -106,7 +106,8 @@ class _OnboardingPageState extends State<OnboardingPage>
       return;
     }
 
-    if (_currentPage == 0 && _logoMoveController.value == 0) {
+    if (_currentPage == 0 &&
+        _logoMoveController.value <= _logoAtCenterThreshold) {
       await _animateLogoToTop();
       if (!mounted) return;
     }
@@ -124,8 +125,9 @@ class _OnboardingPageState extends State<OnboardingPage>
         _logoMoveController.value <= _logoAtCenterThreshold;
     final showCenterHero =
         _currentPage == 0 && logoAtCenter && !_logoHandoffToOverlay;
-    final showOverlayLogo =
-        _logoHandoffToOverlay || _logoMoveController.value > _logoAtCenterThreshold;
+    final showOverlayLogo = _currentPage > 0 ||
+        _logoHandoffToOverlay ||
+        _logoMoveController.value > _logoAtCenterThreshold;
 
     return Scaffold(
       backgroundColor: scheme.surface,
